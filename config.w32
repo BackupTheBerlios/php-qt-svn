@@ -1,0 +1,13 @@
+// $Id$
+// vim:ft=javascript
+
+// If your extension references something external, use ARG_WITH
+// ARG_WITH("php_qt", "for php_qt support", "no");
+
+// Otherwise, use ARG_ENABLE
+// ARG_ENABLE("php_qt", "enable php_qt support", "no");
+
+if (PHP_PHP_QT != "no") {
+	EXTENSION("php_qt", "php_qt.c");
+}
+
