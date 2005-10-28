@@ -126,20 +126,20 @@ distclean: clean
 .PHONY: all clean install distclean test
 .NOEXPORT:
 
-main_window.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/main_window.cpp
-	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/main_window.cpp -o main_window.lo 
+main_window.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/main_window/*.cpp
+	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/main_window/*.cpp -o main_window.lo 
 
-abstract_widgets.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/abstract_widgets.cpp
-	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/abstract_widgets.cpp -o abstract_widgets.lo 
+abstract_widgets.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/abstract_widgets/*.cpp
+	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/abstract_widgets/*.cpp -o abstract_widgets.lo 
 
-object_model.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/object_model.cpp
-	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/object_model.cpp -o object_model.lo 
+object_model.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/object_model/*.cpp
+	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/object_model/*.cpp -o object_model.lo 
 
-text_related.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/text_related.cpp
-	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/text_related.cpp -o text_related.lo 
+text_related.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/text_related/*.cpp
+	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/text_related/*.cpp -o text_related.lo 
 
-basic_widgets.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/basic_widgets.cpp
-	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/basic_widgets.cpp -o basic_widgets.lo 
+basic_widgets.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/basic_widgets/*.cpp
+	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/basic_widgets/*.cpp -o basic_widgets.lo 
 
 php_qt.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/php_qt.cpp
 	$(LIBTOOL) --mode=compile $(CC)  -g -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) -prefer-pic -c  /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/php_qt.cpp  -o php_qt.lo 

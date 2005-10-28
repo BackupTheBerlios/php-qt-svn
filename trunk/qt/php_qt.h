@@ -22,8 +22,8 @@
 #define debug
 #define object_hash_list
 
+#include <QTextStream>
 #define QOUT()                                              \
-#include <QTextStream>                                      \
     extern QTextStream qout(stdout, QIODevice::WriteOnly);  \
 
 #ifndef NOT_YET_IMPLEMENTED
