@@ -49,11 +49,11 @@ ZEND_METHOD(QAbstractButton,__construct){
     }
 }
 
-PHP_QT_SIMPLE_METHOD(QAbstractButton,autoExclusive,RETURN_BOOL);
-PHP_QT_SIMPLE_METHOD(QAbstractButton,autoRepeat,RETURN_BOOL);
-PHP_QT_SIMPLE_METHOD(QAbstractButton,isCheckable,RETURN_BOOL);
-PHP_QT_SIMPLE_METHOD(QAbstractButton,isChecked,RETURN_BOOL);
-PHP_QT_SIMPLE_METHOD(QAbstractButton,isDown,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QAbstractButton,autoExclusive,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QAbstractButton,autoRepeat,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QAbstractButton,isCheckable,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QAbstractButton,isChecked,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QAbstractButton,isDown,RETURN_BOOL);
 
 PHP_QT_ABSTRACT_SETBOOL_METHOD(QAbstractButton,setAutoExclusive,QPushButton,"autoExclusive");
 PHP_QT_ABSTRACT_SETBOOL_METHOD(QAbstractButton,setAutoRepeat,QPushButton,"autoRepeat");
