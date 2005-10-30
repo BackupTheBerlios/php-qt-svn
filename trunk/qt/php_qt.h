@@ -1,7 +1,7 @@
 /*
  * PHP-Qt - The PHP language bindings for Qt
  *
- * Copyright (C) 2005 Thomas Moenicke <tm@ippfp.org>
+ * Copyright (C) 2005 Thomas Moenicke <tm@ippfp.org>, Jean-Luc Gyger <jean_luc.gyger@freesurf.ch>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -65,6 +65,17 @@ ZEND_METHOD(classname,function){                            \
 ZEND_METHOD(classname,function){                            \
     classname *o = (classname*) PHP_QT_FETCH();             \
     returntype(o->function());                              \
+}                                                           \
+
+#define PHP_QT_STATIC_METHOD(classname, function)           \
+ZEND_METHOD(classname,function){                            \
+    zval *id;                                               \
+    id = getThis();                                         \
+    if(id != NULL){                                         \
+        classname *o = (classname*) id;                     \
+        o->function();                                      \
+    } else classname::function();                           \
+    RETURN_NULL();                                          \
 }                                                           \
 
 #define PHP_QT_SETBOOL_METHOD(classname,function)                        \
@@ -134,8 +145,6 @@ void _register_QApplication();
 void _register_QWidget();
 void _register_QAbstractButton();
 void _register_QPushButton();
-
-
 
 
 
