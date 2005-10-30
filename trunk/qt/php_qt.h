@@ -78,6 +78,17 @@ ZEND_METHOD(classname,function){                            \
     RETURN_NULL();                                          \
 }                                                           \
 
+#define PHP_QT_STATIC_RETURN_METHOD(classname, function, returntype)  \
+ZEND_METHOD(classname,function){                            \
+  zval *id;                                                 \
+  id = getThis();                                           \
+  if(id != NULL){                                           \
+    classname *o = (classname*) id;                         \
+    returntype(o->function());                              \
+  } else                                                    \
+    returntype(classname::function());                      \
+  }                                                         \
+
 #define PHP_QT_SETBOOL_METHOD(classname,function)                        \
 ZEND_METHOD(classname,function){                                                \
     type *b;                                                                    \
