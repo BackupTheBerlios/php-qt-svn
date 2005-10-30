@@ -78,6 +78,41 @@ ZEND_METHOD(classname,function){                            \
     RETURN_NULL();                                          \
 }                                                           \
 
+//add by Gyger Jean-Luc
+#define PHP_QT_SETBOOL_STATIC_METHOD(classname, function)						\
+ZEND_METHOD(classname,function){												\
+	zval *id;																	\
+    zend_bool b;                                                            	\
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) {	\
+            return;                                                             \
+    }                                                                           \
+	id = getThis();																\
+	if(id != NULL){																\
+	    classname *o = (classname*) id;											\
+		o->function(b);															\
+	}else																		\
+		classname::function(b);													\
+	RETURN_NULL()																\
+}																				\
+
+//add by Gyger Jean-Luc
+#define PHP_QT_SETLONG_STATIC_METHOD(classname, function)						\
+ZEND_METHOD(classname,function){												\
+	zval *id;																	\
+    long l;                                                                    	\
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&l) == FAILURE) {    \
+            return;                                                             \
+    }                                                                           \
+	id = getThis();																\
+	if(id != NULL){																\
+	    classname *o = (classname*) id;											\
+		o->function(l);															\
+	}else																		\
+		classname::function(l);													\
+	RETURN_NULL()																\
+}																				\
+
+
 #define PHP_QT_STATIC_RETURN_METHOD(classname, function, returntype)  \
 ZEND_METHOD(classname,function){                            \
   zval *id;                                                 \

@@ -391,9 +391,34 @@ void _register_QAbstractButton(TSRMLS_D)
 static zend_function_entry QApplication_methods[] = {
  
     ZEND_ME(QApplication,__construct,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QApplication,exec,NULL,ZEND_ACC_PUBLIC)
-    
-    {NULL,NULL,NULL}
+//	ZEND_ME(QApplication, activeModalWidget, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+	ZEND_ME(QApplication, aboutQt, NULL, ZEND_ACC_PUBLIC) //add by Gyger Jean-Luc
+	ZEND_ME(QApplication, closeAllWindows, NULL, ZEND_ACC_PUBLIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication,exec,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) // modif for static call, Gyger Jean-Luc
+	ZEND_ME(QApplication, beep, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc    
+  	ZEND_ME(QApplication, colorSpec, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, cursorFlashTime, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, desktopSettingsAware, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, doubleClickInterval, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, isLeftToRight, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, isRightToLeft, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, keyboardInputInterval, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, quitOnLastWindowClosed, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, restoreOverrideCursor, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+  	ZEND_ME(QApplication, setDesktopSettingsAware, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, setColorSpec, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, setCursorFlashTime, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, setDoubleClickInterval, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, setKeyboardInputInterval, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, setQuitOnLastWindowClosed, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, setStartDragDistance, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, setStartDragTime, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, setWheelScrollLines, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, startDragDistance, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, startDragTime, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, syncX, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, wheelScrollLines, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+	{NULL,NULL,NULL}
 
 };
 

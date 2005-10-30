@@ -81,8 +81,71 @@ ZEND_METHOD(QString,compare);
 ZEND_METHOD(QLatin1String,__construct);
 ZEND_METHOD(QLatin1String,latin1);
 
+//public members
 ZEND_METHOD(QApplication,__construct);
+//public slots
+ZEND_METHOD(QApplication,aboutQt); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,closeAllWindows); // add by Gyger Jean-Luc
+//static public members
 ZEND_METHOD(QApplication,exec);
+ZEND_METHOD(QApplication,beep); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,colorSpec); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,cursorFlashTime); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,desktopSettingsAware); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,doubleClickInterval); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,isLeftToRight); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,isRightToLeft); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,keyboardInputInterval); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,quitOnLastWindowClosed); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,restoreOverrideCursor); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,setDesktopSettingsAware); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,setColorSpec); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,setCursorFlashTime); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,setDoubleClickInterval); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,setKeyboardInputInterval); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,setQuitOnLastWindowClosed); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,setStartDragDistance); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,setStartDragTime); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,setWheelScrollLines); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,startDragDistance); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,startDragTime); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,syncX); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,wheelScrollLines); // add by Gyger Jean-Luc
+/*//ZEND_METHOD(QApplication,activeModalWidget); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,activePopupWidget); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,activeWindow); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,allWidgets); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,changeOverrideCursor); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,clipboard); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,desktop); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,focusWidget); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,font); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,fontMetrics); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,globalStrut); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,isEffectEnabled); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,keyboardModifiers); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,layoutDirection); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,mouseButton); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,overrideCursor); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,palette); // WARNING 3 implementations, add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,qwsDecoration); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,qwsSetDecoration); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,setActiveWindow); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,setEffectEnabled); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,setFont); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,setGlobalStrut); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,setLayoutDirection); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,setOverrideCursor); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,setPalette); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,setStyle); //WARNING 2 imlementation, add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,setWindowIcon); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,style); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,topLevelAt); //WARNING 2 imlementation, add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,topLevelWidgets); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,type); // add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,widgetAt); //WARNING 2 imlementation, add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,windowIcon); //add by Gyger Jean-Luc
+*/
 
 ZEND_METHOD(QAbstractButton,__construct);
 ZEND_METHOD(QAbstractButton,autoExclusive);
