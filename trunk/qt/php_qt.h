@@ -54,13 +54,20 @@
 
 #define PHP_QT_FETCH() php_qt_fetch(getThis())
 
-#define PHP_QT_SIMPLE_METHOD(classname,function,returntype) \
+#define PHP_QT_METHOD(classname,function)                   \
+ZEND_METHOD(classname,function){                            \
+    classname *o = (classname*) PHP_QT_FETCH();             \
+    o->function();                                          \
+    RETURN_NULL();                                          \
+}                                                           \
+
+#define PHP_QT_RETURN_METHOD(classname,function,returntype) \
 ZEND_METHOD(classname,function){                            \
     classname *o = (classname*) PHP_QT_FETCH();             \
     returntype(o->function());                              \
 }                                                           \
 
-#define PHP_QT_SIMPLE_SETBOOL_METHOD(classname,function)                        \
+#define PHP_QT_SETBOOL_METHOD(classname,function)                        \
 ZEND_METHOD(classname,function){                                                \
     type *b;                                                                    \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) {    \

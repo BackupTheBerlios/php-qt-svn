@@ -14,50 +14,32 @@ dnl [  --with-php_qt             Include php_qt support])
 dnl Otherwise use enable:
 
 PHP_ARG_ENABLE(php_qt, whether to enable php_qt support,
-Make sure that the comment is aligned:
+dnl Make sure that the comment is aligned:
 [  --enable-php_qt           Enable php_qt support])
 
 if test "$PHP_PHP_QT" != "no"; then
-  dnl Write more examples of tests here...
 
-  dnl # --with-php_qt -> check with-path
-  dnl SEARCH_PATH="/usr/local /usr"     # you might want to change this
-  dnl SEARCH_FOR="/include/php_qt.h"  # you most likely want to change this
-  dnl if test -r $PHP_PHP_QT/$SEARCH_FOR; then # path given as parameter
-  dnl   PHP_QT_DIR=$PHP_PHP_QT
-  dnl else # search default path list
-  dnl   AC_MSG_CHECKING([for php_qt files in default path])
-  dnl   for i in $SEARCH_PATH ; do
-  dnl     if test -r $i/$SEARCH_FOR; then
-  dnl       PHP_QT_DIR=$i
-  dnl       AC_MSG_RESULT(found in $i)
-  dnl     fi
-  dnl   done
-  dnl fi
-  dnl
-  dnl if test -z "$PHP_QT_DIR"; then
-  dnl   AC_MSG_RESULT([not found])
-  dnl   AC_MSG_ERROR([Please reinstall the php_qt distribution])
-  dnl fi
+  PHP_REQUIRE_CXX
 
-  dnl # --with-php_qt -> add include path
-  dnl PHP_ADD_INCLUDE($PHP_QT_DIR/include)
+  PHP_ADD_MAKEFILE_FRAGMENT(Makefile.qt)
 
-  dnl # --with-php_qt -> check for lib and symbol presence
-  dnl LIBNAME=php_qt # you may want to change this
-  dnl LIBSYMBOL=php_qt # you most likely want to change this 
+  PHP_ADD_INCLUDE(/usr/share/qt4/mkspecs/linux-g++)
+  PHP_ADD_INCLUDE(/usr/include/qt4/QtGui)
+  PHP_ADD_INCLUDE(/usr/include/qt4/QtCore)
+  PHP_ADD_INCLUDE(/usr/include/qt4)
 
-  dnl PHP_CHECK_LIBRARY($LIBNAME,$LIBSYMBOL,
-  dnl [
-  dnl   PHP_ADD_LIBRARY_WITH_PATH($LIBNAME, $PHP_QT_DIR/lib, PHP_QT_SHARED_LIBADD)
-  dnl   AC_DEFINE(HAVE_PHP_QTLIB,1,[ ])
-  dnl ],[
-  dnl   AC_MSG_ERROR([wrong php_qt lib version or lib not found])
-  dnl ],[
-  dnl   -L$PHP_QT_DIR/lib -lm -ldl
-  dnl ])
-  dnl
-  dnl PHP_SUBST(PHP_QT_SHARED_LIBADD)
+  PHP_NEW_EXTENSION(php_qt, \
+  qt/main_window/qapplication.cpp \
+  qt/abstract_widgets/qabstractbutton.cpp \
+  qt/abstract_widgets/qwidget.cpp \
+  qt/basic_widgets/qpushbutton.cpp \
+  qt/object_model/qobject.cpp \
+  qt/text_related/qstring.cpp \
+  qt/text_related/qlatin1string.cpp \
+  qt/text_related/qchar.cpp \
+  qt/php_qt.cpp ,$ext_shared)
 
-  PHP_NEW_EXTENSION(php_qt, php_qt.c, $ext_shared)
+  PHP_ADD_BUILD_DIR($ext_builddir/qt)
+
+
 fi
