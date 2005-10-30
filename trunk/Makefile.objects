@@ -1,5 +1,21 @@
-php_qt.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/php_qt.c
-	$(LIBTOOL) --mode=compile $(CC)  -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS)  -c /home/moni/software/php-5.1.0RC1/ext/php_qt/php_qt.c -o php_qt.lo 
+qt/main_window/qapplication.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/main_window/qapplication.cpp
+	$(LIBTOOL) --mode=compile $(CXX)  -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CXXFLAGS_CLEAN) $(EXTRA_CXXFLAGS)  -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/main_window/qapplication.cpp -o qt/main_window/qapplication.lo 
+qt/abstract_widgets/qabstractbutton.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/abstract_widgets/qabstractbutton.cpp
+	$(LIBTOOL) --mode=compile $(CXX)  -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CXXFLAGS_CLEAN) $(EXTRA_CXXFLAGS)  -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/abstract_widgets/qabstractbutton.cpp -o qt/abstract_widgets/qabstractbutton.lo 
+qt/abstract_widgets/qwidget.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/abstract_widgets/qwidget.cpp
+	$(LIBTOOL) --mode=compile $(CXX)  -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CXXFLAGS_CLEAN) $(EXTRA_CXXFLAGS)  -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/abstract_widgets/qwidget.cpp -o qt/abstract_widgets/qwidget.lo 
+qt/basic_widgets/qpushbutton.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/basic_widgets/qpushbutton.cpp
+	$(LIBTOOL) --mode=compile $(CXX)  -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CXXFLAGS_CLEAN) $(EXTRA_CXXFLAGS)  -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/basic_widgets/qpushbutton.cpp -o qt/basic_widgets/qpushbutton.lo 
+qt/object_model/qobject.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/object_model/qobject.cpp
+	$(LIBTOOL) --mode=compile $(CXX)  -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CXXFLAGS_CLEAN) $(EXTRA_CXXFLAGS)  -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/object_model/qobject.cpp -o qt/object_model/qobject.lo 
+qt/text_related/qstring.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/text_related/qstring.cpp
+	$(LIBTOOL) --mode=compile $(CXX)  -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CXXFLAGS_CLEAN) $(EXTRA_CXXFLAGS)  -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/text_related/qstring.cpp -o qt/text_related/qstring.lo 
+qt/text_related/qlatin1string.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/text_related/qlatin1string.cpp
+	$(LIBTOOL) --mode=compile $(CXX)  -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CXXFLAGS_CLEAN) $(EXTRA_CXXFLAGS)  -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/text_related/qlatin1string.cpp -o qt/text_related/qlatin1string.lo 
+qt/text_related/qchar.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/text_related/qchar.cpp
+	$(LIBTOOL) --mode=compile $(CXX)  -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CXXFLAGS_CLEAN) $(EXTRA_CXXFLAGS)  -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/text_related/qchar.cpp -o qt/text_related/qchar.lo 
+qt/php_qt.lo: /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/php_qt.cpp
+	$(LIBTOOL) --mode=compile $(CXX)  -I. -I/home/moni/software/php-5.1.0RC1/ext/php_qt $(COMMON_FLAGS) $(CXXFLAGS_CLEAN) $(EXTRA_CXXFLAGS)  -c /home/moni/software/php-5.1.0RC1/ext/php_qt/qt/php_qt.cpp -o qt/php_qt.lo 
 $(phplibdir)/php_qt.la: ./php_qt.la
 	$(LIBTOOL) --mode=install cp ./php_qt.la $(phplibdir)
 

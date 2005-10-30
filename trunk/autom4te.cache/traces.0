@@ -96,8 +96,18 @@ m4trace:configure.in:59: -1- AC_SUBST([target_os], [`echo $ac_cv_target | sed 's
 m4trace:configure.in:66: -1- AC_SUBST([RE2C])
 m4trace:configure.in:67: -1- AC_SUBST([AWK])
 m4trace:configure.in:69: -1- sinclude([config.m4])
-m4trace:config.m4:62: -1- AC_DEFINE_TRACE_LITERAL([COMPILE_DL_PHP_QT])
-m4trace:config.m4:62: -1- AH_OUTPUT([COMPILE_DL_PHP_QT], [/* Whether to build php_qt as dynamic module */
+m4trace:config.m4:63: -1- AC_PROG_CXX
+m4trace:config.m4:63: -1- AC_SUBST([CXX])
+m4trace:config.m4:63: -1- AC_SUBST([CXXFLAGS])
+m4trace:config.m4:63: -1- AC_SUBST([LDFLAGS])
+m4trace:config.m4:63: -1- AC_SUBST([CPPFLAGS])
+m4trace:config.m4:63: -1- AC_SUBST([CXX])
+m4trace:config.m4:63: -1- AC_SUBST([ac_ct_CXX])
+m4trace:config.m4:63: -1- AC_SUBST([CXXCPP])
+m4trace:config.m4:63: -1- AC_SUBST([CPPFLAGS])
+m4trace:config.m4:63: -1- AC_SUBST([CXXCPP])
+m4trace:config.m4:101: -1- AC_DEFINE_TRACE_LITERAL([COMPILE_DL_PHP_QT])
+m4trace:config.m4:101: -1- AH_OUTPUT([COMPILE_DL_PHP_QT], [/* Whether to build php_qt as dynamic module */
 #undef COMPILE_DL_PHP_QT])
 m4trace:configure.in:74: -1- AC_PROG_LIBTOOL
 m4trace:configure.in:74: -1- AC_PROG_LN_S
@@ -421,13 +431,6 @@ aclocal.m4:2610: _AC_PROG_LIBTOOL is expanded from...
 configure.in:74: _AC_PROG_LIBTOOL is required by...
 aclocal.m4:2590: AC_PROG_LIBTOOL is expanded from...
 configure.in:74: the top level])
-m4trace:configure.in:74: -1- AC_PROG_CXX
-m4trace:configure.in:74: -1- AC_SUBST([CXX])
-m4trace:configure.in:74: -1- AC_SUBST([CXXFLAGS])
-m4trace:configure.in:74: -1- AC_SUBST([LDFLAGS])
-m4trace:configure.in:74: -1- AC_SUBST([CPPFLAGS])
-m4trace:configure.in:74: -1- AC_SUBST([CXX])
-m4trace:configure.in:74: -1- AC_SUBST([ac_ct_CXX])
 m4trace:configure.in:74: -1- AC_SUBST([CXXCPP])
 m4trace:configure.in:74: -1- AC_SUBST([CPPFLAGS])
 m4trace:configure.in:74: -1- AC_SUBST([CXXCPP])
