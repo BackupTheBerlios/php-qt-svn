@@ -139,7 +139,7 @@ ZEND_METHOD(classname,function){                                                
 
 #define PHP_QT_ABSTRACT_SETBOOL_METHOD(classname,function,pseudo,name)     \
 ZEND_METHOD(classname,function){                                                \
-    bool *b;                                                                    \
+    zend_bool b;                                                                    \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) {    \
             return;                                                             \
     }                                                                           \
