@@ -93,7 +93,7 @@ ZEND_METHOD(classname,function){                                             \
         classname *o = (classname*) id;                                      \
         o->function(b);                                                      \
     }else                                                                    \
-        classname::function(b);                                              \
+        classname::function((bool) b);                                              \
     RETURN_NULL()                                                            \
 }                                                                            \
 
@@ -137,15 +137,15 @@ ZEND_METHOD(classname,function){                                                
     RETURN_NULL();                                                              \
 }                                                                               \
 
-#define PHP_QT_ABSTRACT_SETBOOL_METHOD(classname,function,pseudo,name)     \
+#define PHP_QT_ABSTRACT_SETBOOL_METHOD(classname,function,pseudo,name)          \
 ZEND_METHOD(classname,function){                                                \
-    zend_bool b;                                                                    \
+    zend_bool b;                                                                \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) {    \
             return;                                                             \
     }                                                                           \
-    zend_update_property_bool(Z_OBJCE_P(getThis()),getThis(), name, strlen(name), (long int)b TSRMLS_DC); \
-    pseudo* pseudo_ptr = new pseudo();                                          \
-    pseudo_ptr->function(b);                                                    \
+    zend_update_property_bool(Z_OBJCE_P(getThis()),getThis(), name, strlen(name), b TSRMLS_DC); \
+    pseudo* pseudo_ptr = (pseudo*) PHP_QT_FETCH();                                          \
+    pseudo_ptr->function((bool) b);                                             \
     RETURN_NULL();                                                              \
 }                                                                     
 
