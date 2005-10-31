@@ -15,7 +15,12 @@
   | Author:                                                              |
   +----------------------------------------------------------------------+
 */
-
+/*
+ * Copyright (C) 2005 
+ * Thomas Moenicke <tm@ippfp.org>, 
+ * Jean-Luc Gyger <jean_luc.gyger@freesurf.ch>
+ *
+*/
 /* $Id: header,v 1.15 2004/01/08 16:46:52 sniper Exp $ */
 
 #ifndef PHP_PHP_QT_H
