@@ -36,7 +36,8 @@ ZEND_DECLARE_MODULE_GLOBALS(php_qt)
 /* True global resources - no need for thread safety here */
 static int le_php_qt;
 
-static zend_class_entry *QWidget_ce_ptr;
+
+zend_class_entry *QWidget_ce_ptr; //Gyger Jean-Luc change to non static
 static zend_class_entry *QString_ce_ptr;
 static zend_class_entry *QObject_ce_ptr;
 static zend_class_entry *QLatin1String_ce_ptr;
@@ -429,12 +430,12 @@ void _register_QAbstractButton(TSRMLS_D)
 static zend_function_entry QApplication_methods[] = {
  
     ZEND_ME(QApplication,__construct,NULL,ZEND_ACC_PUBLIC)
-//	ZEND_ME(QApplication, activeModalWidget, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
-	ZEND_ME(QApplication, aboutQt, NULL, ZEND_ACC_PUBLIC) //add by Gyger Jean-Luc
-	ZEND_ME(QApplication, closeAllWindows, NULL, ZEND_ACC_PUBLIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, activeModalWidget, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, aboutQt, NULL, ZEND_ACC_PUBLIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, closeAllWindows, NULL, ZEND_ACC_PUBLIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication,exec,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) // modif for static call, Gyger Jean-Luc
-	ZEND_ME(QApplication, beep, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc    
-  	ZEND_ME(QApplication, colorSpec, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, beep, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc    
+    ZEND_ME(QApplication, colorSpec, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication, cursorFlashTime, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication, desktopSettingsAware, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication, doubleClickInterval, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
@@ -443,7 +444,7 @@ static zend_function_entry QApplication_methods[] = {
     ZEND_ME(QApplication, keyboardInputInterval, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication, quitOnLastWindowClosed, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication, restoreOverrideCursor, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
-  	ZEND_ME(QApplication, setDesktopSettingsAware, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
+    ZEND_ME(QApplication, setDesktopSettingsAware, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication, setColorSpec, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication, setCursorFlashTime, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication, setDoubleClickInterval, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
@@ -456,8 +457,7 @@ static zend_function_entry QApplication_methods[] = {
     ZEND_ME(QApplication, startDragTime, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication, syncX, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
     ZEND_ME(QApplication, wheelScrollLines, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC) //add by Gyger Jean-Luc
-	{NULL,NULL,NULL}
-
+    {NULL,NULL,NULL}
 };
 
 void _register_QApplication(TSRMLS_D)

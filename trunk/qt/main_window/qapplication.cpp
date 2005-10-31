@@ -24,6 +24,7 @@
 using namespace std;
 
 #include <QApplication>
+#include <QWidget>
 #include "../php_qt.h"
 
 int argc__;
@@ -78,3 +79,4 @@ PHP_QT_STATIC_RETURN_METHOD(QApplication, startDragDistance, RETURN_LONG)
 PHP_QT_STATIC_RETURN_METHOD(QApplication, startDragTime, RETURN_LONG)
 PHP_QT_STATIC_METHOD(QApplication, syncX) 
 PHP_QT_STATIC_RETURN_METHOD(QApplication, wheelScrollLines, RETURN_LONG)
+PHP_QT_STATIC_RETURN_OBJ_METHOD(QApplication, activeModalWidget, QWidget)

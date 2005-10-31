@@ -24,6 +24,7 @@
 #define debug
 #define object_hash_list
 
+
 #include <QTextStream>
 #define QOUT()                                              \
     extern QTextStream qout(stdout, QIODevice::WriteOnly);  \
@@ -114,7 +115,30 @@ ZEND_METHOD(classname,function){                                                
     RETURN_NULL()                                                               \
 }                                                                               \
 
+//add by Gyger Jean-Luc
+#define PHP_QT_RET_OBJ(classname,obj)                   \
+zend_class_entry *ce;                                   \
+if(obj != NULL) {                                       \
+    object_init_ex(return_value, classname##_ce_ptr);   \
+    zend_rsrc_list_entry le;                            \
+    le.ptr = obj;                                       \
+    php_qt_register(return_value,le);                   \
+}                                                       \
+else                                                    \
+    RETURN_NULL();                                      \
 
+
+#define PHP_QT_STATIC_RETURN_OBJ_METHOD(classname, function, object_type) \
+ZEND_METHOD(classname,function){                               \
+    zval *id;                                                  \
+    id = getThis();                                            \
+    if(id != NULL){                                            \
+        classname *o = (classname*) id;                        \
+        PHP_QT_RET_OBJ(object_type,o->function());             \
+    } else  PHP_QT_RET_OBJ(object_type,classname::function())  \
+    RETURN_NULL();                                             \
+} 
+	
 #define PHP_QT_STATIC_RETURN_METHOD(classname, function, returntype)  \
 ZEND_METHOD(classname,function){                            \
   zval *id;                                                 \
@@ -194,5 +218,4 @@ void _register_QWidget();
 void _register_QAbstractButton();
 void _register_QPushButton();
 
-
-
+extern zend_class_entry *QWidget_ce_ptr;

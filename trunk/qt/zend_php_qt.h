@@ -116,7 +116,7 @@ ZEND_METHOD(QApplication,startDragDistance); // add by Gyger Jean-Luc
 ZEND_METHOD(QApplication,startDragTime); // add by Gyger Jean-Luc
 ZEND_METHOD(QApplication,syncX); // add by Gyger Jean-Luc
 ZEND_METHOD(QApplication,wheelScrollLines); // add by Gyger Jean-Luc
-/*//ZEND_METHOD(QApplication,activeModalWidget); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,activeModalWidget); // add by Gyger Jean-Luc
 //ZEND_METHOD(QApplication,activePopupWidget); // add by Gyger Jean-Luc
 //ZEND_METHOD(QApplication,activeWindow); // add by Gyger Jean-Luc
 //ZEND_METHOD(QApplication,allWidgets); // add by Gyger Jean-Luc
@@ -150,7 +150,6 @@ ZEND_METHOD(QApplication,wheelScrollLines); // add by Gyger Jean-Luc
 //ZEND_METHOD(QApplication,type); // add by Gyger Jean-Luc
 //ZEND_METHOD(QApplication,widgetAt); //WARNING 2 imlementation, add by Gyger Jean-Luc
 //ZEND_METHOD(QApplication,windowIcon); //add by Gyger Jean-Luc
-*/
 
 ZEND_METHOD(QAbstractButton,__construct);
 ZEND_METHOD(QAbstractButton,autoExclusive);
