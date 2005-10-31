@@ -308,11 +308,44 @@ void _register_QObject(TSRMLS_D){
 static zend_function_entry QWidget_methods[] = {
  
     ZEND_ME(QWidget,__construct,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,isVisible,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,isHidden,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,show,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,hide,NULL,ZEND_ACC_PUBLIC)
-    
+
+    ZEND_ME(QWidget,acceptDrops,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,activateWindow,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,adjustSize,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,clearFocus,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,clearMask,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,grabKeyboard,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,grabMouse,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,hasFocus,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,hasMouseTracking,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,height,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,isActiveWindow,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,isEnabled,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,isFullScreen,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,isHidden,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,isMaximized,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,isMinimized,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,isModal,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,isVisible,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,isWindow,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,isWindowModified,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,maximumHeight,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,maximumWidth,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,minimumHeight,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,minimumWidth,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,releaseKeyboard,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,releaseMouse,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,underMouse,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,unsetCursor,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,unsetLayoutDirection,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,updateGeometry,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,updatesEnabled,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,width,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,x,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,y,NULL,ZEND_ACC_PUBLIC)
+
     {NULL,NULL,NULL}
 };
 

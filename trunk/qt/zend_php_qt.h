@@ -173,10 +173,45 @@ ZEND_METHOD(QPushButton,setFlat);
 ZEND_METHOD(QPushButton,setMenu);
 
 ZEND_METHOD(QWidget,__construct);
-ZEND_METHOD(QWidget,isVisible);
-ZEND_METHOD(QWidget,isHidden);
 ZEND_METHOD(QWidget,show);
 ZEND_METHOD(QWidget,hide);
+
+ZEND_METHOD(QWidget,acceptDrops);
+ZEND_METHOD(QWidget,activateWindow);
+ZEND_METHOD(QWidget,adjustSize);
+ZEND_METHOD(QWidget,clearFocus);
+ZEND_METHOD(QWidget,clearMask);
+ZEND_METHOD(QWidget,grabKeyboard);
+ZEND_METHOD(QWidget,grabMouse);
+ZEND_METHOD(QWidget,hasFocus);
+ZEND_METHOD(QWidget,hasMouseTracking);
+ZEND_METHOD(QWidget,height);
+ZEND_METHOD(QWidget,isActiveWindow);
+ZEND_METHOD(QWidget,isEnabled);
+ZEND_METHOD(QWidget,isFullScreen);
+ZEND_METHOD(QWidget,isHidden);
+ZEND_METHOD(QWidget,isMaximized);
+ZEND_METHOD(QWidget,isMinimized);
+ZEND_METHOD(QWidget,isModal);
+ZEND_METHOD(QWidget,isVisible);
+ZEND_METHOD(QWidget,isWindow);
+ZEND_METHOD(QWidget,isWindowModified);
+ZEND_METHOD(QWidget,maximumHeight);
+ZEND_METHOD(QWidget,maximumWidth);
+ZEND_METHOD(QWidget,minimumHeight);
+ZEND_METHOD(QWidget,minimumWidth);
+ZEND_METHOD(QWidget,releaseKeyboard);
+ZEND_METHOD(QWidget,releaseMouse);
+ZEND_METHOD(QWidget,underMouse);
+ZEND_METHOD(QWidget,unsetCursor);
+ZEND_METHOD(QWidget,unsetLayoutDirection);
+ZEND_METHOD(QWidget,updateGeometry);
+ZEND_METHOD(QWidget,updatesEnabled);
+ZEND_METHOD(QWidget,width);
+ZEND_METHOD(QWidget,x);
+ZEND_METHOD(QWidget,y);
+
+
 
 /* 
   	Declare any global variables you may need between the BEGIN

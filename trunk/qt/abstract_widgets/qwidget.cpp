@@ -48,26 +48,43 @@ ZEND_METHOD(QWidget,__construct){
 
     }
 }
- 
-ZEND_METHOD(QWidget,isVisible){
-    QWidget *o = (QWidget*) PHP_QT_FETCH();
-    RETURN_BOOL(o->isVisible());
-}
 
-ZEND_METHOD(QWidget,isHidden){
-    QWidget *o = (QWidget*) PHP_QT_FETCH();
-    RETURN_BOOL(o->isHidden());
-}
+PHP_QT_METHOD(QWidget,show);
+PHP_QT_METHOD(QWidget,hide);
+PHP_QT_RETURN_METHOD(QWidget,acceptDrops,RETURN_BOOL);
+PHP_QT_METHOD(QWidget,activateWindow);
+PHP_QT_METHOD(QWidget,adjustSize);
+PHP_QT_METHOD(QWidget,clearFocus);
+PHP_QT_METHOD(QWidget,clearMask);
+PHP_QT_METHOD(QWidget,grabKeyboard);
+PHP_QT_METHOD(QWidget,grabMouse);
+PHP_QT_RETURN_METHOD(QWidget,hasFocus,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,hasMouseTracking,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,height,RETURN_LONG);
+PHP_QT_RETURN_METHOD(QWidget,isActiveWindow,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,isEnabled,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,isFullScreen,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,isHidden,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,isMaximized,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,isMinimized,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,isModal,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,isVisible,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,isWindow,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,isWindowModified,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,maximumHeight,RETURN_LONG);
+PHP_QT_RETURN_METHOD(QWidget,maximumWidth,RETURN_LONG);
+PHP_QT_RETURN_METHOD(QWidget,minimumHeight,RETURN_LONG);
+PHP_QT_RETURN_METHOD(QWidget,minimumWidth,RETURN_LONG);
+PHP_QT_METHOD(QWidget,releaseKeyboard);
+PHP_QT_METHOD(QWidget,releaseMouse);
+PHP_QT_RETURN_METHOD(QWidget,underMouse,RETURN_BOOL);
+PHP_QT_METHOD(QWidget,unsetCursor);
+PHP_QT_METHOD(QWidget,unsetLayoutDirection);
+PHP_QT_METHOD(QWidget,updateGeometry);
+PHP_QT_RETURN_METHOD(QWidget,updatesEnabled,RETURN_BOOL);
+PHP_QT_RETURN_METHOD(QWidget,width,RETURN_LONG);
+PHP_QT_RETURN_METHOD(QWidget,x,RETURN_LONG);
+PHP_QT_RETURN_METHOD(QWidget,y,RETURN_LONG);
 
-ZEND_METHOD(QWidget,show){
-    QWidget *o = (QWidget*) PHP_QT_FETCH();
-    o->show();
-    RETURN_NULL();
-}
 
-ZEND_METHOD(QWidget,hide){
-    QWidget *o = (QWidget*) PHP_QT_FETCH();
-    o->hide();
-    RETURN_NULL();
-}
 
