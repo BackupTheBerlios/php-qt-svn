@@ -106,26 +106,13 @@ ZEND_METHOD(QObject,connect){
 
     QObject *sender_ptr = (QObject*) php_qt_fetch(sender);
 
-    /* emulate Qt's SIGNAL(clicked()1) SLOT(show()2) Macros */
-
-    zval* r_signal;
-    zval *_two;
-    MAKE_STD_ZVAL(_two);
-    ZVAL_STRING(_two,"2",1);
-    concat_function(r_signal,_two,signal);
-    const char* __signal = Z_STRVAL_P(r_signal);
-
-    zval* r_slot;
-    zval *_one;
-    MAKE_STD_ZVAL(_one);
-    ZVAL_STRING(_one,"1",1);
-    concat_function(r_slot,_one,slot);
-    const char* __slot = Z_STRVAL_P(r_slot);
+    const char* __signal = Z_STRVAL_P(signal);
+    const char* __slot = Z_STRVAL_P(slot);
 
     if(num_args==4){
-        RETURN_BOOL(QObject::connect((const QObject*) sender_ptr, (const char*) __signal, (const QObject*) receiver_ptr, (const char*)__slot));
+        RETURN_BOOL(QObject::connect((const QObject*) sender_ptr, __signal, (const QObject*) receiver_ptr, __slot));
     } else if(num_args==3){
-        RETURN_BOOL(receiver_ptr->connect((const QObject*) sender_ptr, (const char*) __signal, (const char*)__slot));
+        RETURN_BOOL(receiver_ptr->connect((const QObject*) sender_ptr, __signal, __slot));
     }
 
 }
@@ -138,8 +125,7 @@ ZEND_METHOD(QObject,disconnect){
     zval *slot;
     
     const char* __signal;
-    zval* r_signal;
-    zval *_two;
+
     int num_args = 0;
     num_args = ZEND_NUM_ARGS() TSRMLS_CC;
 
@@ -149,12 +135,7 @@ ZEND_METHOD(QObject,disconnect){
         if(zend_parse_parameters(4 TSRMLS_CC,"ozoz", &sender, &signal, &receiver, &slot) == FAILURE) {
             RETURN_NULL(); 
         }
-
-        MAKE_STD_ZVAL(_two);
-        ZVAL_STRING(_two,"2",1);
-        concat_function(r_signal,_two,signal);
-        __signal = estrdup(Z_STRVAL_P(r_signal));
-
+        __signal = Z_STRVAL_P(signal);
         sender_ptr = (QObject*) php_qt_fetch(sender);
 
     } else if(ZEND_NUM_ARGS() == 3){
@@ -162,10 +143,7 @@ ZEND_METHOD(QObject,disconnect){
             RETURN_NULL(); 
         }
 
-        MAKE_STD_ZVAL(_two);
-        ZVAL_STRING(_two,"2",1);
-        concat_function(r_signal,_two,signal);
-        __signal = estrdup(Z_STRVAL_P(r_signal));
+        __signal = Z_STRVAL_P(signal);
         QObject *sender_ptr = (QObject*) PHP_QT_FETCH();
 
     } else if(ZEND_NUM_ARGS() == 2){
@@ -177,21 +155,15 @@ ZEND_METHOD(QObject,disconnect){
 
     QObject *receiver_ptr = (QObject*) php_qt_fetch(receiver);
 
-    /* emulate Qt's SIGNAL(clicked()) SLOT(show()) Macros */
-
-    zval* r_slot;
-    zval *_one;
-    MAKE_STD_ZVAL(_one);
-    ZVAL_STRING(_one,"1",1);
-    concat_function(r_slot,_one,slot);
-    const char* __slot = estrdup(Z_STRVAL_P(r_slot));
+    // emulate Qt's SIGNAL(clicked()) SLOT(show()) Macros
+    const char* __slot = Z_STRVAL_P(slot);
 
     if(ZEND_NUM_ARGS() ==4){
-        RETURN_BOOL(QObject::disconnect((const QObject*) sender_ptr, (const char*) __signal, (const QObject*) receiver_ptr, (const char*)__slot));
+        RETURN_BOOL(QObject::disconnect((const QObject*) sender_ptr, __signal, (const QObject*) receiver_ptr, __slot));
     } else if(ZEND_NUM_ARGS() ==3){
-        RETURN_BOOL(sender_ptr->disconnect((const char*) __signal, (const QObject*) receiver_ptr, (const char*)__slot));
+        RETURN_BOOL(sender_ptr->disconnect(__signal, (const QObject*) receiver_ptr, __slot));
     } else {
-        RETURN_BOOL(sender_ptr->disconnect((const QObject*) receiver_ptr, (const char*)__slot));
+        RETURN_BOOL(sender_ptr->disconnect((const QObject*) receiver_ptr, __slot));
     }
 
 }
