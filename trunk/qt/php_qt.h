@@ -156,7 +156,7 @@ ZEND_METHOD(classname,function){                                                
             return;                                                             \
     }                                                                           \
     zend_update_property_long(Z_OBJCE_P(getThis()),getThis(), name, strlen(name), (long)b TSRMLS_DC); \
-    pseudo* pseudo_ptr = new pseudo();                                         \
+    pseudo* pseudo_ptr = (pseudo*) PHP_QT_FETCH();                                          \
     pseudo_ptr->function(b);                                                    \
     RETURN_NULL();                                                              \
 }                                                                     
@@ -169,7 +169,7 @@ ZEND_METHOD(classname,function){                                                
             return;                                                             \
     }                                                                           \
     zend_update_property_string(Z_OBJCE_P(getThis()),getThis(), name, strlen(name), (long)b TSRMLS_DC); \
-    pseudo* pseudo_ptr = new pseudo();                                         \
+    pseudo* pseudo_ptr = (pseudo*) PHP_QT_FETCH();                                          \
     pseudo_ptr->function(b);                                                    \
     RETURN_NULL();                                                              \
 }                                                                     
