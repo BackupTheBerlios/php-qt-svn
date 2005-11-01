@@ -74,6 +74,7 @@ ZEND_METHOD(QObject,signalsBlocked);
 ZEND_METHOD(QObject,startTimer);
 ZEND_METHOD(QObject,thread);
 
+/* QString */
 ZEND_METHOD(QString,__construct);
 ZEND_METHOD(QString,append);
 ZEND_METHOD(QString,arg);
@@ -83,74 +84,132 @@ ZEND_METHOD(QString,chop);
 ZEND_METHOD(QString,clear);
 ZEND_METHOD(QString,compare);
 
+/* QLatin1String */
 ZEND_METHOD(QLatin1String,__construct);
 ZEND_METHOD(QLatin1String,latin1);
 
+
+/* QCoreApplication */
+//public members
+ZEND_METHOD(QCoreApplication,__construct);
+ZEND_METHOD(QCoreApplication,filterEvent);
+ZEND_METHOD(QCoreApplication,notify);
+ZEND_METHOD(QCoreApplication,setEventFilter);
+ZEND_METHOD(QCoreApplication,winEventFilter);
+//public slot
+ZEND_METHOD(QCoreApplication,quit);
+//public static members
+ZEND_METHOD(QCoreApplication,exec);
+ZEND_METHOD(QCoreApplication,addLibraryPath);
+ZEND_METHOD(QCoreApplication,applicationDirPath); 
+ZEND_METHOD(QCoreApplication,applicationFilePath);
+ZEND_METHOD(QCoreApplication,applicationName);
+ZEND_METHOD(QCoreApplication,argc); 
+ZEND_METHOD(QCoreApplication,argv); 
+ZEND_METHOD(QCoreApplication,closingDown); 
+ZEND_METHOD(QCoreApplication,exit); 
+ZEND_METHOD(QCoreApplication,flush); 
+ZEND_METHOD(QCoreApplication,hasPendingEvents); 
+ZEND_METHOD(QCoreApplication,installTranslator); 
+ZEND_METHOD(QCoreApplication,instance); 
+ZEND_METHOD(QCoreApplication,libraryPaths); 
+ZEND_METHOD(QCoreApplication,organizationDomain); 
+ZEND_METHOD(QCoreApplication,organizationName); 
+ZEND_METHOD(QCoreApplication,postEvent); 
+ZEND_METHOD(QCoreApplication,processEvents); //WARNING 2 Implemetation
+ZEND_METHOD(QCoreApplication,removeLibraryPath); 
+ZEND_METHOD(QCoreApplication,removePostedEvents); 
+ZEND_METHOD(QCoreApplication,removeTranslator); 
+ZEND_METHOD(QCoreApplication,sendEvent); 
+ZEND_METHOD(QCoreApplication,sendPostedEvents); //WARNING 2 Implemetation
+ZEND_METHOD(QCoreApplication,setApplicationName); 
+ZEND_METHOD(QCoreApplication,setLibraryPaths); 
+ZEND_METHOD(QCoreApplication,setOrganizationDomain); 
+ZEND_METHOD(QCoreApplication,setOrganizationName); 
+ZEND_METHOD(QCoreApplication,startingUp); 
+ZEND_METHOD(QCoreApplication,translate); 
+
+
+/* QApplication */
 //public members
 ZEND_METHOD(QApplication,__construct);
+ZEND_METHOD(QApplication,commitData);
+ZEND_METHOD(QApplication,inputContext);
+ZEND_METHOD(QApplication,isSessionRestored);
+ZEND_METHOD(QApplication,macEventFilter);
+ZEND_METHOD(QApplication,qwsEventFilter);
+ZEND_METHOD(QApplication,qwsSetCustomColors);
+ZEND_METHOD(QApplication,saveState);
+ZEND_METHOD(QApplication,sessionId);
+ZEND_METHOD(QApplication,sessionKey);
+ZEND_METHOD(QApplication,setInputContext);
+ZEND_METHOD(QApplication,winFocus);
+ZEND_METHOD(QApplication,x11EventFilter);
+ZEND_METHOD(QApplication,x11ProcessEvent);
 //public slots
-ZEND_METHOD(QApplication,aboutQt); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,closeAllWindows); // add by Gyger Jean-Luc
+ZEND_METHOD(QApplication,aboutQt); 
+ZEND_METHOD(QApplication,closeAllWindows); 
 //static public members
-ZEND_METHOD(QApplication,exec);
-ZEND_METHOD(QApplication,beep); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,colorSpec); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,cursorFlashTime); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,desktopSettingsAware); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,doubleClickInterval); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,isLeftToRight); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,isRightToLeft); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,keyboardInputInterval); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,quitOnLastWindowClosed); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,restoreOverrideCursor); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,setDesktopSettingsAware); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,setColorSpec); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,setCursorFlashTime); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,setDoubleClickInterval); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,setKeyboardInputInterval); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,setQuitOnLastWindowClosed); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,setStartDragDistance); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,setStartDragTime); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,setWheelScrollLines); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,startDragDistance); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,startDragTime); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,syncX); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,wheelScrollLines); // add by Gyger Jean-Luc
-ZEND_METHOD(QApplication,activeModalWidget); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,activePopupWidget); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,activeWindow); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,allWidgets); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,changeOverrideCursor); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,clipboard); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,desktop); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,focusWidget); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,font); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,fontMetrics); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,globalStrut); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,isEffectEnabled); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,keyboardModifiers); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,layoutDirection); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,mouseButton); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,overrideCursor); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,palette); // WARNING 3 implementations, add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,qwsDecoration); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,qwsSetDecoration); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,setActiveWindow); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,setEffectEnabled); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,setFont); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,setGlobalStrut); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,setLayoutDirection); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,setOverrideCursor); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,setPalette); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,setStyle); //WARNING 2 imlementation, add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,setWindowIcon); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,style); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,topLevelAt); //WARNING 2 imlementation, add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,topLevelWidgets); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,type); // add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,widgetAt); //WARNING 2 imlementation, add by Gyger Jean-Luc
-//ZEND_METHOD(QApplication,windowIcon); //add by Gyger Jean-Luc
+//ZEND_METHOD(QApplication,exec);
+ZEND_METHOD(QApplication,beep); 
+ZEND_METHOD(QApplication,colorSpec); 
+ZEND_METHOD(QApplication,cursorFlashTime); 
+ZEND_METHOD(QApplication,desktopSettingsAware); 
+ZEND_METHOD(QApplication,doubleClickInterval); 
+ZEND_METHOD(QApplication,isLeftToRight); 
+ZEND_METHOD(QApplication,isRightToLeft); 
+ZEND_METHOD(QApplication,keyboardInputInterval); 
+ZEND_METHOD(QApplication,quitOnLastWindowClosed); 
+ZEND_METHOD(QApplication,restoreOverrideCursor); 
+ZEND_METHOD(QApplication,setDesktopSettingsAware); 
+ZEND_METHOD(QApplication,setColorSpec); 
+ZEND_METHOD(QApplication,setCursorFlashTime); 
+ZEND_METHOD(QApplication,setDoubleClickInterval); 
+ZEND_METHOD(QApplication,setKeyboardInputInterval); 
+ZEND_METHOD(QApplication,setQuitOnLastWindowClosed); 
+ZEND_METHOD(QApplication,setStartDragDistance); 
+ZEND_METHOD(QApplication,setStartDragTime); 
+ZEND_METHOD(QApplication,setWheelScrollLines); 
+ZEND_METHOD(QApplication,startDragDistance); 
+ZEND_METHOD(QApplication,startDragTime); 
+ZEND_METHOD(QApplication,syncX); 
+ZEND_METHOD(QApplication,wheelScrollLines); 
+ZEND_METHOD(QApplication,activeModalWidget); 
+ZEND_METHOD(QApplication,activePopupWidget); 
+ZEND_METHOD(QApplication,activeWindow); 
+ZEND_METHOD(QApplication,allWidgets); 
+ZEND_METHOD(QApplication,changeOverrideCursor); 
+ZEND_METHOD(QApplication,clipboard); 
+ZEND_METHOD(QApplication,desktop); 
+ZEND_METHOD(QApplication,focusWidget); 
+ZEND_METHOD(QApplication,font); 
+ZEND_METHOD(QApplication,fontMetrics); 
+ZEND_METHOD(QApplication,globalStrut); 
+ZEND_METHOD(QApplication,isEffectEnabled); 
+ZEND_METHOD(QApplication,keyboardModifiers); 
+ZEND_METHOD(QApplication,layoutDirection); 
+ZEND_METHOD(QApplication,mouseButton); 
+ZEND_METHOD(QApplication,overrideCursor); 
+ZEND_METHOD(QApplication,palette); // WARNING 3 implementations
+ZEND_METHOD(QApplication,qwsDecoration); 
+ZEND_METHOD(QApplication,qwsSetDecoration); 
+ZEND_METHOD(QApplication,setActiveWindow); 
+ZEND_METHOD(QApplication,setEffectEnabled); 
+ZEND_METHOD(QApplication,setFont); 
+ZEND_METHOD(QApplication,setGlobalStrut); 
+ZEND_METHOD(QApplication,setLayoutDirection); 
+ZEND_METHOD(QApplication,setOverrideCursor); 
+ZEND_METHOD(QApplication,setPalette); 
+ZEND_METHOD(QApplication,setStyle); //WARNING 2 imlementation
+ZEND_METHOD(QApplication,setWindowIcon); 
+ZEND_METHOD(QApplication,style); 
+ZEND_METHOD(QApplication,topLevelAt); //WARNING 2 imlementation
+ZEND_METHOD(QApplication,topLevelWidgets); 
+ZEND_METHOD(QApplication,type); 
+ZEND_METHOD(QApplication,widgetAt); //WARNING 2 imlementation,
+ZEND_METHOD(QApplication,windowIcon); 
 
+/* QAbstractButton */
 ZEND_METHOD(QAbstractButton,__construct);
 ZEND_METHOD(QAbstractButton,autoExclusive);
 ZEND_METHOD(QAbstractButton,autoRepeat);
@@ -161,6 +220,7 @@ ZEND_METHOD(QAbstractButton,setAutoExclusive);
 ZEND_METHOD(QAbstractButton,setAutoRepeat);
 ZEND_METHOD(QAbstractButton,setCheckable);
 
+/* QPushButton */
 ZEND_METHOD(QPushButton,__construct);
 ZEND_METHOD(QPushButton,autoDefault);
 ZEND_METHOD(QPushButton,isDefault);
@@ -171,6 +231,7 @@ ZEND_METHOD(QPushButton,setDefault);
 ZEND_METHOD(QPushButton,setFlat);
 ZEND_METHOD(QPushButton,setMenu);
 
+/* QWidget */
 ZEND_METHOD(QWidget,__construct);
 ZEND_METHOD(QWidget,show);
 ZEND_METHOD(QWidget,hide);
@@ -210,7 +271,14 @@ ZEND_METHOD(QWidget,width);
 ZEND_METHOD(QWidget,x);
 ZEND_METHOD(QWidget,y);
 
-
+/* QEvent */
+ZEND_METHOD(QEvent,__construct);
+ZEND_METHOD(QEvent,accept);
+ZEND_METHOD(QEvent,ignore);
+ZEND_METHOD(QEvent,isAccepted);
+ZEND_METHOD(QEvent,setAccepted);
+ZEND_METHOD(QEvent,spontaneous);
+ZEND_METHOD(QEvent,type);
 
 /* 
   	Declare any global variables you may need between the BEGIN

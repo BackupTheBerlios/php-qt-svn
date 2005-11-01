@@ -72,50 +72,44 @@ ZEND_METHOD(classname,function){                            \
 
 #define PHP_QT_STATIC_METHOD(classname, function)           \
 ZEND_METHOD(classname,function){                            \
-    zval *id;                                               \
-    id = getThis();                                         \
-    if(id != NULL){                                         \
-        classname *o = (classname*) id;                     \
+    if(getThis() != NULL){                                  \
+        classname *o = (classname*) PHP_QT_FETCH();         \
         o->function();                                      \
     } else classname::function();                           \
     RETURN_NULL();                                          \
 }                                                           \
 
-//add by Gyger Jean-Luc
+
 #define PHP_QT_SETBOOL_STATIC_METHOD(classname, function)                    \
 ZEND_METHOD(classname,function){                                             \
-    zval *id;                                                                \
     zend_bool b;                                                             \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) { \
             return;                                                          \
     }                                                                        \
-    id = getThis();                                                          \
-    if(id != NULL){                                                          \
-        classname *o = (classname*) id;                                      \
+    if(getThis() != NULL){                                                   \
+        classname *o = (classname*) PHP_QT_FETCH();                          \
         o->function(b);                                                      \
     }else                                                                    \
-        classname::function((bool) b);                                              \
+        classname::function((bool) b);                                       \
     RETURN_NULL()                                                            \
 }                                                                            \
 
-//add by Gyger Jean-Luc
+
 #define PHP_QT_SETLONG_STATIC_METHOD(classname, function)                       \
 ZEND_METHOD(classname,function){                                                \
-    zval *id;                                                                   \
     long l;                                                                     \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&l) == FAILURE) {    \
             return;                                                             \
     }                                                                           \
-    id = getThis();                                                             \
-    if(id != NULL){                                                             \
-        classname *o = (classname*) id;                                         \
+    if(getThis() != NULL){                                                      \
+        classname *o = (classname*) PHP_QT_FETCH();                             \
         o->function(l);                                                         \
     }else                                                                       \
         classname::function(l);                                                 \
     RETURN_NULL()                                                               \
 }                                                                               \
 
-//add by Gyger Jean-Luc
+
 #define PHP_QT_RET_OBJ(classname,obj)                   \
 zend_class_entry *ce;                                   \
 if(obj != NULL) {                                       \
@@ -130,10 +124,8 @@ else                                                    \
 
 #define PHP_QT_STATIC_RETURN_OBJ_METHOD(classname, function, object_type) \
 ZEND_METHOD(classname,function){                               \
-    zval *id;                                                  \
-    id = getThis();                                            \
-    if(id != NULL){                                            \
-        classname *o = (classname*) id;                        \
+    if(getThis() != NULL){                                     \
+        classname *o = (classname*) PHP_QT_FETCH();            \
         PHP_QT_RET_OBJ(object_type,o->function());             \
     } else  PHP_QT_RET_OBJ(object_type,classname::function())  \
     RETURN_NULL();                                             \
@@ -141,18 +133,16 @@ ZEND_METHOD(classname,function){                               \
 	
 #define PHP_QT_STATIC_RETURN_METHOD(classname, function, returntype)  \
 ZEND_METHOD(classname,function){                            \
-  zval *id;                                                 \
-  id = getThis();                                           \
-  if(id != NULL){                                           \
-    classname *o = (classname*) id;                         \
+  if(getThis() != NULL){                                    \
+    classname *o = (classname*) PHP_QT_FETCH();             \
     returntype(o->function());                              \
   } else                                                    \
     returntype(classname::function());                      \
   }                                                         \
 
-#define PHP_QT_SETBOOL_METHOD(classname,function)                        \
+#define PHP_QT_SETBOOL_METHOD(classname,function)                               \
 ZEND_METHOD(classname,function){                                                \
-    type *b;                                                                    \
+    zend_bool *b;                                                                    \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) {    \
             return;                                                             \
     }                                                                           \
@@ -214,8 +204,12 @@ void _register_QString();
 void _register_QLatin1String();
 void _register_QObject();
 void _register_QApplication();
+void _register_QCoreApplication();
 void _register_QWidget();
 void _register_QAbstractButton();
 void _register_QPushButton();
+void _register_QEvent();
 
 extern zend_class_entry *QWidget_ce_ptr;
+extern zend_class_entry *QCoreApplication_ce_ptr;
+extern zend_class_entry *QEvent_ce_ptr;
