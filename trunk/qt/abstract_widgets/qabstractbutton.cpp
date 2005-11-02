@@ -55,8 +55,8 @@ PHP_QT_RETURN_METHOD(QAbstractButton,isCheckable,RETURN_BOOL);
 PHP_QT_RETURN_METHOD(QAbstractButton,isChecked,RETURN_BOOL);
 PHP_QT_RETURN_METHOD(QAbstractButton,isDown,RETURN_BOOL);
 
-PHP_QT_ABSTRACT_SETBOOL_METHOD(QAbstractButton,setAutoExclusive,QPushButton,"autoExclusive");
-PHP_QT_ABSTRACT_SETBOOL_METHOD(QAbstractButton,setAutoRepeat,QPushButton,"autoRepeat");
-PHP_QT_ABSTRACT_SETBOOL_METHOD(QAbstractButton,setCheckable,QPushButton,"checkable");
-PHP_QT_ABSTRACT_SETBOOL_METHOD(QAbstractButton,setDown,QPushButton,"down");
+PHP_QT_ABSTRACT_SETBOOL_METHOD(QAbstractButton,setAutoExclusive,QPushButton,"setAutoExclusive");
+PHP_QT_ABSTRACT_SETBOOL_METHOD(QAbstractButton,setAutoRepeat,QPushButton,"setAutoRepeat");
+PHP_QT_ABSTRACT_SETBOOL_METHOD(QAbstractButton,setCheckable,QPushButton,"setCheckable");
+PHP_QT_ABSTRACT_SETBOOL_METHOD(QAbstractButton,setDown,QPushButton,"setDown");
 
