@@ -1,9 +1,13 @@
 dnl $Id$
 dnl config.m4 for extension php_qt
 
-dnl Comments in this file start with the string 'dnl'.
-dnl Remove where necessary. This file will not work
-dnl without editing.
+
+PHP_ARG_WITH(prefix,
+[  --with-prefix=DIR    php prefix])
+
+if test "$PHP_PREFIX" != "no"; then
+    $prefix=$PHP_PREFIX
+fi
 
 dnl If your extension references something external, use with:
 
@@ -30,6 +34,7 @@ if test "$PHP_PHP_QT" != "no"; then
 
   PHP_NEW_EXTENSION(php_qt, \
   qt/main_window/qapplication.cpp \
+  qt/main_window/qcoreapplication.cpp \
   qt/abstract_widgets/qabstractbutton.cpp \
   qt/abstract_widgets/qwidget.cpp \
   qt/basic_widgets/qpushbutton.cpp \
@@ -37,9 +42,9 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/text_related/qstring.cpp \
   qt/text_related/qlatin1string.cpp \
   qt/text_related/qchar.cpp \
-  qt/php_qt.cpp ,$ext_shared)
+  qt/event/qevent.cpp \
+  qt/php_qt.cpp,$ext_shared)
 
   PHP_ADD_BUILD_DIR($ext_builddir/qt)
-
 
 fi
