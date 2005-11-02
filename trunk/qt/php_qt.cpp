@@ -27,6 +27,8 @@
 #include <QObject>
 #include <QApplication>
 
+QOUT();
+
 //static int objects_handle;
 
 /* If you declare any globals in php_php_qt.h uncomment this:
@@ -52,6 +54,8 @@ zend_class_entry *QEvent_ce_ptr;
  */
 function_entry php_qt_functions[] = {
 	PHP_FE(confirm_php_qt_compiled,	NULL)		/* For testing, remove later. */
+    PHP_FE(SIGNAL,	NULL)
+    PHP_FE(SLOT,	NULL)
 	{NULL, NULL, NULL}	/* Must be the last line in php_qt_functions[] */
 };
 /* }}} */
@@ -295,6 +299,50 @@ PHP_FUNCTION(confirm_php_qt_compiled)
   	len = sprintf(string, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "php_qt", arg);
 	RETURN_STRINGL(string, len, 1);
 
+}
+
+/*
+ *  emulate the SIGNAL(), SLOT() macros in Qt
+ */
+
+PHP_FUNCTION(SIGNAL)
+{
+    const char* string;
+    int* string_len;
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&string,&string_len)) {
+        return;
+    }
+
+    char* tmp = (char*) emalloc((int) string_len + 2);
+    strcpy(tmp,"2");
+
+    strncat(tmp, string, (int) string_len);
+
+    ZVAL_STRING(return_value,tmp,1);
+
+    efree(tmp);
+
+    return;
+}
+
+PHP_FUNCTION(SLOT)
+{
+    const char* string;
+    int* string_len;
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&string,&string_len)) {
+        return;
+    }
+
+    char* tmp = (char*) emalloc((int) string_len + 2);
+    strcpy(tmp,"1");
+
+    strncat(tmp, string, (int) string_len);
+
+    ZVAL_STRING(return_value,tmp,1);
+
+    efree(tmp);
+
+    return;
 }
 
 /* }}} */

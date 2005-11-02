@@ -43,6 +43,10 @@ PHP_MINFO_FUNCTION(php_qt);
 
 PHP_FUNCTION(confirm_php_qt_compiled);	/* For testing, remove later. */
 
+/* emulate SIGNAL(), SLOT() macros */
+PHP_FUNCTION(SIGNAL);
+PHP_FUNCTION(SLOT);
+
 /* QObject */
 ZEND_METHOD(QObject,__construct);
 ZEND_METHOD(QObject,__destruct);
