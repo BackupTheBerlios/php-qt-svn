@@ -223,6 +223,7 @@ ZEND_METHOD(QAbstractButton,isDown);
 ZEND_METHOD(QAbstractButton,setAutoExclusive);
 ZEND_METHOD(QAbstractButton,setAutoRepeat);
 ZEND_METHOD(QAbstractButton,setCheckable);
+ZEND_METHOD(QAbstractButton,paintEvent);
 
 /* QPushButton */
 ZEND_METHOD(QPushButton,__construct);
@@ -234,6 +235,7 @@ ZEND_METHOD(QPushButton,setAutoDefault);
 ZEND_METHOD(QPushButton,setDefault);
 ZEND_METHOD(QPushButton,setFlat);
 ZEND_METHOD(QPushButton,setMenu);
+ZEND_METHOD(QPushButton,paintEvent);
 
 /* QWidget */
 ZEND_METHOD(QWidget,__construct);
@@ -283,6 +285,26 @@ ZEND_METHOD(QEvent,isAccepted);
 ZEND_METHOD(QEvent,setAccepted);
 ZEND_METHOD(QEvent,spontaneous);
 ZEND_METHOD(QEvent,type);
+
+/* QLayoutItem */
+ZEND_METHOD(QLayoutItem,__construct);
+ZEND_METHOD(QLayoutItem,alignment);
+ZEND_METHOD(QLayoutItem,hasHeightForWidth);
+ZEND_METHOD(QLayoutItem,heightForWidth);
+ZEND_METHOD(QLayoutItem,invalidate);
+ZEND_METHOD(QLayoutItem,layout);
+ZEND_METHOD(QLayoutItem,minimumHeightForWidth);
+ZEND_METHOD(QLayoutItem,setAlignment);
+ZEND_METHOD(QLayoutItem,spacerItem);
+ZEND_METHOD(QLayoutItem,widget);
+ZEND_METHOD(QLayoutItem,expandingDirections);//abstract
+ZEND_METHOD(QLayoutItem,geometry);//abstract
+ZEND_METHOD(QLayoutItem,isEmpty);//abstract
+ZEND_METHOD(QLayoutItem,maximumSize);//abstract
+ZEND_METHOD(QLayoutItem,minimumSize);//abstract
+ZEND_METHOD(QLayoutItem,setGeometry);//abstract
+ZEND_METHOD(QLayoutItem,sizeHint);//abstract
+
 
 /* 
   	Declare any global variables you may need between the BEGIN

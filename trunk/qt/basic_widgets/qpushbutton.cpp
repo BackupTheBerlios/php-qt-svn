@@ -50,6 +50,10 @@ ZEND_METHOD(QPushButton,__construct){
     }
 }
 
+ZEND_METHOD(QPushButton,paintEvent){
+}
+
+
 ZEND_METHOD(QPushButton,autoDefault){
 
     QPushButton *o = (QPushButton*) PHP_QT_FETCH();

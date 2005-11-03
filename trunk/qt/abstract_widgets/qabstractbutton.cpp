@@ -27,15 +27,15 @@ using namespace std;
 
 ZEND_METHOD(QAbstractButton,__construct){
 
-    if(ZEND_NUM_ARGS() > 0){
+    /*if(ZEND_NUM_ARGS() > 0){
         zval *object;
 
 	    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o",&object) == FAILURE) {
             return;
         }
-        QAbstractButton* parent = (QAbstractButton*) php_qt_fetch(object);
+        QAbstractButton* parent = (QAbstractButton*) php_qt_fetch(object);*/
         /* dirty, we cannot instanciate QAbstractButton directly */
-        QAbstractButton* QAbstractButton_ptr = new QPushButton(parent);
+        /*QAbstractButton* QAbstractButton_ptr = new QPushButton(parent);
         PHP_QT_REGISTER(QAbstractButton_ptr);
 
         RETURN_NULL();
@@ -46,7 +46,10 @@ ZEND_METHOD(QAbstractButton,__construct){
         PHP_QT_REGISTER(QAbstractButton_ptr);
 
         RETURN_NULL();
-    }
+    }*/
+}
+
+ZEND_METHOD(QAbstractButton,paintEvent){
 }
 
 PHP_QT_RETURN_METHOD(QAbstractButton,autoExclusive,RETURN_BOOL);

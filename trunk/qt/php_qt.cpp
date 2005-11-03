@@ -48,6 +48,10 @@ static zend_class_entry *QAbstractButton_ce_ptr;
 static zend_class_entry *QApplication_ce_ptr;
 zend_class_entry *QCoreApplication_ce_ptr;
 zend_class_entry *QEvent_ce_ptr;
+zend_class_entry *QLayoutItem_ce_ptr;
+zend_class_entry *QLayout_ce_ptr;
+zend_class_entry *QSpacerItem_ce_ptr;
+
 /* {{{ php_qt_functions[]
  *
  * Every user visible function must have an entry in php_qt_functions[].
@@ -230,6 +234,8 @@ PHP_MINIT_FUNCTION(php_qt)
 	REGISTER_LONG_CONSTANT("QEVENT_TYPE_USER", QEvent::User,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QEVENT_TYPE_MAXUSER", QEvent::MaxUser,CONST_CS | CONST_PERSISTENT);	
 	
+	
+	_register_QLayoutItem(TSRMLS_C);
 //    objects_handle = zend_register_list_destructors_ex(NULL,NULL,"Qt Wrapper",module_number);
 
 	return SUCCESS;
@@ -528,7 +534,7 @@ static zend_function_entry QPushButton_methods[] = {
     ZEND_ME(QPushButton,setDefault,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QPushButton,setFlat,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QPushButton,setMenu,NULL,ZEND_ACC_PUBLIC)
-    
+    ZEND_ME(QPushButton,paintEvent,NULL,ZEND_ACC_PUBLIC)
     {NULL,NULL,NULL}
 
 };
@@ -554,6 +560,7 @@ static zend_function_entry QAbstractButton_methods[] = {
     ZEND_ME(QAbstractButton,isDown,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractButton,setAutoExclusive,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractButton,setAutoRepeat,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractButton,paintEvent,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
 //    ZEND_ME(QAbstractButton,setCheckable,NULL,ZEND_ACC_PUBLIC)
 //    ZEND_ME(QAbstractButton,setDown,NULL,ZEND_ACC_PUBLIC)
 
@@ -759,6 +766,37 @@ void _register_QEvent(TSRMLS_D)
     INIT_CLASS_ENTRY(ce,"QEvent",QEvent_methods);
     QEvent_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
 
+}
+
+static zend_function_entry QLayoutItem_methods[] = {
+	ZEND_ME(QLayoutItem,__construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayoutItem,alignment,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayoutItem,hasHeightForWidth,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayoutItem,heightForWidth,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayoutItem,invalidate,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayoutItem,layout,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayoutItem,minimumHeightForWidth,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayoutItem,setAlignment,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayoutItem,spacerItem,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayoutItem,widget,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayoutItem, expandingDirections,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+	ZEND_ME(QLayoutItem,geometry,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+	ZEND_ME(QLayoutItem,isEmpty,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+	ZEND_ME(QLayoutItem,maximumSize,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+	ZEND_ME(QLayoutItem,minimumSize,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+	ZEND_ME(QLayoutItem,setGeometry,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+	ZEND_ME(QLayoutItem,sizeHint,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+	{NULL,NULL,NULL}
+};
+
+
+void _register_QLayoutItem(TSRMLS_C)
+{
+    zend_class_entry ce;
+    TSRMLS_FETCH();
+
+    INIT_CLASS_ENTRY(ce,"QLayoutItem",QLayoutItem_methods);
+    QLayoutItem_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
 }
 
 /* }}} */
