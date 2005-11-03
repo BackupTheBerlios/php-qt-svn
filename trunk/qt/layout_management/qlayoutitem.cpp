@@ -59,7 +59,6 @@ ZEND_METHOD(QLayoutItem,minimumHeightForWidth)
             return;
     }
     QLayoutItem* obj = (QLayoutItem*) PHP_QT_FETCH();
-	qDebug("%u",obj->minimumHeightForWidth(l));
     RETURN_LONG(obj->minimumHeightForWidth(l));
 }
 

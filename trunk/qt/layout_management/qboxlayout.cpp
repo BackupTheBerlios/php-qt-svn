@@ -42,59 +42,91 @@ ZEND_METHOD(QBoxLayout,__construct){
 	RETURN_NULL();
 }
 
-ZEND_METHOD(QBoxLayout,sizeHint)
-{
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
-}
 
 ZEND_METHOD(QBoxLayout,addItem)
 {
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
+	zval *object;
+	QLayoutItem *layoutItem = NULL;
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o", &object) == FAILURE) {
+		return;
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	layoutItem = (QLayoutItem*) php_qt_fetch(object);
+	
+	obj->addItem(layoutItem);
+	
+	RETURN_NULL();
 }
 
-ZEND_METHOD(QBoxLayout,count)
-{
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
-}
+PHP_QT_RETURN_METHOD(QBoxLayout,count,RETURN_LONG)
 
 ZEND_METHOD(QBoxLayout,takeAt)
 {
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
+	zval *object;
+	long index;
+		
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l", &index) == FAILURE) {
+		return;
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	PHP_QT_RET_OBJ(QLayoutItem,obj->takeAt(index));
 }
 
-ZEND_METHOD(QBoxLayout,setGeometry)
+
+ZEND_METHOD(QBoxLayout,itemAt)
 {
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
+	zval *object;
+	long index;
+		
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l", &index) == FAILURE) {
+		return;
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	PHP_QT_RET_OBJ(QLayoutItem,obj->itemAt(index));
 }
+
 
 ZEND_METHOD(QBoxLayout,addLayout)
 {
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
+	zval *object;
+	QLayout *layout = NULL;
+	long stretch=0;
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o|l", &object, &stretch) == FAILURE) {
+		return;
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	layout = (QLayout*) php_qt_fetch(object);
+	
+	obj->addLayout(layout,stretch);
+	
+	RETURN_NULL();
 }
 
-ZEND_METHOD(QBoxLayout,addSpacing)
-{
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
-}
+PHP_QT_SETLONG_METHOD(QBoxLayout,addSpacing)
 
 ZEND_METHOD(QBoxLayout,addStretch)
 {
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
+	long stretch=0;
+	if(ZEND_NUM_ARGS() == 1)
+	{
+		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l", &stretch) == FAILURE) {
+			return;
+		}
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	obj->addStretch(stretch);
+	
+	RETURN_NULL();
 }
 
-ZEND_METHOD(QBoxLayout,addStrut)
-{
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
-}
+PHP_QT_SETLONG_METHOD(QBoxLayout,addStrut)
 
 ZEND_METHOD(QBoxLayout,addWidget)
 {
@@ -119,52 +151,130 @@ ZEND_METHOD(QBoxLayout,addWidget)
 ZEND_METHOD(QBoxLayout, direction)
 {
     QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
-	qDebug("%X", obj);
-	obj->direction();
-	RETURN_LONG(0);
-    //RETURN_LONG((long)obj->direction());
-
+    RETURN_LONG((long)obj->direction());
 }
 
 ZEND_METHOD(QBoxLayout,insertLayout)
 {
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
+	zval *object;
+	QLayout *layout = NULL;
+	long stretch=0;
+	long index;
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"lo|l",&index , &object, &stretch) == FAILURE) {
+		return;
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	layout = (QLayout*) php_qt_fetch(object);
+	
+	obj->insertLayout(index,layout,stretch);
+	
+	RETURN_NULL();
 }
 
 ZEND_METHOD(QBoxLayout,insertSpacing)
 {
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
+	long size;
+	long index;
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ll",&index , &size) == FAILURE) {
+		return;
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	obj->insertSpacing(index,size);
+	
+	RETURN_NULL();
 }
 
 ZEND_METHOD(QBoxLayout,insertStretch)
 {
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
+	long stretch=0;
+	long index;
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l|l",&index , &stretch) == FAILURE) {
+		return;
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	obj->insertStretch(index,stretch);
+	
+	RETURN_NULL();
 }
 
 ZEND_METHOD(QBoxLayout,insertWidget)
 {
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
+	zval *object;
+	long stretch = 0;
+	long alignment = 0;
+	long index;
+	QWidget *widget = NULL;
+		
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"lo|ll",index, &object, &stretch, &alignment) == FAILURE) {
+		return;
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	widget = (QWidget*) php_qt_fetch(object);
+		
+	obj->insertWidget(index,widget, stretch, (Qt::Alignment)alignment);
+	
+	RETURN_NULL();
 }
 
 PHP_QT_METHOD(QBoxLayout,invalidate)
 
 ZEND_METHOD(QBoxLayout,setDirection)
 {
-    NOT_YET_IMPLEMENTED
-    RETURN_NULL(); 
+	long direction;
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&direction) == FAILURE) {
+		return;
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	obj->setDirection((QBoxLayout::Direction)direction);
+	
+	RETURN_NULL();
 }
 
 ZEND_METHOD(QBoxLayout,setStretchFactor)
+{
+	zval *object;
+	long stretch = 0;
+	QObject *o = NULL;
+	
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ol", &object, &stretch) == FAILURE) {
+		return;
+	}
+	QBoxLayout* obj = (QBoxLayout*) PHP_QT_FETCH();
+	
+	o = (QObject*) php_qt_fetch(object);
+
+	QString tmp(o->metaObject()->className());
+		
+	if(tmp == "QWidget")
+		RETURN_BOOL(obj->setStretchFactor((QWidget *)o, stretch))
+	else
+		RETURN_BOOL(obj->setStretchFactor((QLayout *)o, stretch))
+}
+
+ZEND_METHOD(QBoxLayout,insertItem)
 {
     NOT_YET_IMPLEMENTED
     RETURN_NULL(); 
 }
 
-ZEND_METHOD(QBoxLayout,insertItem)
+ZEND_METHOD(QBoxLayout,setGeometry)
+{
+    NOT_YET_IMPLEMENTED
+    RETURN_NULL(); 
+}
+
+ZEND_METHOD(QBoxLayout,sizeHint)
 {
     NOT_YET_IMPLEMENTED
     RETURN_NULL(); 
