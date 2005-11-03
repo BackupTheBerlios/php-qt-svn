@@ -26,9 +26,19 @@ using namespace std;
 #include "../php_qt.h"
 
 ZEND_METHOD(QLayoutItem,__construct){}
-
-PHP_QT_RETURN_METHOD(QLayoutItem, alignment, RETURN_LONG)
 PHP_QT_RETURN_METHOD(QLayoutItem,hasHeightForWidth, RETURN_BOOL);
+PHP_QT_METHOD(QLayoutItem,invalidate)
+PHP_QT_RETURN_OBJ_METHOD(QLayoutItem,layout,QLayout)
+PHP_QT_RETURN_OBJ_METHOD(QLayoutItem,spacerItem,QSpacerItem)
+PHP_QT_RETURN_OBJ_METHOD(QLayoutItem,widget,QWidget)
+
+ZEND_METHOD(QLayoutItem, alignment)
+{
+    QLayoutItem* obj = (QLayoutItem*) PHP_QT_FETCH();
+    RETURN_LONG((long)obj->alignment());
+
+}
+
 
 ZEND_METHOD(QLayoutItem,heightForWidth)
 {
@@ -41,8 +51,6 @@ ZEND_METHOD(QLayoutItem,heightForWidth)
 
 }
 
-PHP_QT_METHOD(QLayoutItem,invalidate)
-PHP_QT_RETURN_OBJ_METHOD(QLayoutItem,layout,QLayout)
 
 ZEND_METHOD(QLayoutItem,minimumHeightForWidth)
 {
@@ -51,6 +59,7 @@ ZEND_METHOD(QLayoutItem,minimumHeightForWidth)
             return;
     }
     QLayoutItem* obj = (QLayoutItem*) PHP_QT_FETCH();
+	qDebug("%u",obj->minimumHeightForWidth(l));
     RETURN_LONG(obj->minimumHeightForWidth(l));
 }
 
@@ -65,9 +74,6 @@ ZEND_METHOD(QLayoutItem,setAlignment)
     RETURN_NULL();
 }
 
-PHP_QT_RETURN_OBJ_METHOD(QLayoutItem,spacerItem,QSpacerItem)
-
-PHP_QT_RETURN_OBJ_METHOD(QLayoutItem,widget,QWidget)
 
 ZEND_METHOD(QLayoutItem,expandingDirections){}//abstract
 ZEND_METHOD(QLayoutItem,geometry){}//abstract

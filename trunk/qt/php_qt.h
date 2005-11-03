@@ -230,10 +230,13 @@ void _register_QAbstractButton();
 void _register_QPushButton();
 void _register_QEvent();
 void _register_QLayoutItem();
+void _register_QLayout();
+void _register_QBoxLayout();
 
 extern zend_class_entry *QWidget_ce_ptr;
 extern zend_class_entry *QCoreApplication_ce_ptr;
 extern zend_class_entry *QEvent_ce_ptr;
 extern zend_class_entry *QLayoutItem_ce_ptr;
 extern zend_class_entry *QLayout_ce_ptr;
+extern zend_class_entry *QBoxLayout_ce_ptr;
 extern zend_class_entry *QSpacerItem_ce_ptr;

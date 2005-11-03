@@ -26,6 +26,7 @@
 #include "php_qt.h"
 #include <QObject>
 #include <QApplication>
+#include <QBoxLayout>
 
 QOUT();
 
@@ -50,6 +51,7 @@ zend_class_entry *QCoreApplication_ce_ptr;
 zend_class_entry *QEvent_ce_ptr;
 zend_class_entry *QLayoutItem_ce_ptr;
 zend_class_entry *QLayout_ce_ptr;
+zend_class_entry *QBoxLayout_ce_ptr;
 zend_class_entry *QSpacerItem_ce_ptr;
 
 /* {{{ php_qt_functions[]
@@ -59,7 +61,7 @@ zend_class_entry *QSpacerItem_ce_ptr;
 function_entry php_qt_functions[] = {
 	PHP_FE(confirm_php_qt_compiled,	NULL)		/* For testing, remove later. */
     PHP_FE(SIGNAL,	NULL)
-    PHP_FE(SLOT,	NULL)
+    PHP_FE(SLOT,	NULL)	
 	{NULL, NULL, NULL}	/* Must be the last line in php_qt_functions[] */
 };
 /* }}} */
@@ -118,6 +120,23 @@ PHP_MINIT_FUNCTION(php_qt)
 	ZEND_INIT_MODULE_GLOBALS(php_qt, php_php_qt_init_globals, NULL);
 	REGISTER_INI_ENTRIES();
 	*/
+	/*Qt constant */
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNLEFT",Qt::AlignLeft ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNRIGHT",Qt::AlignRight ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNHCENTER",Qt::AlignHCenter ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNJUSTIFY",Qt::AlignJustify ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNTOP",Qt::AlignTop ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNBOTTOM",Qt::AlignBottom ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNVCENTER",Qt::AlignVCenter ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNCENTER",Qt::AlignCenter ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNABSOLUTE",Qt::AlignAbsolute ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNLEADING",Qt::AlignLeading ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNTRAILING",Qt::AlignTrailing ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNHORIZONTAL_MASK",Qt::AlignHorizontal_Mask ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNVERTICAL_MASK",Qt::AlignVertical_Mask ,CONST_CS | CONST_PERSISTENT);	
+	
+	
+	
 	_register_QCoreApplication(TSRMLS_C);
 	REGISTER_LONG_CONSTANT("QCOREAPPLICATION_ENCODING_DEFAULTCODEC",QCoreApplication::DefaultCodec ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QCOREAPPLICATION_ENCODING_UNICODEUTF8",QCoreApplication::UnicodeUTF8 ,CONST_CS | CONST_PERSISTENT);	
@@ -236,6 +255,21 @@ PHP_MINIT_FUNCTION(php_qt)
 	
 	
 	_register_QLayoutItem(TSRMLS_C);
+	
+	_register_QLayout(TSRMLS_C);
+	REGISTER_LONG_CONSTANT("QLAYOUT_SIZECONSTRAINT_SETDEFAULTCONSTRAINT",QLayout::SetDefaultConstraint ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QLAYOUT_SIZECONSTRAINT_SETFIXEDSIZE",QLayout::SetFixedSize ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QLAYOUT_SIZECONSTRAINT_SETMINIMUMSIZE",QLayout::SetMinimumSize ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QLAYOUT_SIZECONSTRAINT_SETMAXIMUMSIZE",QLayout::SetMaximumSize ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QLAYOUT_SIZECONSTRAINT_SETMINANDMAXSIZE",QLayout::SetMinAndMaxSize ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QLAYOUT_SIZECONSTRAINT_SETNOTCONSTRAINT",QLayout::SetNoConstraint ,CONST_CS | CONST_PERSISTENT);	
+	
+	_register_QBoxLayout(TSRMLS_C);
+	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_LEFT_TO_RIGHT",QBoxLayout::LeftToRight ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_RIGHT_TO_LEFT",QBoxLayout::RightToLeft ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_TOP_TO_BOTTOM",QBoxLayout::TopToBottom ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_BOTTOM_TO_TOP",QBoxLayout::BottomToTop ,CONST_CS | CONST_PERSISTENT);	
+	
 //    objects_handle = zend_register_list_destructors_ex(NULL,NULL,"Qt Wrapper",module_number);
 
 	return SUCCESS;
@@ -427,8 +461,8 @@ static zend_function_entry QObject_methods[] = {
     ZEND_ME(QObject,test,NULL,ZEND_ACC_PUBLIC)    
     ZEND_ME(QObject,blockSignals,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QObject,children,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QObject,connect,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QObject,disconnect,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QObject,connect,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+    ZEND_ME(QObject,disconnect,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
     ZEND_ME(QObject,dumpObjectInfo,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QObject,dumpObjectTree,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QObject,event,NULL,ZEND_ACC_PUBLIC)
@@ -797,6 +831,69 @@ void _register_QLayoutItem(TSRMLS_C)
 
     INIT_CLASS_ENTRY(ce,"QLayoutItem",QLayoutItem_methods);
     QLayoutItem_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
+}
+
+static zend_function_entry QLayout_methods[] = {
+	ZEND_ME(QLayout,__construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,expandingDirections,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,geometry,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,isEmpty,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,maximumSize,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,minimumSize,NULL,ZEND_ACC_PUBLIC)
+	//abstract class
+	ZEND_ME(QLayout,addItem,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+	ZEND_ME(QLayout,count,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+	ZEND_ME(QLayout,takeAt,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+
+	{NULL,NULL,NULL}
+};
+
+
+void _register_QLayout(TSRMLS_C)
+{
+   zend_class_entry ce;
+   
+   //QLayout inherits QLayoutItem and QObject 
+   INIT_CLASS_ENTRY(ce,"QLayout",QLayout_methods);
+   //Register class and inherits QLayoutItem
+   QLayout_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QLayoutItem_ce_ptr,NULL TSRMLS_CC);
+   //Inherits QObject
+   zend_do_inheritance(QLayout_ce_ptr, QObject_ce_ptr TSRMLS_CC);
+}
+
+static zend_function_entry QBoxLayout_methods[] = {
+	ZEND_ME(QBoxLayout,__construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QBoxLayout,sizeHint,NULL,ZEND_ACC_PUBLIC)
+	//abstract class
+	ZEND_ME(QBoxLayout,addItem,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QBoxLayout,count,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QBoxLayout,takeAt,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QBoxLayout,setGeometry,NULL,ZEND_ACC_PUBLIC)	
+
+	ZEND_ME(QBoxLayout,addLayout,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,addSpacing,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,addStretch,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,addStrut,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,addWidget,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,direction,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,insertLayout,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,insertSpacing,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,insertStretch,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,insertWidget,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,invalidate,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,setDirection,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,setStretchFactor,NULL,ZEND_ACC_PUBLIC)	
+	ZEND_ME(QBoxLayout,insertItem,NULL,ZEND_ACC_PROTECTED)	
+		
+	{NULL,NULL,NULL}
+};
+
+void _register_QBoxLayout(TSRMLS_C)
+{
+   zend_class_entry ce;
+    
+   INIT_CLASS_ENTRY(ce,"QBoxLayout",QBoxLayout_methods);
+   QBoxLayout_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QLayout_ce_ptr,NULL TSRMLS_CC);
 }
 
 /* }}} */

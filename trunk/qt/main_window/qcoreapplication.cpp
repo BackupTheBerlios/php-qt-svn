@@ -130,7 +130,7 @@ ZEND_METHOD(QCoreApplication,applicationDirPath){
 	else
 		tmp = QCoreApplication::applicationDirPath();
 	
-	RETURN_STRING(tmp.toLatin1().data(),tmp.length());    
+	RETURN_STRING(tmp.toLatin1().data(),tmp.length());
 }
 
 ZEND_METHOD(QCoreApplication,applicationFilePath){

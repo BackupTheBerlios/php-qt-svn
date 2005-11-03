@@ -305,6 +305,40 @@ ZEND_METHOD(QLayoutItem,minimumSize);//abstract
 ZEND_METHOD(QLayoutItem,setGeometry);//abstract
 ZEND_METHOD(QLayoutItem,sizeHint);//abstract
 
+/* QLayout */
+ZEND_METHOD(QLayout,__construct);
+ZEND_METHOD(QLayout,expandingDirections);
+ZEND_METHOD(QLayout,geometry);
+ZEND_METHOD(QLayout,isEmpty);
+ZEND_METHOD(QLayout,maximumSize);
+ZEND_METHOD(QLayout,minimumSize);
+//ZEND_METHOD(QLayout,setGeometry);
+//ZEND_METHOD(QLayout,sizeHint);
+ZEND_METHOD(QLayout,addItem);
+ZEND_METHOD(QLayout,count);
+ZEND_METHOD(QLayout,takeAt);
+
+/* QLayoutBox */
+ZEND_METHOD(QBoxLayout,__construct);
+ZEND_METHOD(QBoxLayout,sizeHint);
+ZEND_METHOD(QBoxLayout,addItem);
+ZEND_METHOD(QBoxLayout,count);
+ZEND_METHOD(QBoxLayout,takeAt);
+ZEND_METHOD(QBoxLayout,setGeometry);
+ZEND_METHOD(QBoxLayout,addLayout);	
+ZEND_METHOD(QBoxLayout,addSpacing);	
+ZEND_METHOD(QBoxLayout,addStretch);	
+ZEND_METHOD(QBoxLayout,addStrut);
+ZEND_METHOD(QBoxLayout,addWidget);
+ZEND_METHOD(QBoxLayout,direction);	
+ZEND_METHOD(QBoxLayout,insertLayout);	
+ZEND_METHOD(QBoxLayout,insertSpacing);
+ZEND_METHOD(QBoxLayout,insertStretch);	
+ZEND_METHOD(QBoxLayout,insertWidget);	
+ZEND_METHOD(QBoxLayout,invalidate);
+ZEND_METHOD(QBoxLayout,setDirection);	
+ZEND_METHOD(QBoxLayout,setStretchFactor);	
+ZEND_METHOD(QBoxLayout,insertItem);	
 
 /* 
   	Declare any global variables you may need between the BEGIN
