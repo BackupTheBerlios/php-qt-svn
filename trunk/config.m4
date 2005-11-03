@@ -43,6 +43,7 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/text_related/qlatin1string.cpp \
   qt/text_related/qchar.cpp \
   qt/event/qevent.cpp \
+  qt/layout_management/qlayoutitem.cpp \
   qt/php_qt.cpp,$ext_shared)
 
   PHP_ADD_BUILD_DIR($ext_builddir/qt)
