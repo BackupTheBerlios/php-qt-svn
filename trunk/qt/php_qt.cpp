@@ -534,7 +534,7 @@ static zend_function_entry QPushButton_methods[] = {
     ZEND_ME(QPushButton,setDefault,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QPushButton,setFlat,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QPushButton,setMenu,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QPushButton,paintEvent,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QPushButton,paintEvent,NULL,ZEND_ACC_PROTECTED)
     {NULL,NULL,NULL}
 
 };
@@ -560,7 +560,7 @@ static zend_function_entry QAbstractButton_methods[] = {
     ZEND_ME(QAbstractButton,isDown,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractButton,setAutoExclusive,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractButton,setAutoRepeat,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QAbstractButton,paintEvent,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+    ZEND_ME(QAbstractButton,paintEvent,NULL,ZEND_ACC_PROTECTED|ZEND_ACC_ABSTRACT)
 //    ZEND_ME(QAbstractButton,setCheckable,NULL,ZEND_ACC_PUBLIC)
 //    ZEND_ME(QAbstractButton,setDown,NULL,ZEND_ACC_PUBLIC)
 
