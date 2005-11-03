@@ -38,12 +38,12 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/abstract_widgets/qabstractbutton.cpp \
   qt/abstract_widgets/qwidget.cpp \
   qt/basic_widgets/qpushbutton.cpp \
+  qt/layout_management/qlayoutitem.cpp \
   qt/object_model/qobject.cpp \
   qt/text_related/qstring.cpp \
   qt/text_related/qlatin1string.cpp \
   qt/text_related/qchar.cpp \
   qt/event/qevent.cpp \
-  qt/layout_management/qlayoutitem.cpp \
   qt/php_qt.cpp,$ext_shared)
 
   PHP_ADD_BUILD_DIR($ext_builddir/qt)
