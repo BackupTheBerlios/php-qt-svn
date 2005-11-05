@@ -154,8 +154,8 @@ ZEND_METHOD(classname,function){                                                
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) {    \
             return;                                                             \
     }                                                                           \
-    pseudo* pseudo_ptr = new pseudo();                                          \
-    pseudo_ptr->function(b);                                                    \
+    classname* obj = (classname*) PHP_QT_FETCH();                                     \
+    obj->function(b);                                                    \
     RETURN_NULL();                                                              \
 }                                                                               \
 
