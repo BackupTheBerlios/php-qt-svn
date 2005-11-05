@@ -87,4 +87,80 @@ PHP_QT_RETURN_METHOD(QWidget,x,RETURN_LONG);
 PHP_QT_RETURN_METHOD(QWidget,y,RETURN_LONG);
 
 
+// PHP_QT_RETURN_OBJ_METHOD(QWidget, function, object_type) \
+
+ //PHP_QT_RETURN_OBJ_METHOD(QWidget, accessibleDescription, QString);
+ //PHP_QT_RETURN_OBJ_METHOD(QWidget, accessibleName, QString);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, backgroundRole, QPalette::ColorRole); // ??
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, baseSize, QSize);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, childrenRecr, QRect);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, childrenRegion, QRegion);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, contentsRect, QRect);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, contextMenuPolicy, Qt::ContextMenyPolicy); // ??
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, cursor, QCursor);
+PHP_QT_METHOD(QWidget, ensurePolished);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, focusPolicy, Qt::FocusPolicy); // ??
+PHP_QT_RETURN_OBJ_METHOD(QWidget, focusProxy, QWidget);
+PHP_QT_RETURN_OBJ_METHOD(QWidget, focusWidget, QWidget);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, font, QFont); // const QFont &
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, fontInfo, QFontInfo);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, fontMetrics, QFontMetrics);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, foregroundRole, QPalette::ColorRole); // ??
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, frameGeometry, QRect);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, frameSize, QSize);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, geometry, QRect); // const QRect &
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, getDC, HDC); // virtual HDC
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, inputContext, QInputContext);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, inputMethodQuery, QVariant); // virtual QVariant
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, layout, QLayout); // QLayout *
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, layoutDirection, Qt::LayoutDirection); // ??
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, mask, QRegion);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, maximumSize, QSize);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, minimumSize, QSize);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, minimumSizeHint, QSize); // virtual QSize
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, nextInFocusChain, QWidget); // QWidget *
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, normalGeometry, QRect);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, paintEngine, QPaintEngine); // QPaintEngine *
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, palette, QPalette); // const
+PHP_QT_RETURN_OBJ_METHOD(QWidget, parentWidget, QWidget); // QWidget *
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, pos, QPoint);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, rect, QRect);
+//PHP_QT_METHOD(QWidget, releaseDC);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, size, QSize);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, sizeHint, QSize); // virtual QSize
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, sizeIncrement, QSize);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, sizePolicy, QSizePolicy);
+ //PHP_QT_RETURN_OBJ_METHOD(QWidget, statusTip, QString);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, style, QStyle); // QStyle *
+ //PHP_QT_RETURN_OBJ_METHOD(QWidget, toolTip, QString);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, visibleRegion, QRegion);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, whatsThis, QString);
+PHP_QT_RETURN_OBJ_METHOD(QWidget, window, QWidget); // QWidget *
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, windowFlags, Qt::WindowFlags); // ??
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, windowIcon, QIcon);
+ //PHP_QT_RETURN_OBJ_METHOD(QWidget, windowIconText, QString);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, windowOpacity, qreal);
+ //PHP_QT_RETURN_OBJ_METHOD(QWidget, windowRole, QString);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, windowState, Qt::WindowStates); // ??
+ //PHP_QT_RETURN_OBJ_METHOD(QWidget, windowTitle, QString);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, windowType, Qt::WindowType);
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, x11Info, QX11Info); // const QX11Info &
+//PHP_QT_RETURN_OBJ_METHOD(QWidget, x11PictureHandle, Qt::HANDLE); // ??
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

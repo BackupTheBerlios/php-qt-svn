@@ -24,8 +24,6 @@ using namespace std;
 #include <QString>
 #include "../php_qt.h"
 
-static zend_class_entry *QString_ce_ptr;
-
 /**
  *  QString
  */

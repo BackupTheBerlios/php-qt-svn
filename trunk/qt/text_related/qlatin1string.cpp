@@ -24,8 +24,6 @@ using namespace std;
 #include <QLatin1String>
 #include "../php_qt.h"
 
-static zend_class_entry *QLatin1String_ce_ptr;
-
 /**
  *  QLatin1String
  */

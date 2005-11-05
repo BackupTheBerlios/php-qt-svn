@@ -39,14 +39,13 @@ ZEND_DECLARE_MODULE_GLOBALS(php_qt)
 /* True global resources - no need for thread safety here */
 static int le_php_qt;
 
-
 zend_class_entry *QWidget_ce_ptr; //Gyger Jean-Luc change to non static
-static zend_class_entry *QString_ce_ptr;
-static zend_class_entry *QObject_ce_ptr;
-static zend_class_entry *QLatin1String_ce_ptr;
-static zend_class_entry *QPushButton_ce_ptr;
-static zend_class_entry *QAbstractButton_ce_ptr;
-static zend_class_entry *QApplication_ce_ptr;
+zend_class_entry *QString_ce_ptr;
+zend_class_entry *QObject_ce_ptr;
+zend_class_entry *QLatin1String_ce_ptr;
+zend_class_entry *QPushButton_ce_ptr;
+zend_class_entry *QAbstractButton_ce_ptr;
+zend_class_entry *QApplication_ce_ptr;
 zend_class_entry *QCoreApplication_ce_ptr;
 zend_class_entry *QEvent_ce_ptr;
 zend_class_entry *QLayoutItem_ce_ptr;
@@ -542,6 +541,64 @@ static zend_function_entry QWidget_methods[] = {
     ZEND_ME(QWidget,width,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,x,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,y,NULL,ZEND_ACC_PUBLIC)
+
+    ZEND_ME(QWidget,accessibleDescription,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,accessibleName,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,backgroundRole,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,baseSize,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,childrenRecr,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,childrenRegion,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,contentsRect,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,contextMenuPolicy,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,cursor,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,ensurePolished,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,focusPolicy,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,focusProxy,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,focusWidget,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,font,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,fontInfo,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,fontMetrics,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,foregroundRole,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,frameGeometry,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,frameSize,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,geometry,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,getDC,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,inputContext,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,inputMethodQuery,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,layout,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,layoutDirection,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,mask,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,maximumSize,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,minimumSize,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,minimumSizeHint,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,nextInFocusChain,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,normalGeometry,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,paintEngine,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,palette,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,parentWidget,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,pos,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,rect,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,releaseDC,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,size,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,sizeHint,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,sizeIncrement,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,sizePolicy,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,statusTip,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,style,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,toolTip,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,visibleRegion,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,whatsThis,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,window,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,windowFlags,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,windowIcon,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,windowIconText,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,windowOpacity,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,windowRole,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,windowState,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,windowTitle,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,windowType,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,x11Info,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,x11PictureHandle,NULL,ZEND_ACC_PUBLIC)
 
     {NULL,NULL,NULL}
 };

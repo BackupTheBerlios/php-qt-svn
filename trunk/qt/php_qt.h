@@ -133,9 +133,11 @@ ZEND_METHOD(classname,function){                               \
 
 #define PHP_QT_RETURN_OBJ_METHOD(classname, function, object_type) \
 ZEND_METHOD(classname,function){                                   \
-    classname *o = (classname*) PHP_QT_FETCH();                    \
-    PHP_QT_RET_OBJ(object_type,o->function());                     \
-    RETURN_NULL();                                                 \
+    if(getThis() != NULL){                                     \
+        classname *o = (classname*) PHP_QT_FETCH();                    \
+        PHP_QT_RET_OBJ(object_type,o->function());                     \
+    }    \
+    RETURN_NULL(); \
 } 
 
 	
@@ -233,6 +235,12 @@ void _register_QLayoutItem();
 void _register_QLayout();
 void _register_QBoxLayout();
 
+extern zend_class_entry *QString_ce_ptr;
+extern zend_class_entry *QObject_ce_ptr;
+extern zend_class_entry *QLatin1String_ce_ptr;
+extern zend_class_entry *QPushButton_ce_ptr;
+extern zend_class_entry *QAbstractButton_ce_ptr;
+extern zend_class_entry *QApplication_ce_ptr;
 extern zend_class_entry *QWidget_ce_ptr;
 extern zend_class_entry *QCoreApplication_ce_ptr;
 extern zend_class_entry *QEvent_ce_ptr;
