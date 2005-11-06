@@ -1,0 +1,68 @@
+PHP-Qt - an extension for PHP5 that aims to write software with the Qt Toolkit.
+===============================================================================
+PHP-Qt is an extension for PHP5 that aims to write software with the Qt Toolkit. 
+It provides an object-oriented interface to the Qt4 Framework and allowes 
+to write Qt applications in the PHP language.
+
+Requirements
+============
+
+PHP-Qt requires PHP 5.1RC1 or greater and Qt4 header files.
+
+PHP5: You should have a the header files and the development scripts.
+Qt4: You should have the header files.
+
+Note: at this time it is only possible to compile it in a unix envireonment.
+
+Compiling and installation
+==========================
+
+After unpacking or checking out from SVN copy the php_qt directory into the 
+php-5.1xxx/ext/ directory.
+
+We prefer to build PHP-Qt as module!
+
+At first it is neccessary to check your environment for compiling. 
+To do that change into this directory and run configure:
+
+./configure --enable-php_qt
+
+If you have two or more php installations you can specify the path with
+
+--with-prefix=/path/to/php5
+
+To remove old objectfiles run 
+
+make clean
+
+Finally, run 
+
+make
+
+to build the extension. If the compilation is successful run 
+
+make install
+
+to copy 'php_qt.so' into php's extension directory.
+
+To test it, simply run one of the test scripts in the php_qt/test/ subdirectory.
+
+
+Mailing lists
+=============
+
+Subversion commits
+The list for svn commits. Readonly!
+
+address:        php-qt-svn@lists.berlios.de.
+Subscription:   https://lists.berlios.de/mailman/listinfo/php-qt-svn
+Archive:        https://lists.berlios.de/pipermail/php-qt-svn/
+
+Website
+=======
+
+The website for the project:
+
+    http://php-qt.berlios.de
+
+
