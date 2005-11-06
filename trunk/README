@@ -51,12 +51,22 @@ To test it, simply run one of the test scripts in the php_qt/test/ subdirectory.
 Mailing lists
 =============
 
+user discussion
+-----------------
+users mailing list
+
+address:        php-qt-users@lists.berlios.de.
+Subscription:   https://lists.berlios.de/mailman/listinfo/php-qt-users
+Archive:        https://lists.berlios.de/pipermail/php-qt-users/
+
 Subversion commits
+--------------------
 The list for svn commits. Readonly!
 
 address:        php-qt-svn@lists.berlios.de.
 Subscription:   https://lists.berlios.de/mailman/listinfo/php-qt-svn
 Archive:        https://lists.berlios.de/pipermail/php-qt-svn/
+
 
 Website
 =======
