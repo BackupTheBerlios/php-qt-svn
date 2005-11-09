@@ -1,2 +1,2 @@
-LIBS          = $(SUBLIBS) -L/usr/lib/qt4 -L/usr/lib -L/tmp/buildd/qt4-x11-4.0.1/lib -lQtGui -L/usr/X11R6/lib -laudio -lXt -lpng -lSM -lICE -lXi -lXrender -lXrandr -lXcursor -lXinerama -lfreetype -lXext -lX11 -lm -lQtCore -lfontconfig -lz -ldl -lpthread
+LDFLAGS          = $(SUBLIBS) -L/usr/lib/qt4 -L/usr/lib -L/tmp/buildd/qt4-x11-4.0.1/lib -lQtGui -L/usr/X11R6/lib -laudio -lXt -lpng -lSM -lICE -lXi -lXrender -lXrandr -lXcursor -lXinerama -lfreetype -lXext -lX11 -lm -lQtCore -lfontconfig -lz -ldl -lpthread
 
