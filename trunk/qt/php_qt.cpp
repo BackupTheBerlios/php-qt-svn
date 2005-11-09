@@ -542,7 +542,7 @@ static zend_function_entry QWidget_methods[] = {
     ZEND_ME(QWidget,x,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,y,NULL,ZEND_ACC_PUBLIC)
 
-    ZEND_ME(QWidget,accessibleDescription,NULL,ZEND_ACC_PUBLIC)
+/*    ZEND_ME(QWidget,accessibleDescription,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,accessibleName,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,backgroundRole,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,baseSize,NULL,ZEND_ACC_PUBLIC)
@@ -551,11 +551,11 @@ static zend_function_entry QWidget_methods[] = {
     ZEND_ME(QWidget,contentsRect,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,contextMenuPolicy,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,cursor,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,ensurePolished,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,focusPolicy,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,focusProxy,NULL,ZEND_ACC_PUBLIC)
+*/    ZEND_ME(QWidget,ensurePolished,NULL,ZEND_ACC_PUBLIC)
+/*    ZEND_ME(QWidget,focusPolicy,NULL,ZEND_ACC_PUBLIC)
+*/    ZEND_ME(QWidget,focusProxy,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,focusWidget,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,font,NULL,ZEND_ACC_PUBLIC)
+/*    ZEND_ME(QWidget,font,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,fontInfo,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,fontMetrics,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,foregroundRole,NULL,ZEND_ACC_PUBLIC)
@@ -575,8 +575,8 @@ static zend_function_entry QWidget_methods[] = {
     ZEND_ME(QWidget,normalGeometry,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,paintEngine,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,palette,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,parentWidget,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,pos,NULL,ZEND_ACC_PUBLIC)
+*/    ZEND_ME(QWidget,parentWidget,NULL,ZEND_ACC_PUBLIC)
+/*    ZEND_ME(QWidget,pos,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,rect,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,releaseDC,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,size,NULL,ZEND_ACC_PUBLIC)
@@ -588,8 +588,8 @@ static zend_function_entry QWidget_methods[] = {
     ZEND_ME(QWidget,toolTip,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,visibleRegion,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,whatsThis,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,window,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,windowFlags,NULL,ZEND_ACC_PUBLIC)
+*/    ZEND_ME(QWidget,window,NULL,ZEND_ACC_PUBLIC)
+/*    ZEND_ME(QWidget,windowFlags,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,windowIcon,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,windowIconText,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,windowOpacity,NULL,ZEND_ACC_PUBLIC)
@@ -599,7 +599,7 @@ static zend_function_entry QWidget_methods[] = {
     ZEND_ME(QWidget,windowType,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,x11Info,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,x11PictureHandle,NULL,ZEND_ACC_PUBLIC)
-
+*/
     {NULL,NULL,NULL}
 };
 
