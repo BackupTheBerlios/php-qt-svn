@@ -23,7 +23,9 @@ php-5.1xxx/ext/ directory.
 We prefer to build PHP-Qt as module!
 
 At first it is neccessary to check your environment for compiling. 
-To do that change into this directory and run configure:
+To do that change into this directory and run phpize and configure:
+
+phpize
 
 ./configure --enable-php_qt
 
