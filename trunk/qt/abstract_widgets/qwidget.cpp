@@ -89,7 +89,7 @@ PHP_QT_RETURN_METHOD(QWidget,y,RETURN_LONG);
 
 // PHP_QT_RETURN_OBJ_METHOD(QWidget, function, object_type) \
 
- //PHP_QT_RETURN_OBJ_METHOD(QWidget, accessibleDescription, QString);
+PHP_QT_RETURN_PROPERTY_OBJ_METHOD(QWidget, accessibleDescription);
  //PHP_QT_RETURN_OBJ_METHOD(QWidget, accessibleName, QString);
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, backgroundRole, QPalette::ColorRole); // ??
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, baseSize, QSize);
@@ -126,6 +126,7 @@ PHP_QT_RETURN_OBJ_METHOD(QWidget, parentWidget, QWidget); // QWidget *
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, pos, QPoint);
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, rect, QRect);
 //PHP_QT_METHOD(QWidget, releaseDC);
+PHP_QT_SET_PROPERTY_OBJ_METHOD(QWidget,setAccessibleDescription,QString);
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, size, QSize);
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, sizeHint, QSize); // virtual QSize
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, sizeIncrement, QSize);

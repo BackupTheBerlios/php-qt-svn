@@ -279,22 +279,22 @@ ZEND_METHOD(QObject,moveToThread){
     RETURN_NULL();    
 }
 
-ZEND_METHOD(QObject,objectName){
+/*ZEND_METHOD(QObject,objectName){
     zval* return_;
     return_ = zend_read_property(Z_OBJCE_P(getThis()),getThis(),"objectName",strlen("objectName"),1 TSRMLS_CC);
     RETURN_ZVAL(return_,1,0);
-}
+}*/
 
-ZEND_METHOD(QObject,parent){
+/*ZEND_METHOD(QObject,parent){
     zval* return_;
     return_ = zend_read_property(Z_OBJCE_P(getThis()),getThis(),"parent",strlen("parent"),1 TSRMLS_CC);
     RETURN_ZVAL(return_,1,0);
-}
+}*/
 
+// TODO
 ZEND_METHOD(QObject,property){
-    zval* return_;
-    return_ = zend_read_property(Z_OBJCE_P(getThis()),getThis(),"property",strlen("property"),1 TSRMLS_CC);
-    RETURN_ZVAL(return_,1,0);
+    NOT_YET_IMPLEMENTED
+    RETURN_NULL();
 }
 
 ZEND_METHOD(QObject,removeEventFilter){    
@@ -312,7 +312,7 @@ ZEND_METHOD(QObject,removeEventFilter){
 
 }
 
-ZEND_METHOD(QObject,setObjectName){
+/*ZEND_METHOD(QObject,setObjectName){
     zval *object;
 
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o", &object) == FAILURE) {
@@ -324,7 +324,7 @@ ZEND_METHOD(QObject,setObjectName){
     zend_update_property(Z_OBJCE_P(getThis()),getThis(),"objectName",strlen("objectName"),object TSRMLS_CC);
     RETURN_NULL();
 }
-
+*/
 ZEND_METHOD(QObject,setParent){
 
     zval *object;
@@ -376,3 +376,8 @@ ZEND_METHOD(QObject,thread){
     RETURN_NULL();    
 }
 
+PHP_QT_RETURN_PROPERTY_OBJ_METHOD(QObject,objectName);
+PHP_QT_SET_PROPERTY_OBJ_METHOD(QObject,setObjectName,QString);
+PHP_QT_RETURN_PROPERTY_OBJ_METHOD(QObject,parent);
+//PHP_QT_SET_PROPERTY_OBJ_METHOD(QObject,setParent,QObject);
+//PHP_QT_RETURN_OBJ_METHOD(QObject,property,QVariant);

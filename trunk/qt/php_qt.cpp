@@ -542,8 +542,8 @@ static zend_function_entry QWidget_methods[] = {
     ZEND_ME(QWidget,x,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,y,NULL,ZEND_ACC_PUBLIC)
 
-/*    ZEND_ME(QWidget,accessibleDescription,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,accessibleName,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,accessibleDescription,NULL,ZEND_ACC_PUBLIC)
+/*    ZEND_ME(QWidget,accessibleName,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,backgroundRole,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,baseSize,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,childrenRecr,NULL,ZEND_ACC_PUBLIC)
@@ -579,7 +579,8 @@ static zend_function_entry QWidget_methods[] = {
 /*    ZEND_ME(QWidget,pos,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,rect,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,releaseDC,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QWidget,size,NULL,ZEND_ACC_PUBLIC)
+*/    ZEND_ME(QWidget,setAccessibleDescription,NULL,ZEND_ACC_PUBLIC)
+/*    ZEND_ME(QWidget,size,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,sizeHint,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,sizeIncrement,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,sizePolicy,NULL,ZEND_ACC_PUBLIC)
@@ -611,6 +612,69 @@ void _register_QWidget(TSRMLS_D)
     
     QWidget_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QObject_ce_ptr,NULL TSRMLS_CC);
     // call zend_do_inheritance directly to inherit from QPaintDevice
+
+//    zend_declare_property_null(QObject_ce_ptr,"accessibleDescription",strlen("accessibleDescription"),ZEND_ACC_PROTECTED TSRMLS_CC);
+    PHP_QT_DECLARE_PROPERTY("acceptDrops");
+    PHP_QT_DECLARE_PROPERTY("accessibleDescription");
+    PHP_QT_DECLARE_PROPERTY("accessibleName");
+    PHP_QT_DECLARE_PROPERTY("baseSize");
+    PHP_QT_DECLARE_PROPERTY("childrenRect");
+    PHP_QT_DECLARE_PROPERTY("childrenRegion");
+    PHP_QT_DECLARE_PROPERTY("contextMenuPolicy");
+    PHP_QT_DECLARE_PROPERTY("cursor");
+    PHP_QT_DECLARE_PROPERTY("enabled");
+    PHP_QT_DECLARE_PROPERTY("focus");
+    PHP_QT_DECLARE_PROPERTY("focusPolicy");
+    PHP_QT_DECLARE_PROPERTY("font");
+    PHP_QT_DECLARE_PROPERTY("frameGeometry");
+    PHP_QT_DECLARE_PROPERTY("frameSize");
+    PHP_QT_DECLARE_PROPERTY("fullScreen");
+    PHP_QT_DECLARE_PROPERTY("geometry");
+    PHP_QT_DECLARE_PROPERTY("height");
+    PHP_QT_DECLARE_PROPERTY("isActiveWindow");
+    PHP_QT_DECLARE_PROPERTY("layotDirection");
+    PHP_QT_DECLARE_PROPERTY("maximized");
+    PHP_QT_DECLARE_PROPERTY("maximumHeight");
+    PHP_QT_DECLARE_PROPERTY("maximumSize");
+    PHP_QT_DECLARE_PROPERTY("maximumWidth");
+    PHP_QT_DECLARE_PROPERTY("minimized");
+    PHP_QT_DECLARE_PROPERTY("minimumHeight");
+    PHP_QT_DECLARE_PROPERTY("minimumSize");
+
+    PHP_QT_DECLARE_PROPERTY("minimumSizeHint");
+    PHP_QT_DECLARE_PROPERTY("minimumWidth");
+    PHP_QT_DECLARE_PROPERTY("modal");
+    PHP_QT_DECLARE_PROPERTY("mouseTracking");
+    PHP_QT_DECLARE_PROPERTY("normalGeometry");
+    PHP_QT_DECLARE_PROPERTY("palette");
+    PHP_QT_DECLARE_PROPERTY("pos");
+    PHP_QT_DECLARE_PROPERTY("rect");
+    PHP_QT_DECLARE_PROPERTY("size");
+    PHP_QT_DECLARE_PROPERTY("sizeHint");
+    PHP_QT_DECLARE_PROPERTY("sizeIncrement");
+    PHP_QT_DECLARE_PROPERTY("sizePolicy");
+    PHP_QT_DECLARE_PROPERTY("statusTip");
+    PHP_QT_DECLARE_PROPERTY("toolTip");
+    PHP_QT_DECLARE_PROPERTY("updatesEnabled");
+    PHP_QT_DECLARE_PROPERTY("visible");
+    PHP_QT_DECLARE_PROPERTY("whatsThis");
+    PHP_QT_DECLARE_PROPERTY("width");
+    PHP_QT_DECLARE_PROPERTY("windowFlags");
+    PHP_QT_DECLARE_PROPERTY("windowIcon");
+    PHP_QT_DECLARE_PROPERTY("windowIconText");
+    PHP_QT_DECLARE_PROPERTY("windowModified");
+    PHP_QT_DECLARE_PROPERTY("windowOpacity");
+    PHP_QT_DECLARE_PROPERTY("windowTitle");
+    PHP_QT_DECLARE_PROPERTY("x");
+    PHP_QT_DECLARE_PROPERTY("y");
+
+
+
+/*
+properties:
+    acceptDrops
+    accessibleDescription;
+*/
 
 }
 
