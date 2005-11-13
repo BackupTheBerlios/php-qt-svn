@@ -50,6 +50,9 @@
 #define PHP_QT_FETCH_OBJECT(list_entry)     zend_hash_find(&EG(persistent_list),PHP_QT_HASH_QOBJECT,strlen(PHP_QT_HASH_QOBJECT),(void**)&list_entry)
 #endif
 
+#define PHP_QT_DECLARE_PROPERTY(property)           \
+    zend_declare_property_null(QObject_ce_ptr,property,strlen(property),ZEND_ACC_PROTECTED TSRMLS_CC);
+
 #define PHP_QT_REGISTER(object)     \
     zend_rsrc_list_entry le;        \
     le.ptr = object;                \
@@ -140,7 +143,28 @@ ZEND_METHOD(classname,function){                                   \
     RETURN_NULL(); \
 } 
 
-	
+#define PHP_QT_RETURN_PROPERTY_OBJ_METHOD(classname,function)                                        \
+ZEND_METHOD(classname,function){                                                                                  \
+    zval* return_;                                                                                              \
+    if(getThis() != NULL) {                                                                                     \
+        return_ = zend_read_property(Z_OBJCE_P(getThis()),getThis(),#function,strlen(#function),1 TSRMLS_CC);         \
+        RETURN_ZVAL(return_,1,0); \
+    } else php_error(E_WARNING,"empty object");                                                                 \
+}
+
+#define PHP_QT_SET_PROPERTY_OBJ_METHOD(classname,function,z_property)                 \
+ZEND_METHOD(classname,function){                                                        \
+    zval *object;                                                                       \
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o", &object) == FAILURE) {      \
+        return;                                                                         \
+    }                                                                                   \
+    z_property *tmp = (z_property*) php_qt_fetch(object);                               \
+    classname *QObject_ptr = (classname*) PHP_QT_FETCH();                               \
+    QObject_ptr->function((const z_property&)tmp);                                      \
+    zend_update_property(Z_OBJCE_P(getThis()),getThis(),#z_property,strlen(#z_property),object TSRMLS_CC);    \
+    RETURN_NULL();                              \
+}                                               \
+
 #define PHP_QT_STATIC_RETURN_METHOD(classname, function, returntype)  \
 ZEND_METHOD(classname,function){                            \
   if(getThis() != NULL){                                    \
