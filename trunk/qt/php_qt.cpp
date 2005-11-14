@@ -543,6 +543,7 @@ static zend_function_entry QWidget_methods[] = {
     ZEND_ME(QWidget,y,NULL,ZEND_ACC_PUBLIC)
 
     ZEND_ME(QWidget,accessibleDescription,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,accessibleName,NULL,ZEND_ACC_PUBLIC)
 /*    ZEND_ME(QWidget,accessibleName,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,backgroundRole,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,baseSize,NULL,ZEND_ACC_PUBLIC)
@@ -580,6 +581,7 @@ static zend_function_entry QWidget_methods[] = {
     ZEND_ME(QWidget,rect,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,releaseDC,NULL,ZEND_ACC_PUBLIC)
 */    ZEND_ME(QWidget,setAccessibleDescription,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,setAccessibleName,NULL,ZEND_ACC_PUBLIC)
 /*    ZEND_ME(QWidget,size,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,sizeHint,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,sizeIncrement,NULL,ZEND_ACC_PUBLIC)

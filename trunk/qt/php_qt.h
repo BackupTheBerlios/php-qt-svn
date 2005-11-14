@@ -152,15 +152,15 @@ ZEND_METHOD(classname,function){                                                
     } else php_error(E_WARNING,"empty object");                                                                 \
 }
 
-#define PHP_QT_SET_PROPERTY_OBJ_METHOD(classname,function,z_property)                 \
+#define PHP_QT_SET_PROPERTY_OBJ_METHOD(classname,function,z_property,z_type)                 \
 ZEND_METHOD(classname,function){                                                        \
     zval *object;                                                                       \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o", &object) == FAILURE) {      \
         return;                                                                         \
     }                                                                                   \
-    z_property *tmp = (z_property*) php_qt_fetch(object);                               \
+    z_type *tmp = (z_type*) php_qt_fetch(object);                               \
     classname *QObject_ptr = (classname*) PHP_QT_FETCH();                               \
-    QObject_ptr->function((const z_property&)tmp);                                      \
+    QObject_ptr->function((const z_type&) tmp);                                      \
     zend_update_property(Z_OBJCE_P(getThis()),getThis(),#z_property,strlen(#z_property),object TSRMLS_CC);    \
     RETURN_NULL();                              \
 }                                               \

@@ -377,7 +377,7 @@ ZEND_METHOD(QObject,thread){
 }
 
 PHP_QT_RETURN_PROPERTY_OBJ_METHOD(QObject,objectName);
-PHP_QT_SET_PROPERTY_OBJ_METHOD(QObject,setObjectName,QString);
+PHP_QT_SET_PROPERTY_OBJ_METHOD(QObject,setObjectName,objectName,QString);
 PHP_QT_RETURN_PROPERTY_OBJ_METHOD(QObject,parent);
 //PHP_QT_SET_PROPERTY_OBJ_METHOD(QObject,setParent,QObject);
 //PHP_QT_RETURN_OBJ_METHOD(QObject,property,QVariant);
