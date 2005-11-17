@@ -28,7 +28,7 @@ using namespace std;
 
 ZEND_METHOD(QPushButton,__construct){
 
-    if(ZEND_NUM_ARGS() > 0){
+    if(ZEND_NUM_ARGS() == 1){
         char *string;
         int string_len;
 
@@ -36,6 +36,20 @@ ZEND_METHOD(QPushButton,__construct){
             return;
         }
         QPushButton* QPushButton_ptr = new QPushButton(string);
+        PHP_QT_REGISTER(QPushButton_ptr);
+
+        RETURN_NULL();
+
+    } else if(ZEND_NUM_ARGS() == 2){
+        char *string;
+        int string_len;
+        zval *parent;
+
+	    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"so",&string, &string_len, &parent) == FAILURE) {
+            return;
+        }
+        QWidget *p = (QWidget*) php_qt_fetch(parent);
+        QPushButton* QPushButton_ptr = new QPushButton(string,p);
         PHP_QT_REGISTER(QPushButton_ptr);
 
         RETURN_NULL();
@@ -49,6 +63,8 @@ ZEND_METHOD(QPushButton,__construct){
         RETURN_NULL();
     }
 }
+
+// destructor
 
 ZEND_METHOD(QPushButton,paintEvent){
 }
