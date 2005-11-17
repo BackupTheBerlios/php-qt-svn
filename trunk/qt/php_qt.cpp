@@ -28,7 +28,7 @@
 #include <QApplication>
 #include <QBoxLayout>
 
-QOUT();
+//QOUT();
 
 //static int objects_handle;
 
@@ -149,7 +149,6 @@ PHP_MINIT_FUNCTION(php_qt)
 	REGISTER_LONG_CONSTANT("QAPPLICATION_TYPE_TTY",QApplication::Tty ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QAPPLICATION_TYPE_GUICLIENT",QApplication::GuiClient ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QAPPLICATION_TYPE_GUISERVER",QApplication::GuiServer ,CONST_CS | CONST_PERSISTENT);	
-	
 	
     _register_QString(TSRMLS_C);
     _register_QLatin1String(TSRMLS_C);
@@ -580,8 +579,12 @@ static zend_function_entry QWidget_methods[] = {
 /*    ZEND_ME(QWidget,pos,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,rect,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,releaseDC,NULL,ZEND_ACC_PUBLIC)
-*/    ZEND_ME(QWidget,setAccessibleDescription,NULL,ZEND_ACC_PUBLIC)
+*/
+    ZEND_ME(QWidget,resize,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,setAccessibleDescription,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,setAccessibleName,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,setGeometry,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,setFixedSize,NULL,ZEND_ACC_PUBLIC)
 /*    ZEND_ME(QWidget,size,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,sizeHint,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,sizeIncrement,NULL,ZEND_ACC_PUBLIC)

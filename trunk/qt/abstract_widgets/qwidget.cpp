@@ -127,8 +127,111 @@ PHP_QT_RETURN_OBJ_METHOD(QWidget, parentWidget, QWidget); // QWidget *
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, pos, QPoint);
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, rect, QRect);
 //PHP_QT_METHOD(QWidget, releaseDC);
+
+ZEND_METHOD(QWidget,resize) 
+{
+
+    int w;
+    int h;
+    zval *size;
+
+    int num_args = 0;
+    num_args = ZEND_NUM_ARGS() TSRMLS_CC;
+
+    if(num_args == 2){
+        if(zend_parse_parameters(num_args TSRMLS_CC,"ll", &w, &h) == FAILURE) {
+            RETURN_NULL(); 
+        }
+
+        QWidget *o = (QWidget*) PHP_QT_FETCH();
+
+        o->resize(w,h);
+
+    } else if(ZEND_NUM_ARGS() == 1){
+        if(zend_parse_parameters(num_args TSRMLS_CC,"o", &size) == FAILURE) {
+            RETURN_NULL(); 
+        }
+
+        QSize *s = (QSize*) php_qt_fetch(size);
+        QWidget *o = (QWidget*) PHP_QT_FETCH();
+
+//        o->resize(s);
+
+    }
+}
+
 PHP_QT_SET_PROPERTY_OBJ_METHOD(QWidget,setAccessibleDescription,accessibleDescription,QString);
 PHP_QT_SET_PROPERTY_OBJ_METHOD(QWidget,setAccessibleName,accessibleName,QString);
+
+ZEND_METHOD(QWidget,setGeometry) 
+{
+
+    int x;
+    int y;
+    int w;
+    int h;
+    zval *size;
+
+    int num_args = 0;
+    num_args = ZEND_NUM_ARGS() TSRMLS_CC;
+
+    if(num_args == 4){
+        if(zend_parse_parameters(num_args TSRMLS_CC,"llll", &x, &y, &w, &h) == FAILURE) {
+            RETURN_NULL(); 
+        }
+
+        QWidget *o = (QWidget*) PHP_QT_FETCH();
+
+        o->setGeometry(x,y,w,h);
+
+    } else if(ZEND_NUM_ARGS() == 1){
+        if(zend_parse_parameters(num_args TSRMLS_CC,"o", &size) == FAILURE) {
+            RETURN_NULL(); 
+        }
+
+        QRect *s = (QRect*) php_qt_fetch(size);
+        QWidget *o = (QWidget*) PHP_QT_FETCH();
+
+//        o->setGeometry(s);
+
+    }
+}
+
+ZEND_METHOD(QWidget,setFixedSize) 
+{
+
+    int w;
+    int h;
+    zval *size;
+
+    int num_args = 0;
+    num_args = ZEND_NUM_ARGS() TSRMLS_CC;
+
+    if(num_args == 2){
+        if(zend_parse_parameters(num_args TSRMLS_CC,"ll", &w, &h) == FAILURE) {
+            RETURN_NULL(); 
+        }
+
+        QWidget *o = (QWidget*) PHP_QT_FETCH();
+
+        o->setFixedSize(w,h);
+
+    } else if(ZEND_NUM_ARGS() == 1){
+        if(zend_parse_parameters(num_args TSRMLS_CC,"o", &size) == FAILURE) {
+            RETURN_NULL(); 
+        }
+
+        QSize *s = (QSize*) php_qt_fetch(size);
+        QWidget *o = (QWidget*) PHP_QT_FETCH();
+
+//        o->setFixedSize(s);
+
+    }
+}
+
+
+//PHP_QT_SET_PROPERTY_OBJ_METHOD(QWidget,setBackgroundRole,QPalette);
+
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, size, QSize);
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, sizeHint, QSize); // virtual QSize
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, sizeIncrement, QSize);
