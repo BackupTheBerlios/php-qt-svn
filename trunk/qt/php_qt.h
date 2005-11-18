@@ -268,6 +268,8 @@ void _register_QEvent();
 void _register_QLayoutItem();
 void _register_QLayout();
 void _register_QBoxLayout();
+void _register_QAbstractSlider();
+void _register_QSlider();
 void _register_QLineEdit();
 
 extern zend_class_entry *QString_ce_ptr;

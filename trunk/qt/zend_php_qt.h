@@ -457,7 +457,6 @@ ZEND_METHOD(QLineEdit,__construct);
 
 /* QSlider */
 ZEND_METHOD(QSlider,__construct);
-ZEND_METHOD(QSlider,__destruct);
 ZEND_METHOD(QSlider,setTickInterval);
 //ZEND_METHOD(QSlider,setTickPosition);
 ZEND_METHOD(QSlider,tickInterval);

@@ -274,7 +274,9 @@ PHP_MINIT_FUNCTION(php_qt)
 	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_BOTTOM_TO_TOP",QBoxLayout::BottomToTop ,CONST_CS | CONST_PERSISTENT);	
 
 	_register_QLineEdit(TSRMLS_C);
-	
+
+    _register_QAbstractSlider(TSRMLS_C);
+    _register_QSlider(TSRMLS_C);
 		
 //    objects_handle = zend_register_list_destructors_ex(NULL,NULL,"Qt Wrapper",module_number);
 
@@ -1089,7 +1091,6 @@ void _register_QAbstractSlider(TSRMLS_C)
 
 static zend_function_entry QSlider_methods[] = {
 	ZEND_ME(QSlider,__construct,NULL,ZEND_ACC_PUBLIC)
-    ZEND_ME(QSlider,__destruct,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QSlider,setTickInterval,NULL,ZEND_ACC_PUBLIC)
 //    ZEND_ME(QSlider,setTickPosition,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QSlider,tickInterval,NULL,ZEND_ACC_PUBLIC)
