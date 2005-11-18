@@ -26,6 +26,8 @@ using namespace std;
 #include <QCoreApplication>
 #include "../php_qt.h"
 
+zval* qcoreApplication = NULL;
+
 /**
  *  Constructor
  */ 
@@ -36,7 +38,7 @@ ZEND_METHOD(QCoreApplication,__construct){
     QCoreApplication *app;
     app = new QCoreApplication(argc__, argv__);
     PHP_QT_REGISTER(app);
-
+	qcoreApplication = getThis();
 }
 
 /// @todo must be implemented
@@ -180,7 +182,15 @@ ZEND_METHOD(QCoreApplication,installTranslator){
     RETURN_NULL();    
 }
 
-PHP_QT_STATIC_RETURN_OBJ_METHOD(QCoreApplication, instance, QCoreApplication)
+ZEND_METHOD(QCoreApplication,instance){                               
+	if(getThis() != NULL){
+		RETURN_ZVAL(getThis(), 1, 0)
+	}
+	else {	
+		RETURN_ZVAL(qcoreApplication, 1, 0)
+	}
+} 
+
 
 /// @todo must be implemented
 ZEND_METHOD(QCoreApplication,libraryPaths){
