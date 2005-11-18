@@ -120,6 +120,7 @@ if(obj != NULL) {                                       \
     zend_rsrc_list_entry le;                            \
     le.ptr = obj;                                       \
     php_qt_register(return_value,le);                   \
+    return;                                             \
 }                                                       \
 else                                                    \
     RETURN_NULL();                                      \
@@ -130,8 +131,10 @@ ZEND_METHOD(classname,function){                                \
     if(getThis() != NULL){                                      \
         classname *o = (classname*) PHP_QT_FETCH();             \
         PHP_QT_RET_OBJ(object_type,o->function());              \
-    } else  PHP_QT_RET_OBJ(object_type,classname::function())   \
-    return;                                                     \
+    } else  {                                                   \
+        PHP_QT_RET_OBJ(object_type,classname::function())       \
+    }                                                           \
+    RETURN_NULL();                                              \
 } 
 
 #define PHP_QT_RETURN_OBJ_METHOD(classname, function, object_type)  \
@@ -140,7 +143,7 @@ ZEND_METHOD(classname,function){                                    \
         classname *o = (classname*) PHP_QT_FETCH();                 \
         PHP_QT_RET_OBJ(object_type,o->function());                  \
     }                                                               \
-    return;                                                         \
+    RETURN_NULL();                                                  \
 } 
 
 #define PHP_QT_RETURN_PROPERTY_OBJ_METHOD(classname,function)                                        \
