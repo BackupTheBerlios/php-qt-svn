@@ -53,6 +53,7 @@ zend_class_entry *QLayout_ce_ptr;
 zend_class_entry *QBoxLayout_ce_ptr;
 zend_class_entry *QSpacerItem_ce_ptr;
 zend_class_entry *QAbstractSlider_ce_ptr;
+zend_class_entry *QLineEdit_ce_ptr;
 
 /* {{{ php_qt_functions[]
  *
@@ -134,7 +135,9 @@ PHP_MINIT_FUNCTION(php_qt)
 	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNTRAILING",Qt::AlignTrailing ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNHORIZONTAL_MASK",Qt::AlignHorizontal_Mask ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNVERTICAL_MASK",Qt::AlignVertical_Mask ,CONST_CS | CONST_PERSISTENT);	
-	
+	REGISTER_LONG_CONSTANT("QT_ORIENTATIONS_VERTICAL",Qt::Vertical ,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QT_ORIENTATIONS_HORIZONTAL",Qt::Horizontal ,CONST_CS | CONST_PERSISTENT);	
+		
 	
 	
 	_register_QCoreApplication(TSRMLS_C);
@@ -268,7 +271,10 @@ PHP_MINIT_FUNCTION(php_qt)
 	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_RIGHT_TO_LEFT",QBoxLayout::RightToLeft ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_TOP_TO_BOTTOM",QBoxLayout::TopToBottom ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_BOTTOM_TO_TOP",QBoxLayout::BottomToTop ,CONST_CS | CONST_PERSISTENT);	
+
+	_register_QLineEdit(TSRMLS_C);
 	
+		
 //    objects_handle = zend_register_list_destructors_ex(NULL,NULL,"Qt Wrapper",module_number);
 
 	return SUCCESS;
@@ -905,7 +911,6 @@ void _register_QApplication(TSRMLS_D)
     zend_declare_property_long(QApplication_ce_ptr,"startDragDistance",strlen("startDragDistance"),QApplication::startDragDistance(),ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_long(QApplication_ce_ptr,"startDragTime",strlen("startDragTime"),QApplication::startDragTime(),ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_long(QApplication_ce_ptr,"wheelScrollLines",strlen("wheelScrollLines"),QApplication::wheelScrollLines(),ZEND_ACC_PROTECTED TSRMLS_CC);
-
 }
 
 static zend_function_entry QEvent_methods[] = {
@@ -967,10 +972,33 @@ static zend_function_entry QLayout_methods[] = {
 	ZEND_ME(QLayout,isEmpty,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLayout,maximumSize,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLayout,minimumSize,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,activate,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,addWidget,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,indexOf,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,isEnabled,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,margin,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,menuBar,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,parentWidget,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,removeItem,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,removeWidget,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,setAlignment,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,setEnabled,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,setMargin,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,setMenuBar,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,setSizeConstraint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,setSpacing,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,sizeConstraint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,spacing,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,update,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLayout,closestAcceptableSize,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	//ZEND_ME(QLayout,addChildLayout,NULL,ZEND_ACC_PROTECTED)
+	//ZEND_ME(QLayout,addChildWidget,NULL,ZEND_ACC_PROTECTED)
+	//ZEND_ME(QLayout,alignmentRect,NULL,ZEND_ACC_PROTECTED)
 	//abstract class
 	ZEND_ME(QLayout,addItem,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
 	ZEND_ME(QLayout,count,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
 	ZEND_ME(QLayout,takeAt,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
+	ZEND_ME(QLayout,itemAt,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
 
 	{NULL,NULL,NULL}
 };
@@ -985,7 +1013,7 @@ void _register_QLayout(TSRMLS_C)
    //Register class and inherits QLayoutItem
    QLayout_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QLayoutItem_ce_ptr,NULL TSRMLS_CC);
    //Inherits QObject
-   zend_do_inheritance(QLayout_ce_ptr, QObject_ce_ptr TSRMLS_CC);
+   zend_do_inheritance(QLayout_ce_ptr, QObject_ce_ptr TSRMLS_CC); 
 }
 
 static zend_function_entry QBoxLayout_methods[] = {
@@ -996,7 +1024,8 @@ static zend_function_entry QBoxLayout_methods[] = {
 	ZEND_ME(QBoxLayout,count,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QBoxLayout,takeAt,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QBoxLayout,setGeometry,NULL,ZEND_ACC_PUBLIC)	
-
+	ZEND_ME(QBoxLayout,itemAt,NULL,ZEND_ACC_PUBLIC)
+	
 	ZEND_ME(QBoxLayout,addLayout,NULL,ZEND_ACC_PUBLIC)	
 	ZEND_ME(QBoxLayout,addSpacing,NULL,ZEND_ACC_PUBLIC)	
 	ZEND_ME(QBoxLayout,addStretch,NULL,ZEND_ACC_PUBLIC)	
@@ -1054,6 +1083,20 @@ void _register_QAbstractSlider(TSRMLS_C)
     
    INIT_CLASS_ENTRY(ce,"QAbstractSlider",QAbstractSlider_methods);
    QAbstractSlider_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QWidget_ce_ptr,NULL TSRMLS_CC);
+}
+
+static zend_function_entry QLineEdit_methods[] = {
+	ZEND_ME(QLineEdit,__construct,NULL,ZEND_ACC_PUBLIC)
+	{NULL,NULL,NULL}
+};
+
+
+void _register_QLineEdit(TSRMLS_C)
+{
+   zend_class_entry ce;
+    
+   INIT_CLASS_ENTRY(ce,"QLineEdit",QLineEdit_methods);
+   QLineEdit_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QWidget_ce_ptr,NULL TSRMLS_CC);
 }
 
 

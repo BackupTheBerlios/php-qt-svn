@@ -377,11 +377,32 @@ ZEND_METHOD(QLayout,geometry);
 ZEND_METHOD(QLayout,isEmpty);
 ZEND_METHOD(QLayout,maximumSize);
 ZEND_METHOD(QLayout,minimumSize);
-//ZEND_METHOD(QLayout,setGeometry);
-//ZEND_METHOD(QLayout,sizeHint);
 ZEND_METHOD(QLayout,addItem);
 ZEND_METHOD(QLayout,count);
 ZEND_METHOD(QLayout,takeAt);
+ZEND_METHOD(QLayout,itemAt);
+ZEND_METHOD(QLayout,activate);
+ZEND_METHOD(QLayout,addWidget);
+ZEND_METHOD(QLayout,indexOf);
+ZEND_METHOD(QLayout,isEnabled);
+ZEND_METHOD(QLayout,margin);
+ZEND_METHOD(QLayout,menuBar);
+ZEND_METHOD(QLayout,parentWidget);
+ZEND_METHOD(QLayout,removeItem);
+ZEND_METHOD(QLayout,removeWidget);
+ZEND_METHOD(QLayout,setAlignment);
+ZEND_METHOD(QLayout,setEnabled);
+ZEND_METHOD(QLayout,setMargin);
+ZEND_METHOD(QLayout,setMenuBar);
+ZEND_METHOD(QLayout,setSizeConstraint);
+ZEND_METHOD(QLayout,setSpacing);
+ZEND_METHOD(QLayout,sizeConstraint);
+ZEND_METHOD(QLayout,spacing);
+ZEND_METHOD(QLayout,update);
+ZEND_METHOD(QLayout,closestAcceptableSize);
+//ZEND_METHOD(QLayout,addChildLayout);
+//ZEND_METHOD(QLayout,addChildWidget);
+//ZEND_METHOD(QLayout,alignmentRect);
 
 /* QLayoutBox */
 ZEND_METHOD(QBoxLayout,__construct);
@@ -404,6 +425,7 @@ ZEND_METHOD(QBoxLayout,invalidate);
 ZEND_METHOD(QBoxLayout,setDirection);	
 ZEND_METHOD(QBoxLayout,setStretchFactor);	
 ZEND_METHOD(QBoxLayout,insertItem);	
+ZEND_METHOD(QBoxLayout,itemAt);
 
 /* QAbstractSlider */
 ZEND_METHOD(QAbstractSlider,__construct);
@@ -430,6 +452,8 @@ ZEND_METHOD(QAbstractSlider,sliderPosition);
 //QAbstractSlide,triggerAction,SliderAction)
 ZEND_METHOD(QAbstractSlider,value);
 
+/* QLineEdit */
+ZEND_METHOD(QLineEdit,__construct);
 
 /* 
   	Declare any global variables you may need between the BEGIN
