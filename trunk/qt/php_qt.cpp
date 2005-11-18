@@ -27,6 +27,7 @@
 #include <QObject>
 #include <QApplication>
 #include <QBoxLayout>
+#include <QLineEdit>
 
 //QOUT();
 
@@ -274,6 +275,9 @@ PHP_MINIT_FUNCTION(php_qt)
 	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_BOTTOM_TO_TOP",QBoxLayout::BottomToTop ,CONST_CS | CONST_PERSISTENT);	
 
 	_register_QLineEdit(TSRMLS_C);
+	REGISTER_LONG_CONSTANT("QLINEEDIT_ECHOMODE_NORMAL", QLineEdit::Normal,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QLINEEDIT_ECHOMODE_NOECHO", QLineEdit::NoEcho,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QLINEEDIT_ECHOMODE_PASSWORD", QLineEdit::Password,CONST_CS | CONST_PERSISTENT);	
 
     _register_QAbstractSlider(TSRMLS_C);
     _register_QSlider(TSRMLS_C);
@@ -1110,6 +1114,60 @@ void _register_QSlider(TSRMLS_C)
 
 static zend_function_entry QLineEdit_methods[] = {
 	ZEND_ME(QLineEdit,__construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,__destruct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,alignment,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,backspace,NULL,ZEND_ACC_PUBLIC)
+	//ZEND_ME(QLineEdit,createStandardContextMenu,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,cursorBackward,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,cursorForward,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,cursorPosition,NULL,ZEND_ACC_PUBLIC)
+	//ZEND_ME(QLineEdit,cursorPositionAt,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,cursorWordBackward,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,cursorWordForward,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,del,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,deselect,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,displayText,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,dragEnabled,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,echoMode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,end,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,hasAcceptableInput,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,hasFrame,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,hasSelectedText,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,home,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,inputMask,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,insert,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,isModified,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,isReadOnly,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,isRedoAvailable,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,isUndoAvailable,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,maxLength,NULL,ZEND_ACC_PUBLIC)
+	//ZEND_ME(QLineEdit,minimumSizeHint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,selectedText,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,selectionStart,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setAlignment,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setCursorPosition,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setDragEnabled,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setEchoMode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setFrame,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setInputMask,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setMaxLength,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setModified,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setReadOnly,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setSelection,NULL,ZEND_ACC_PUBLIC)
+	//ZEND_ME(QLineEdit,setValidator,NULL,ZEND_ACC_PUBLIC)
+	//ZEND_ME(QLineEdit,sizeHint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,text,NULL,ZEND_ACC_PUBLIC)
+	//ZEND_ME(QLineEdit,validator,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,clear,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,copy,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,cut,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,paste,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,redo,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,selectAll,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,setText,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLineEdit,undo,NULL,ZEND_ACC_PUBLIC)
+	//ZEND_ME(QLineEdit,contextMenuEvent,NULL,ZEND_ACC_PROTECTED)
+	//ZEND_ME(QLineEdit,keyPressEvent,NULL,ZEND_ACC_PROTECTED)
 	{NULL,NULL,NULL}
 };
 
