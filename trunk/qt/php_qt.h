@@ -126,21 +126,21 @@ else                                                    \
 
 
 #define PHP_QT_STATIC_RETURN_OBJ_METHOD(classname, function, object_type) \
-ZEND_METHOD(classname,function){                               \
-    if(getThis() != NULL){                                     \
-        classname *o = (classname*) PHP_QT_FETCH();            \
-        PHP_QT_RET_OBJ(object_type,o->function());             \
-    } else  PHP_QT_RET_OBJ(object_type,classname::function())  \
-    RETURN_NULL();                                             \
+ZEND_METHOD(classname,function){                                \
+    if(getThis() != NULL){                                      \
+        classname *o = (classname*) PHP_QT_FETCH();             \
+        PHP_QT_RET_OBJ(object_type,o->function());              \
+    } else  PHP_QT_RET_OBJ(object_type,classname::function())   \
+    return;                                                     \
 } 
 
-#define PHP_QT_RETURN_OBJ_METHOD(classname, function, object_type) \
-ZEND_METHOD(classname,function){                                   \
-    if(getThis() != NULL){                                     \
-        classname *o = (classname*) PHP_QT_FETCH();                    \
-        PHP_QT_RET_OBJ(object_type,o->function());                     \
-    }    \
-    RETURN_NULL(); \
+#define PHP_QT_RETURN_OBJ_METHOD(classname, function, object_type)  \
+ZEND_METHOD(classname,function){                                    \
+    if(getThis() != NULL){                                          \
+        classname *o = (classname*) PHP_QT_FETCH();                 \
+        PHP_QT_RET_OBJ(object_type,o->function());                  \
+    }                                                               \
+    return;                                                         \
 } 
 
 #define PHP_QT_RETURN_PROPERTY_OBJ_METHOD(classname,function)                                        \
