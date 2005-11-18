@@ -60,6 +60,13 @@
 
 #define PHP_QT_FETCH() php_qt_fetch(getThis())
 
+#define PHP_QT_DESTRUCT(classname)              \
+ZEND_METHOD(classname,__desctruct){             \
+    classname *o = (classname*) PHP_QT_FETCH(); \
+    o->~classname();                            \
+}                                               \
+
+
 #define PHP_QT_METHOD(classname,function)                   \
 ZEND_METHOD(classname,function){                            \
     classname *o = (classname*) PHP_QT_FETCH();             \
