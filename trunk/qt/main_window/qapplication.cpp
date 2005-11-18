@@ -30,6 +30,9 @@ using namespace std;
 int argc__;
 char *argv__[1];
 
+extern zval* qcoreApplication;
+
+
 /**
  *  Constructor
  */ 
@@ -38,7 +41,7 @@ ZEND_METHOD(QApplication,__construct){
     QApplication *app;
     app = new QApplication(argc__, argv__);
     PHP_QT_REGISTER(app);
-
+	qcoreApplication = getThis();
 }
 
 /// @todo must be implemented

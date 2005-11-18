@@ -38,7 +38,8 @@ ZEND_METHOD(QCoreApplication,__construct){
     QCoreApplication *app;
     app = new QCoreApplication(argc__, argv__);
     PHP_QT_REGISTER(app);
-	qcoreApplication = getThis();
+	if(qcoreApplication == NULL)
+		qcoreApplication = getThis();
 }
 
 /// @todo must be implemented
@@ -182,13 +183,8 @@ ZEND_METHOD(QCoreApplication,installTranslator){
     RETURN_NULL();    
 }
 
-ZEND_METHOD(QCoreApplication,instance){                               
-	if(getThis() != NULL){
-		RETURN_ZVAL(getThis(), 1, 0)
-	}
-	else {	
-		RETURN_ZVAL(qcoreApplication, 1, 0)
-	}
+ZEND_METHOD(QCoreApplication,instance){
+	RETURN_ZVAL(qcoreApplication, 1, 0)
 } 
 
 
