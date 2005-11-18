@@ -37,6 +37,7 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/main_window/qcoreapplication.cpp \
   qt/abstract_widgets/qabstractbutton.cpp \
   qt/abstract_widgets/qwidget.cpp \
+  qt/abstract_widgets/qabstractslider.cpp \
   qt/basic_widgets/qpushbutton.cpp \
   qt/layout_management/qlayoutitem.cpp \
   qt/layout_management/qlayout.cpp \

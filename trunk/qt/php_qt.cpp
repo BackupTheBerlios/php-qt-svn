@@ -52,6 +52,7 @@ zend_class_entry *QLayoutItem_ce_ptr;
 zend_class_entry *QLayout_ce_ptr;
 zend_class_entry *QBoxLayout_ce_ptr;
 zend_class_entry *QSpacerItem_ce_ptr;
+zend_class_entry *QAbstractSlider_ce_ptr;
 
 /* {{{ php_qt_functions[]
  *
@@ -1021,6 +1022,40 @@ void _register_QBoxLayout(TSRMLS_C)
    INIT_CLASS_ENTRY(ce,"QBoxLayout",QBoxLayout_methods);
    QBoxLayout_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QLayout_ce_ptr,NULL TSRMLS_CC);
 }
+
+static zend_function_entry QAbstractSlider_methods[] = {
+    ZEND_ME(QAbstractSlider,hasTracking,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,invertedAppearance,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,invertedControls,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,isSliderDown,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,maximum,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,minimum,NULL,ZEND_ACC_PUBLIC)
+//    ZEND_ME(QAbstractSlide,orientation,Orientation)
+    ZEND_ME(QAbstractSlider,pageStep,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,setInvertedAppearance,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,setInvertedControls,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,setMaximum,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,setMinimum,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,setPageStep,NULL,ZEND_ACC_PUBLIC)
+//  ZEND_ME(QAbstractSlider,setRange)
+    ZEND_ME(QAbstractSlider,setSingleStep,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,setSliderDown,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,setSliderPosition,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,setTracking,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,singleStep,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,sliderPosition,NULL,ZEND_ACC_PUBLIC)
+//  ZEND_ME(QAbstractSlide,triggerAction,SliderAction)
+    ZEND_ME(QAbstractSlider,value,NULL,ZEND_ACC_PUBLIC)
+};
+
+void _register_QAbstractSlider(TSRMLS_C)
+{
+   zend_class_entry ce;
+    
+   INIT_CLASS_ENTRY(ce,"QAbstractSlider",QAbstractSlider_methods);
+   QAbstractSlider_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QWidget_ce_ptr,NULL TSRMLS_CC);
+}
+
 
 /* }}} */
 /* The previous line is meant for vim and emacs, so it can correctly fold and 
