@@ -455,6 +455,14 @@ ZEND_METHOD(QAbstractSlider,value);
 /* QLineEdit */
 ZEND_METHOD(QLineEdit,__construct);
 
+/* QSlider */
+ZEND_METHOD(QSlider,__construct);
+ZEND_METHOD(QSlider,__destruct);
+ZEND_METHOD(QSlider,setTickInterval);
+//ZEND_METHOD(QSlider,setTickPosition);
+ZEND_METHOD(QSlider,tickInterval);
+//ZEND_METHOD(QSlider,tickPosition);
+
 /* 
   	Declare any global variables you may need between the BEGIN
 	and END macros here:     

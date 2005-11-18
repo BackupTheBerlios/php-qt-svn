@@ -53,6 +53,7 @@ zend_class_entry *QLayout_ce_ptr;
 zend_class_entry *QBoxLayout_ce_ptr;
 zend_class_entry *QSpacerItem_ce_ptr;
 zend_class_entry *QAbstractSlider_ce_ptr;
+zend_class_entry *QSlider_ce_ptr;
 zend_class_entry *QLineEdit_ce_ptr;
 
 /* {{{ php_qt_functions[]
@@ -1083,6 +1084,27 @@ void _register_QAbstractSlider(TSRMLS_C)
     
    INIT_CLASS_ENTRY(ce,"QAbstractSlider",QAbstractSlider_methods);
    QAbstractSlider_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QWidget_ce_ptr,NULL TSRMLS_CC);
+   PHP_QT_DECLARE_PROPERTY("SliderAction");
+}
+
+static zend_function_entry QSlider_methods[] = {
+	ZEND_ME(QSlider,__construct,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QSlider,__destruct,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QSlider,setTickInterval,NULL,ZEND_ACC_PUBLIC)
+//    ZEND_ME(QSlider,setTickPosition,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QSlider,tickInterval,NULL,ZEND_ACC_PUBLIC)
+//    ZEND_ME(QSlider,tickPosition,NULL,ZEND_ACC_PUBLIC)
+	{NULL,NULL,NULL}
+};
+
+
+void _register_QSlider(TSRMLS_C)
+{
+   zend_class_entry ce;
+    
+   INIT_CLASS_ENTRY(ce,"QSlider",QSlider_methods);
+   QSlider_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QAbstractSlider_ce_ptr,NULL TSRMLS_CC);
+   PHP_QT_DECLARE_PROPERTY("TickPosition");
 }
 
 static zend_function_entry QLineEdit_methods[] = {

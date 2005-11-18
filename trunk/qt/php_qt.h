@@ -284,4 +284,5 @@ extern zend_class_entry *QLayout_ce_ptr;
 extern zend_class_entry *QBoxLayout_ce_ptr;
 extern zend_class_entry *QSpacerItem_ce_ptr;
 extern zend_class_entry *QAbstractSlider_ce_ptr;
+extern zend_class_entry *QSlider_ce_ptr;
 extern zend_class_entry *QLineEdit_ce_ptr;
