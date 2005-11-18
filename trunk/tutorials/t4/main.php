@@ -20,7 +20,7 @@
 
 			parent::__construct();
 
-//            setFixedSize(200, 120);
+            $this->setFixedSize(200, 120);
 
             $this->quit = new QPushButton("Quit", $this);
             $this->quit->setGeometry(62, 40, 75, 30);
