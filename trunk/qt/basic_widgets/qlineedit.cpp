@@ -247,6 +247,7 @@ PHP_QT_SETLONG_METHOD(QLineEdit,setMaxLength);
 
 PHP_QT_SETBOOL_METHOD(QLineEdit,setModified);
 PHP_QT_SETBOOL_METHOD(QLineEdit,setReadOnly);
+
 ZEND_METHOD(QLineEdit,setSelection) {
 	QLineEdit *QLineEdit_ptr;
 	long start;

@@ -1114,7 +1114,6 @@ void _register_QSlider(TSRMLS_C)
 
 static zend_function_entry QLineEdit_methods[] = {
 	ZEND_ME(QLineEdit,__construct,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QLineEdit,__destruct,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLineEdit,alignment,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLineEdit,backspace,NULL,ZEND_ACC_PUBLIC)
 	//ZEND_ME(QLineEdit,createStandardContextMenu,NULL,ZEND_ACC_PUBLIC)

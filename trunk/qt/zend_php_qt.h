@@ -454,7 +454,6 @@ ZEND_METHOD(QAbstractSlider,value);
 
 /* QLineEdit */
 ZEND_METHOD(QLineEdit,__construct);
-ZEND_METHOD(QLineEdit,__destruct);
 ZEND_METHOD(QLineEdit,alignment);
 ZEND_METHOD(QLineEdit,backspace);
 //ZEND_METHOD(QLineEdit,createStandardContextMenu);
