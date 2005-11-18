@@ -26,8 +26,8 @@
             $this->quit->setGeometry(62, 40, 75, 30);
 //            $quit->setFont();
 
-            /* the macro qApp is not available in php-qt, we use QCoreApplication::instance() directly. */
-            $this->connect($this->quit, SIGNAL("clicked()"), QCoreApplication::instance(), SLOT("quit()"));
+            /* the macro qApp is not available in php-qt, we use QApplication::instance() directly. */
+            $this->connect($this->quit, SIGNAL("clicked()"), QApplication::instance(), SLOT("quit()"));
 
         }
     
