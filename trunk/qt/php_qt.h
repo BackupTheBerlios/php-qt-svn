@@ -206,6 +206,23 @@ ZEND_METHOD(classname,function){                                                
     RETURN_NULL();                                                              \
 }                                                                               \
 
+#define PHP_QT_SETLONG_2_METHOD(classname,function)                             \
+ZEND_METHOD(classname,function)                                                 \
+{                                                                               \
+    int val1, val2;                                                             \
+    int num_args = 0;                                                           \
+    num_args = ZEND_NUM_ARGS() TSRMLS_CC;                                       \
+    if(num_args == 2){                                                          \
+        if(zend_parse_parameters(num_args TSRMLS_CC,"ll", &val1, &val2) == FAILURE) {   \
+            RETURN_NULL();                                                      \
+        }                                                                       \
+\
+        classname *o = (classname*) PHP_QT_FETCH();                             \
+\
+        o->function(val1,val2);                                                 \
+\
+    }                                                                           \
+}                                                                               \
 
 #define PHP_QT_ABSTRACT_SETBOOL_METHOD(classname,function,pseudo,name)          \
 ZEND_METHOD(classname,function){                                                \
