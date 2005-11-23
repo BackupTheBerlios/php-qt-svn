@@ -66,6 +66,19 @@ ZEND_METHOD(classname,__desctruct){             \
     o->~classname();                            \
 }                                               \
 
+#define PHP_QT_RET_OBJ(classname,obj)                   \
+zend_class_entry *ce;                                   \
+if(obj != NULL) {                                       \
+    object_init_ex(return_value, classname##_ce_ptr);   \
+    zend_rsrc_list_entry le;                            \
+    le.ptr = obj;                                       \
+    php_qt_register(return_value,le);                   \
+    return;                                             \
+}                                                       \
+else                                                    \
+    RETURN_NULL();                                      \
+
+/* default return macros */
 
 #define PHP_QT_METHOD(classname,function)                   \
 ZEND_METHOD(classname,function){                            \
@@ -79,70 +92,6 @@ ZEND_METHOD(classname,function){                            \
     classname *o = (classname*) PHP_QT_FETCH();             \
     returntype(o->function());                              \
 }                                                           \
-
-#define PHP_QT_STATIC_METHOD(classname, function)           \
-ZEND_METHOD(classname,function){                            \
-    if(getThis() != NULL){                                  \
-        classname *o = (classname*) PHP_QT_FETCH();         \
-        o->function();                                      \
-    } else classname::function();                           \
-    RETURN_NULL();                                          \
-}                                                           \
-
-
-#define PHP_QT_SETBOOL_STATIC_METHOD(classname, function)                    \
-ZEND_METHOD(classname,function){                                             \
-    zend_bool b;                                                             \
-    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) { \
-            return;                                                          \
-    }                                                                        \
-    if(getThis() != NULL){                                                   \
-        classname *o = (classname*) PHP_QT_FETCH();                          \
-        o->function(b);                                                      \
-    }else                                                                    \
-        classname::function((bool) b);                                       \
-    RETURN_NULL()                                                            \
-}                                                                            \
-
-
-#define PHP_QT_SETLONG_STATIC_METHOD(classname, function)                       \
-ZEND_METHOD(classname,function){                                                \
-    long l;                                                                     \
-    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&l) == FAILURE) {    \
-            return;                                                             \
-    }                                                                           \
-    if(getThis() != NULL){                                                      \
-        classname *o = (classname*) PHP_QT_FETCH();                             \
-        o->function(l);                                                         \
-    }else                                                                       \
-        classname::function(l);                                                 \
-    RETURN_NULL()                                                               \
-}                                                                               \
-
-
-#define PHP_QT_RET_OBJ(classname,obj)                   \
-zend_class_entry *ce;                                   \
-if(obj != NULL) {                                       \
-    object_init_ex(return_value, classname##_ce_ptr);   \
-    zend_rsrc_list_entry le;                            \
-    le.ptr = obj;                                       \
-    php_qt_register(return_value,le);                   \
-    return;                                             \
-}                                                       \
-else                                                    \
-    RETURN_NULL();                                      \
-
-
-#define PHP_QT_STATIC_RETURN_OBJ_METHOD(classname, function, object_type) \
-ZEND_METHOD(classname,function){                                \
-    if(getThis() != NULL){                                      \
-        classname *o = (classname*) PHP_QT_FETCH();             \
-        PHP_QT_RET_OBJ(object_type,o->function());              \
-    } else  {                                                   \
-        PHP_QT_RET_OBJ(object_type,classname::function())       \
-    }                                                           \
-    RETURN_NULL();                                              \
-} 
 
 #define PHP_QT_RETURN_OBJ_METHOD(classname, function, object_type)  \
 ZEND_METHOD(classname,function){                                    \
@@ -162,6 +111,68 @@ ZEND_METHOD(classname,function){                                                
     } else php_error(E_WARNING,"empty object");                                                                 \
 }
 
+/* static macros */
+
+#define PHP_QT_STATIC_METHOD(classname, function)           \
+ZEND_METHOD(classname,function){                            \
+    if(getThis() != NULL){                                  \
+        classname *o = (classname*) PHP_QT_FETCH();         \
+        o->function();                                      \
+    } else classname::function();                           \
+    RETURN_NULL();                                          \
+}                                                           \
+
+#define PHP_QT_SETBOOL_STATIC_METHOD(classname, function)                    \
+ZEND_METHOD(classname,function){                                             \
+    zend_bool b;                                                             \
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) { \
+            return;                                                          \
+    }                                                                        \
+    if(getThis() != NULL){                                                   \
+        classname *o = (classname*) PHP_QT_FETCH();                          \
+        o->function(b);                                                      \
+    }else                                                                    \
+        classname::function((bool) b);                                       \
+    RETURN_NULL()                                                            \
+}                                                                            \
+
+#define PHP_QT_SETLONG_STATIC_METHOD(classname, function)                       \
+ZEND_METHOD(classname,function){                                                \
+    long l;                                                                     \
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&l) == FAILURE) {    \
+            return;                                                             \
+    }                                                                           \
+    if(getThis() != NULL){                                                      \
+        classname *o = (classname*) PHP_QT_FETCH();                             \
+        o->function(l);                                                         \
+    }else                                                                       \
+        classname::function(l);                                                 \
+    RETURN_NULL()                                                               \
+}                                                                               \
+
+#define PHP_QT_STATIC_RETURN_METHOD(classname, function, returntype)  \
+ZEND_METHOD(classname,function){                            \
+  if(getThis() != NULL){                                    \
+    classname *o = (classname*) PHP_QT_FETCH();             \
+    returntype(o->function());                              \
+  } else                                                    \
+    returntype(classname::function());                      \
+  }                                                         \
+
+#define PHP_QT_STATIC_RETURN_OBJ_METHOD(classname, function, object_type) \
+ZEND_METHOD(classname,function){                                \
+    if(getThis() != NULL){                                      \
+        classname *o = (classname*) PHP_QT_FETCH();             \
+        PHP_QT_RET_OBJ(object_type,o->function());              \
+    } else  {                                                   \
+        PHP_QT_RET_OBJ(object_type,classname::function())       \
+    }                                                           \
+    RETURN_NULL();                                              \
+} 
+
+
+/* default set macros */
+
 #define PHP_QT_SET_PROPERTY_OBJ_METHOD(classname,function,z_property,z_type)                 \
 ZEND_METHOD(classname,function){                                                        \
     zval *object;                                                                       \
@@ -175,54 +186,56 @@ ZEND_METHOD(classname,function){                                                
     RETURN_NULL();                              \
 }                                               \
 
-#define PHP_QT_STATIC_RETURN_METHOD(classname, function, returntype)  \
-ZEND_METHOD(classname,function){                            \
-  if(getThis() != NULL){                                    \
-    classname *o = (classname*) PHP_QT_FETCH();             \
-    returntype(o->function());                              \
-  } else                                                    \
-    returntype(classname::function());                      \
-  }                                                         \
-
 #define PHP_QT_SETBOOL_METHOD(classname,function)                               \
 ZEND_METHOD(classname,function){                                                \
-    zend_bool b;                                                                    \
+    zend_bool b;                                                                \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) {    \
             return;                                                             \
     }                                                                           \
-    classname* obj = (classname*) PHP_QT_FETCH();                                     \
-    obj->function(b);                                                    \
+    classname* obj = (classname*) PHP_QT_FETCH();                               \
+    obj->function(b);                                                           \
     RETURN_NULL();                                                              \
 }                                                                               \
 
 #define PHP_QT_SETLONG_METHOD(classname,function)                               \
 ZEND_METHOD(classname,function){                                                \
-    long l;                                                                    \
+    long l;                                                                     \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&l) == FAILURE) {    \
             return;                                                             \
     }                                                                           \
-    classname* obj = (classname*) PHP_QT_FETCH();                                            \
-    obj->function(l);                                                    \
+    classname* obj = (classname*) PHP_QT_FETCH();                               \
+    obj->function(l);                                                           \
+    RETURN_NULL();                                                              \
+}                                                                               \
+
+#define PHP_QT_SETENUM_METHOD(classname,function,type)                          \
+ZEND_METHOD(classname,function){                                                \
+    long l;                                                                     \
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&l) == FAILURE) {    \
+            return;                                                             \
+    }                                                                           \
+    classname* obj = (classname*) PHP_QT_FETCH();                               \
+    obj->function((type)l);                                                     \
     RETURN_NULL();                                                              \
 }                                                                               \
 
 #define PHP_QT_SETLONG_2_METHOD(classname,function)                             \
 ZEND_METHOD(classname,function)                                                 \
 {                                                                               \
-    int val1, val2;                                                             \
+    long val1, val2;                                                            \
     int num_args = 0;                                                           \
     num_args = ZEND_NUM_ARGS() TSRMLS_CC;                                       \
     if(num_args == 2){                                                          \
         if(zend_parse_parameters(num_args TSRMLS_CC,"ll", &val1, &val2) == FAILURE) {   \
             RETURN_NULL();                                                      \
         }                                                                       \
-\
         classname *o = (classname*) PHP_QT_FETCH();                             \
-\
         o->function(val1,val2);                                                 \
-\
     }                                                                           \
 }                                                                               \
+
+/* abstract macros 
+ * Note: macros sets properties */
 
 #define PHP_QT_ABSTRACT_SETBOOL_METHOD(classname,function,pseudo,name)          \
 ZEND_METHOD(classname,function){                                                \
@@ -245,6 +258,17 @@ ZEND_METHOD(classname,function){                                                
     zend_update_property_long(Z_OBJCE_P(getThis()),getThis(), name, strlen(name), (long)b TSRMLS_DC); \
     pseudo* pseudo_ptr = (pseudo*) PHP_QT_FETCH();                                          \
     pseudo_ptr->function(b);                                                    \
+    RETURN_NULL();                                                              \
+}                                                                     
+
+#define PHP_QT_ABSTRACT_SETLONG_2_METHOD(classname,function,pseudo)     \
+ZEND_METHOD(classname,function){                                                \
+    long a, b;                                                                    \
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ll",&a,&b) == FAILURE) {    \
+            return;                                                             \
+    }                                                                           \
+    pseudo* pseudo_ptr = (pseudo*) PHP_QT_FETCH();                                          \
+    pseudo_ptr->function(a,b);                                                    \
     RETURN_NULL();                                                              \
 }                                                                     
 

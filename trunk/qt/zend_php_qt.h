@@ -435,22 +435,27 @@ ZEND_METHOD(QAbstractSlider,invertedControls);
 ZEND_METHOD(QAbstractSlider,isSliderDown);
 ZEND_METHOD(QAbstractSlider,maximum);
 ZEND_METHOD(QAbstractSlider,minimum);
-//ZEND_METHOD(QAbstractSlide,orientation,Orientation)
+ZEND_METHOD(QAbstractSlider,orientation);
 ZEND_METHOD(QAbstractSlider,pageStep);
 ZEND_METHOD(QAbstractSlider,setInvertedAppearance);
 ZEND_METHOD(QAbstractSlider,setInvertedControls);
 ZEND_METHOD(QAbstractSlider,setMaximum);
 ZEND_METHOD(QAbstractSlider,setMinimum);
 ZEND_METHOD(QAbstractSlider,setPageStep);
-// ZEND_METHOD(QAbstractSlider,setRange);
+ZEND_METHOD(QAbstractSlider,setRange);
 ZEND_METHOD(QAbstractSlider,setSingleStep);
 ZEND_METHOD(QAbstractSlider,setSliderDown);
 ZEND_METHOD(QAbstractSlider,setSliderPosition);
 ZEND_METHOD(QAbstractSlider,setTracking);
 ZEND_METHOD(QAbstractSlider,singleStep);
 ZEND_METHOD(QAbstractSlider,sliderPosition);
-//QAbstractSlide,triggerAction,SliderAction)
+ZEND_METHOD(QAbstractSlider,triggerAction);
 ZEND_METHOD(QAbstractSlider,value);
+
+/* Slots */
+ZEND_METHOD(QAbstractSlider,setOrientation);
+ZEND_METHOD(QAbstractSlider,setValue);
+
 
 /* QLineEdit */
 ZEND_METHOD(QLineEdit,__construct);

@@ -28,6 +28,7 @@
 #include <QApplication>
 #include <QBoxLayout>
 #include <QLineEdit>
+#include <QAbstractSlider>
 
 //QOUT();
 
@@ -139,9 +140,7 @@ PHP_MINIT_FUNCTION(php_qt)
 	REGISTER_LONG_CONSTANT("QT_ALIGNMENT_ALIGNVERTICAL_MASK",Qt::AlignVertical_Mask ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QT_ORIENTATIONS_VERTICAL",Qt::Vertical ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QT_ORIENTATIONS_HORIZONTAL",Qt::Horizontal ,CONST_CS | CONST_PERSISTENT);	
-		
-	
-	
+
 	_register_QCoreApplication(TSRMLS_C);
 	REGISTER_LONG_CONSTANT("QCOREAPPLICATION_ENCODING_DEFAULTCODEC",QCoreApplication::DefaultCodec ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QCOREAPPLICATION_ENCODING_UNICODEUTF8",QCoreApplication::UnicodeUTF8 ,CONST_CS | CONST_PERSISTENT);	
@@ -280,6 +279,16 @@ PHP_MINIT_FUNCTION(php_qt)
 	REGISTER_LONG_CONSTANT("QLINEEDIT_ECHOMODE_PASSWORD", QLineEdit::Password,CONST_CS | CONST_PERSISTENT);	
 
     _register_QAbstractSlider(TSRMLS_C);
+	REGISTER_LONG_CONSTANT("QABSTRACT_SLIDERACTION_SLIDERNOACTION", QAbstractSlider::SliderNoAction,CONST_CS | CONST_PERSISTENT);	
+
+	REGISTER_LONG_CONSTANT("QABSTRACT_SLIDERACTION_SLIDERSINGLESTEPPADD", QAbstractSlider::SliderSingleStepAdd,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QABSTRACT_SLIDERACTION_SLIDERSINGLESTEPSUB", QAbstractSlider::SliderSingleStepSub,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QABSTRACT_SLIDERACTION_SLIDERPAGESETADD", QAbstractSlider::SliderPageStepAdd,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QABSTRACT_SLIDERACTION_SLIDERPAGESETSUB", QAbstractSlider::SliderPageStepSub,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QABSTRACT_SLIDERACTION_SLIDERTOMINIMUM", QAbstractSlider::SliderToMinimum,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QABSTRACT_SLIDERACTION_SLIDERTOMAXIMUM", QAbstractSlider::SliderToMaximum,CONST_CS | CONST_PERSISTENT);	
+	REGISTER_LONG_CONSTANT("QABSTRACT_SLIDERACTION_SLIDERMOVE", QAbstractSlider::SliderMove,CONST_CS | CONST_PERSISTENT);	
+
     _register_QSlider(TSRMLS_C);
 		
 //    objects_handle = zend_register_list_destructors_ex(NULL,NULL,"Qt Wrapper",module_number);
@@ -1066,22 +1075,27 @@ static zend_function_entry QAbstractSlider_methods[] = {
     ZEND_ME(QAbstractSlider,isSliderDown,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,maximum,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,minimum,NULL,ZEND_ACC_PUBLIC)
-//    ZEND_ME(QAbstractSlide,orientation,Orientation)
+    ZEND_ME(QAbstractSlider,orientation,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,pageStep,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,setInvertedAppearance,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,setInvertedControls,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,setMaximum,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,setMinimum,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,setPageStep,NULL,ZEND_ACC_PUBLIC)
-//  ZEND_ME(QAbstractSlider,setRange)
+    ZEND_ME(QAbstractSlider,setRange,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,setSingleStep,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,setSliderDown,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,setSliderPosition,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,setTracking,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,singleStep,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,sliderPosition,NULL,ZEND_ACC_PUBLIC)
-//  ZEND_ME(QAbstractSlide,triggerAction,SliderAction)
+    ZEND_ME(QAbstractSlider,triggerAction,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QAbstractSlider,value,NULL,ZEND_ACC_PUBLIC)
+
+/* Slots */
+    ZEND_ME(QAbstractSlider,setOrientation,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QAbstractSlider,setValue,NULL,ZEND_ACC_PUBLIC)
+
 };
 
 void _register_QAbstractSlider(TSRMLS_C)

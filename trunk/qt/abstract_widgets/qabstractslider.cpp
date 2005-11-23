@@ -22,6 +22,7 @@
 using namespace std;
 
 #include <QAbstractSlider>
+#include <QSlider>
 #include "../php_qt.h"
 
 
@@ -34,20 +35,26 @@ PHP_QT_RETURN_METHOD(QAbstractSlider,invertedControls,RETURN_BOOL);
 PHP_QT_RETURN_METHOD(QAbstractSlider,isSliderDown,RETURN_BOOL);
 PHP_QT_RETURN_METHOD(QAbstractSlider,maximum,RETURN_LONG);
 PHP_QT_RETURN_METHOD(QAbstractSlider,minimum,RETURN_LONG);
-//PHP_QT_RETURN_OBJ_METHOD(QAbstractSlide,orientation,Orientation)
+PHP_QT_RETURN_METHOD(QAbstractSlider,orientation,RETURN_LONG)
 PHP_QT_RETURN_METHOD(QAbstractSlider,pageStep,RETURN_LONG);
 PHP_QT_SETBOOL_METHOD(QAbstractSlider,setInvertedAppearance);
 PHP_QT_SETBOOL_METHOD(QAbstractSlider,setInvertedControls);
 PHP_QT_SETLONG_METHOD(QAbstractSlider,setMaximum);
 PHP_QT_SETLONG_METHOD(QAbstractSlider,setMinimum);
 PHP_QT_SETLONG_METHOD(QAbstractSlider,setPageStep);
-// setRange
+
+PHP_QT_SETLONG_2_METHOD(QAbstractSlider,setRange);
+
 PHP_QT_SETLONG_METHOD(QAbstractSlider,setSingleStep);
 PHP_QT_SETLONG_METHOD(QAbstractSlider,setSliderDown);
 PHP_QT_SETLONG_METHOD(QAbstractSlider,setSliderPosition);
 PHP_QT_SETBOOL_METHOD(QAbstractSlider,setTracking);
 PHP_QT_RETURN_METHOD(QAbstractSlider,singleStep,RETURN_LONG);
 PHP_QT_RETURN_METHOD(QAbstractSlider,sliderPosition,RETURN_LONG);
-//PHP_QT_RETURN_OBJ_METHOD(QAbstractSlide,triggerAction,SliderAction)
+PHP_QT_SETENUM_METHOD(QAbstractSlider,triggerAction,QAbstractSlider::SliderAction)
 PHP_QT_RETURN_METHOD(QAbstractSlider,value,RETURN_LONG);
+
+/* Slots */
+PHP_QT_SETENUM_METHOD(QAbstractSlider,setOrientation,Qt::Orientation);
+PHP_QT_SETLONG_METHOD(QAbstractSlider,setValue);
 
