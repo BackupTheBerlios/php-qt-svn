@@ -518,9 +518,9 @@ ZEND_METHOD(QLineEdit,undo);
 /* QSlider */
 ZEND_METHOD(QSlider,__construct);
 ZEND_METHOD(QSlider,setTickInterval);
-//ZEND_METHOD(QSlider,setTickPosition);
+ZEND_METHOD(QSlider,setTickPosition);
 ZEND_METHOD(QSlider,tickInterval);
-//ZEND_METHOD(QSlider,tickPosition);
+ZEND_METHOD(QSlider,tickPosition);
 
 /* 
   	Declare any global variables you may need between the BEGIN

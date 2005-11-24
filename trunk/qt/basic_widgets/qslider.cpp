@@ -48,7 +48,7 @@ ZEND_METHOD(QSlider,__construct){
 PHP_QT_DESTRUCT(QSlider);
 
 PHP_QT_SETLONG_METHOD(QSlider,setTickInterval);
-//PHP_QT_SETLONG_METHOD(QSlider,setTickPosition);
+PHP_QT_SETPROPERTY_LONGENUM_METHOD(QSlider,setTickPosition,QSlider::TickPosition,TickPosition);
 PHP_QT_RETURN_METHOD(QSlider,tickInterval,RETURN_LONG);
-//PHP_QT_RETURN_OBJ_METHOD(QSlider,tickPosition,TickPosition);
+PHP_QT_RETURN_METHOD(QSlider,tickPosition,RETURN_LONG);
 

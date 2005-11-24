@@ -51,10 +51,10 @@ PHP_QT_SETLONG_METHOD(QAbstractSlider,setSliderPosition);
 PHP_QT_SETBOOL_METHOD(QAbstractSlider,setTracking);
 PHP_QT_RETURN_METHOD(QAbstractSlider,singleStep,RETURN_LONG);
 PHP_QT_RETURN_METHOD(QAbstractSlider,sliderPosition,RETURN_LONG);
-PHP_QT_SETENUM_METHOD(QAbstractSlider,triggerAction,QAbstractSlider::SliderAction)
+PHP_QT_SETPROPERTY_LONGENUM_METHOD(QAbstractSlider,triggerAction,QAbstractSlider::SliderAction,SliderAction)
 PHP_QT_RETURN_METHOD(QAbstractSlider,value,RETURN_LONG);
 
 /* Slots */
-PHP_QT_SETENUM_METHOD(QAbstractSlider,setOrientation,Qt::Orientation);
+PHP_QT_SET_LONGENUM_METHOD(QAbstractSlider,setOrientation,Qt::Orientation);
 PHP_QT_SETLONG_METHOD(QAbstractSlider,setValue);
 
