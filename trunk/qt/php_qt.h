@@ -208,16 +208,31 @@ ZEND_METHOD(classname,function){                                                
     RETURN_NULL();                                                              \
 }                                                                               \
 
-#define PHP_QT_SETENUM_METHOD(classname,function,type)                          \
+#define PHP_QT_SETPROPERTY_LONGENUM_METHOD(classname,function,type,property)                          \
 ZEND_METHOD(classname,function){                                                \
     long l;                                                                     \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&l) == FAILURE) {    \
             return;                                                             \
     }                                                                           \
     classname* obj = (classname*) PHP_QT_FETCH();                               \
-    obj->function((type)l);                                                     \
+    obj->function((type)l);                                          \
+    zend_update_property_long(Z_OBJCE_P(getThis()),getThis(),#property,strlen(#property),l TSRMLS_CC);    \
     RETURN_NULL();                                                              \
 }                                                                               \
+
+
+
+#define PHP_QT_SET_LONGENUM_METHOD(classname,function,type)                          \
+ZEND_METHOD(classname,function){                                                \
+    zval l;                                                                     \
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&l) == FAILURE) {    \
+            return;                                                             \
+    }                                                                           \
+    classname* obj = (classname*) PHP_QT_FETCH();                               \
+    obj->function((type)l.value.lval);\
+    RETURN_NULL();                                                              \
+}                                                                               \
+
 
 #define PHP_QT_SETLONG_2_METHOD(classname,function)                             \
 ZEND_METHOD(classname,function)                                                 \
