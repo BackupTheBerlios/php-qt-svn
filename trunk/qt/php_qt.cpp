@@ -1198,6 +1198,18 @@ void _register_QLineEdit(TSRMLS_C)
     
    INIT_CLASS_ENTRY(ce,"QLineEdit",QLineEdit_methods);
    QLineEdit_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QWidget_ce_ptr,NULL TSRMLS_CC);
+
+   PHP_QT_DECLARE_PROPERTY("alignment");
+   PHP_QT_DECLARE_PROPERTY("cursorPosition");
+   PHP_QT_DECLARE_PROPERTY("dragEnabled");
+   PHP_QT_DECLARE_PROPERTY("echoMode");
+   PHP_QT_DECLARE_PROPERTY("frame");
+   PHP_QT_DECLARE_PROPERTY("inputMask");
+   PHP_QT_DECLARE_PROPERTY("maxLength");
+   PHP_QT_DECLARE_PROPERTY("modified");
+   PHP_QT_DECLARE_PROPERTY("readOnly");
+   PHP_QT_DECLARE_PROPERTY("redoAvailable");
+   PHP_QT_DECLARE_PROPERTY("text");
 }
 
 

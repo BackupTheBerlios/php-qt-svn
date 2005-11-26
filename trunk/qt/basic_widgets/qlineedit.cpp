@@ -181,6 +181,8 @@ ZEND_METHOD(QLineEdit,selectedText){
 
 PHP_QT_RETURN_METHOD(QLineEdit,selectionStart,RETURN_LONG);
 
+// Moenicke: method sets property
+/*
 ZEND_METHOD(QLineEdit,setAlignment) {
 	QLineEdit *QLineEdit_ptr;
 	long alignment;
@@ -195,11 +197,16 @@ ZEND_METHOD(QLineEdit,setAlignment) {
 	return;
 
 }
+*/
+PHP_QT_SETPROPERTY_LONGENUM_METHOD(QLineEdit,setAlignment,Qt::Alignment,alignment);
 
-PHP_QT_SETLONG_METHOD(QLineEdit,setCursorPosition);
+//PHP_QT_SETLONG_METHOD(QLineEdit,setCursorPosition);
+PHP_QT_SETPROPERTY_LONG_METHOD(QLineEdit,setCursorPosition,cursorPosition);
 
-PHP_QT_SETBOOL_METHOD(QLineEdit,setDragEnabled);
+PHP_QT_SETPROPERTY_BOOL_METHOD(QLineEdit,setDragEnabled,dragEnabled);
 
+// Moenicke: method sets property
+/*
 ZEND_METHOD(QLineEdit,setEchoMode) {
 	QLineEdit *QLineEdit_ptr;
 	long echomode;
@@ -214,8 +221,9 @@ ZEND_METHOD(QLineEdit,setEchoMode) {
 	return;
 
 }
-
-PHP_QT_SETBOOL_METHOD(QLineEdit,setFrame);
+*/
+PHP_QT_SETPROPERTY_LONGENUM_METHOD(QLineEdit,setEchoMode,QLineEdit::EchoMode,echoMode);
+PHP_QT_SETPROPERTY_BOOL_METHOD(QLineEdit,setFrame,frame);
 
 ZEND_METHOD(QLineEdit,setInputMask){
 	zval *uservar;
@@ -237,16 +245,17 @@ ZEND_METHOD(QLineEdit,setInputMask){
 		if(Z_TYPE_P(uservar) == IS_OBJECT)
 		{
 			QString *tmp = (QString*) php_qt_fetch(uservar);
-			QLineEdit_ptr->setInputMask((const QString&)tmp);
+			QLineEdit_ptr->setInputMask((const QString&) tmp);
+            zend_update_property(Z_OBJCE_P(getThis()),getThis(),"inputMask",strlen("inputMask"),uservar TSRMLS_CC);
 		}
 	}	
 	return;
 }
 
-PHP_QT_SETLONG_METHOD(QLineEdit,setMaxLength);
+PHP_QT_SETPROPERTY_LONG_METHOD(QLineEdit,setMaxLength,"maxLength");
 
-PHP_QT_SETBOOL_METHOD(QLineEdit,setModified);
-PHP_QT_SETBOOL_METHOD(QLineEdit,setReadOnly);
+PHP_QT_SETPROPERTY_BOOL_METHOD(QLineEdit,setModified,"modified");
+PHP_QT_SETPROPERTY_BOOL_METHOD(QLineEdit,setReadOnly,"readOnly");
 
 ZEND_METHOD(QLineEdit,setSelection) {
 	QLineEdit *QLineEdit_ptr;
@@ -304,6 +313,7 @@ ZEND_METHOD(QLineEdit,setText){
 		if(Z_TYPE_P(uservar) == IS_OBJECT)
 		{
 			QString *tmp = (QString*) php_qt_fetch(uservar);
+            zend_update_property(Z_OBJCE_P(getThis()),getThis(),"text",strlen("text"),uservar TSRMLS_CC);    \
 			QLineEdit_ptr->setText((const QString&)tmp);
 		}
 	}	

@@ -208,19 +208,35 @@ ZEND_METHOD(classname,function){                                                
     RETURN_NULL();                                                              \
 }                                                                               \
 
-#define PHP_QT_SETPROPERTY_LONGENUM_METHOD(classname,function,type,property)                          \
+#define PHP_QT_SETPROPERTY_LONG_METHOD(classname,function,z_property)            \
+    PHP_QT_SETPROPERTY_LONGENUM_METHOD(classname,function,int,z_property)        \
+
+#define PHP_QT_SETPROPERTY_LONGENUM_METHOD(classname,function,type,property)    \
 ZEND_METHOD(classname,function){                                                \
     long l;                                                                     \
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&l) == FAILURE) {    \
             return;                                                             \
     }                                                                           \
     classname* obj = (classname*) PHP_QT_FETCH();                               \
-    obj->function((type)l);                                          \
+    obj->function((type)l);                                                     \
     zend_update_property_long(Z_OBJCE_P(getThis()),getThis(),#property,strlen(#property),l TSRMLS_CC);    \
     RETURN_NULL();                                                              \
 }                                                                               \
 
+#define PHP_QT_SETPROPERTY_BOOL_METHOD(classname,function,z_property)           \
+    PHP_QT_SETPROPERTY_BOOLENUM_METHOD(classname,function,bool,z_property)      \
 
+#define PHP_QT_SETPROPERTY_BOOLENUM_METHOD(classname,function,type,property)    \
+ZEND_METHOD(classname,function){                                                \
+    long b;                                                                    \
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&b) == FAILURE) {    \
+            return;                                                             \
+    }                                                                           \
+    classname* obj = (classname*) PHP_QT_FETCH();                               \
+    obj->function((type)b);                                                     \
+    zend_update_property_bool(Z_OBJCE_P(getThis()),getThis(),#property,strlen(#property),b TSRMLS_CC);    \
+    RETURN_NULL();                                                              \
+}                                                                               \
 
 #define PHP_QT_SET_LONGENUM_METHOD(classname,function,type)                          \
 ZEND_METHOD(classname,function){                                                \
