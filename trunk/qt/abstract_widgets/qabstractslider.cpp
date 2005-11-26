@@ -37,24 +37,24 @@ PHP_QT_RETURN_METHOD(QAbstractSlider,maximum,RETURN_LONG);
 PHP_QT_RETURN_METHOD(QAbstractSlider,minimum,RETURN_LONG);
 PHP_QT_RETURN_METHOD(QAbstractSlider,orientation,RETURN_LONG)
 PHP_QT_RETURN_METHOD(QAbstractSlider,pageStep,RETURN_LONG);
-PHP_QT_SETBOOL_METHOD(QAbstractSlider,setInvertedAppearance);
-PHP_QT_SETBOOL_METHOD(QAbstractSlider,setInvertedControls);
-PHP_QT_SETLONG_METHOD(QAbstractSlider,setMaximum);
-PHP_QT_SETLONG_METHOD(QAbstractSlider,setMinimum);
-PHP_QT_SETLONG_METHOD(QAbstractSlider,setPageStep);
+PHP_QT_SETPROPERTY_BOOL_METHOD(QAbstractSlider,setInvertedAppearance,"invertedAppearance");
+PHP_QT_SETPROPERTY_BOOL_METHOD(QAbstractSlider,setInvertedControls,"invertedControls");
+PHP_QT_SETPROPERTY_LONG_METHOD(QAbstractSlider,setMaximum,"maximum");
+PHP_QT_SETPROPERTY_LONG_METHOD(QAbstractSlider,setMinimum,"minimum");
+PHP_QT_SETPROPERTY_LONG_METHOD(QAbstractSlider,setPageStep,"pageStep");
 
 PHP_QT_SETLONG_2_METHOD(QAbstractSlider,setRange);
 
-PHP_QT_SETLONG_METHOD(QAbstractSlider,setSingleStep);
-PHP_QT_SETLONG_METHOD(QAbstractSlider,setSliderDown);
-PHP_QT_SETLONG_METHOD(QAbstractSlider,setSliderPosition);
-PHP_QT_SETBOOL_METHOD(QAbstractSlider,setTracking);
+PHP_QT_SETPROPERTY_LONG_METHOD(QAbstractSlider,setSingleStep,"singleStep");
+PHP_QT_SETPROPERTY_BOOL_METHOD(QAbstractSlider,setSliderDown,"sliderDown");
+PHP_QT_SETPROPERTY_LONG_METHOD(QAbstractSlider,setSliderPosition,"sliderPosition");
+PHP_QT_SETPROPERTY_BOOL_METHOD(QAbstractSlider,setTracking,"tracking");
 PHP_QT_RETURN_METHOD(QAbstractSlider,singleStep,RETURN_LONG);
 PHP_QT_RETURN_METHOD(QAbstractSlider,sliderPosition,RETURN_LONG);
-PHP_QT_SETPROPERTY_LONGENUM_METHOD(QAbstractSlider,triggerAction,QAbstractSlider::SliderAction,SliderAction)
+PHP_QT_SET_LONGENUM_METHOD(QAbstractSlider,triggerAction,QAbstractSlider::SliderAction)
 PHP_QT_RETURN_METHOD(QAbstractSlider,value,RETURN_LONG);
 
 /* Slots */
 PHP_QT_SET_LONGENUM_METHOD(QAbstractSlider,setOrientation,Qt::Orientation);
-PHP_QT_SETLONG_METHOD(QAbstractSlider,setValue);
+PHP_QT_SETPROPERTY_LONG_METHOD(QAbstractSlider,setValue,"value");
 

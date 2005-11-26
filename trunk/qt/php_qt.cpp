@@ -1111,7 +1111,17 @@ void _register_QAbstractSlider(TSRMLS_C)
     
    INIT_CLASS_ENTRY(ce,"QAbstractSlider",QAbstractSlider_methods);
    QAbstractSlider_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QWidget_ce_ptr,NULL TSRMLS_CC);
-   PHP_QT_DECLARE_PROPERTY("SliderAction");
+//   PHP_QT_DECLARE_PROPERTY("SliderAction");
+   PHP_QT_DECLARE_PROPERTY("invertedAppearance");
+   PHP_QT_DECLARE_PROPERTY("invertedControls");
+   PHP_QT_DECLARE_PROPERTY("maximum");
+   PHP_QT_DECLARE_PROPERTY("minimum");
+   PHP_QT_DECLARE_PROPERTY("orientation");
+   PHP_QT_DECLARE_PROPERTY("pageStep");
+   PHP_QT_DECLARE_PROPERTY("singleStep");
+   PHP_QT_DECLARE_PROPERTY("sliderDown");
+   PHP_QT_DECLARE_PROPERTY("tracking");
+   PHP_QT_DECLARE_PROPERTY("value");
 }
 
 static zend_function_entry QSlider_methods[] = {
