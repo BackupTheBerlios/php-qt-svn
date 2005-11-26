@@ -427,6 +427,13 @@ ZEND_METHOD(QBoxLayout,setStretchFactor);
 ZEND_METHOD(QBoxLayout,insertItem);	
 ZEND_METHOD(QBoxLayout,itemAt);
 
+/* QVLayoutBox */
+ZEND_METHOD(QVBoxLayout,__construct);
+
+/* QHLayoutBox */
+ZEND_METHOD(QHBoxLayout,__construct);
+
+
 /* QAbstractSlider */
 ZEND_METHOD(QAbstractSlider,__construct);
 ZEND_METHOD(QAbstractSlider,hasTracking);

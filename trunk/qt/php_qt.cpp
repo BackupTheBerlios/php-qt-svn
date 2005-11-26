@@ -54,6 +54,8 @@ zend_class_entry *QEvent_ce_ptr;
 zend_class_entry *QLayoutItem_ce_ptr;
 zend_class_entry *QLayout_ce_ptr;
 zend_class_entry *QBoxLayout_ce_ptr;
+zend_class_entry *QVBoxLayout_ce_ptr;
+zend_class_entry *QHBoxLayout_ce_ptr;
 zend_class_entry *QSpacerItem_ce_ptr;
 zend_class_entry *QAbstractSlider_ce_ptr;
 zend_class_entry *QSlider_ce_ptr;
@@ -274,6 +276,10 @@ PHP_MINIT_FUNCTION(php_qt)
 	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_TOP_TO_BOTTOM",QBoxLayout::TopToBottom ,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_BOTTOM_TO_TOP",QBoxLayout::BottomToTop ,CONST_CS | CONST_PERSISTENT);	
 
+	_register_QVBoxLayout(TSRMLS_C);
+	_register_QHBoxLayout(TSRMLS_C);
+	
+	
 	_register_QLineEdit(TSRMLS_C);
 	REGISTER_LONG_CONSTANT("QLINEEDIT_ECHOMODE_NORMAL", QLineEdit::Normal,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QLINEEDIT_ECHOMODE_NOECHO", QLineEdit::NoEcho,CONST_CS | CONST_PERSISTENT);	
@@ -1220,6 +1226,34 @@ void _register_QLineEdit(TSRMLS_C)
    PHP_QT_DECLARE_PROPERTY("readOnly");
    PHP_QT_DECLARE_PROPERTY("redoAvailable");
    PHP_QT_DECLARE_PROPERTY("text");
+}
+
+static zend_function_entry QVBoxLayout_methods[] = {
+	ZEND_ME(QVBoxLayout,__construct,NULL,ZEND_ACC_PUBLIC)
+	{NULL,NULL,NULL}
+};
+
+
+void _register_QVBoxLayout(TSRMLS_C)
+{
+   zend_class_entry ce;
+    
+   INIT_CLASS_ENTRY(ce,"QVBoxLayout",QVBoxLayout_methods);
+   QVBoxLayout_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QBoxLayout_ce_ptr,NULL TSRMLS_CC);
+}
+
+
+static zend_function_entry QHBoxLayout_methods[] = {
+	ZEND_ME(QHBoxLayout,__construct,NULL,ZEND_ACC_PUBLIC)
+	{NULL,NULL,NULL}
+};
+
+void _register_QHBoxLayout(TSRMLS_C)
+{
+   zend_class_entry ce;
+    
+   INIT_CLASS_ENTRY(ce,"QHBoxLayout",QHBoxLayout_methods);
+   QHBoxLayout_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QBoxLayout_ce_ptr,NULL TSRMLS_CC);
 }
 
 

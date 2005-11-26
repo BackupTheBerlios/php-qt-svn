@@ -44,6 +44,8 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/layout_management/qlayoutitem.cpp \
   qt/layout_management/qlayout.cpp \
   qt/layout_management/qboxlayout.cpp \
+  qt/layout_management/qhboxlayout.cpp \
+  qt/layout_management/qvboxlayout.cpp \
   qt/object_model/qobject.cpp \
   qt/text_related/qstring.cpp \
   qt/text_related/qlatin1string.cpp \
