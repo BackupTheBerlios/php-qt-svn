@@ -744,6 +744,10 @@ void _register_QPushButton(TSRMLS_D)
     QPushButton_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QAbstractButton_ce_ptr,NULL TSRMLS_CC);
     zend_declare_property_null(QPushButton_ce_ptr,"menu",strlen("menu"),ZEND_ACC_PRIVATE TSRMLS_CC);
 
+    PHP_QT_DECLARE_PROPERTY("autoDefault");
+    PHP_QT_DECLARE_PROPERTY("default");
+    PHP_QT_DECLARE_PROPERTY("flat");
+
 }
 
 static zend_function_entry QAbstractButton_methods[] = {
