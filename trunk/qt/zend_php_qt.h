@@ -320,6 +320,7 @@ ZEND_METHOD(QWidget,setAccessibleDescription);
 ZEND_METHOD(QWidget,setAccessibleName);
 ZEND_METHOD(QWidget,setGeometry);
 ZEND_METHOD(QWidget,setFixedSize);
+ZEND_METHOD(QWidget,setLayout);
 /*ZEND_METHOD(QWidget,size);
 ZEND_METHOD(QWidget,sizeHint);
 ZEND_METHOD(QWidget,sizeIncrement);

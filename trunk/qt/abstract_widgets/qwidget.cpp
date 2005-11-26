@@ -232,6 +232,8 @@ ZEND_METHOD(QWidget,setFixedSize)
 
 //PHP_QT_SET_PROPERTY_OBJ_METHOD(QWidget,setBackgroundRole,QPalette);
 
+PHP_QT_SET_OBJ_METHOD(QWidget,setLayout,QLayout);
+
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, size, QSize);
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, sizeHint, QSize); // virtual QSize
 //PHP_QT_RETURN_OBJ_METHOD(QWidget, sizeIncrement, QSize);

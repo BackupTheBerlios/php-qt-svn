@@ -621,6 +621,7 @@ static zend_function_entry QWidget_methods[] = {
     ZEND_ME(QWidget,setAccessibleName,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,setGeometry,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,setFixedSize,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QWidget,setLayout,NULL,ZEND_ACC_PUBLIC)
 /*    ZEND_ME(QWidget,size,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,sizeHint,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QWidget,sizeIncrement,NULL,ZEND_ACC_PUBLIC)

@@ -186,6 +186,18 @@ ZEND_METHOD(classname,function){                                                
     RETURN_NULL();                              \
 }                                               \
 
+#define PHP_QT_SET_OBJ_METHOD(classname,function,z_type)                                \
+ZEND_METHOD(classname,function){                                                        \
+    zval *object;                                                                       \
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o", &object) == FAILURE) {      \
+        return;                                                                         \
+    }                                                                                   \
+    z_type *tmp = (z_type*) php_qt_fetch(object);                                       \
+    classname *QObject_ptr = (classname*) PHP_QT_FETCH();                               \
+    QObject_ptr->function((z_type*) tmp);                                               \
+    RETURN_NULL();                                                                      \
+}                                                                                       \
+
 #define PHP_QT_SETBOOL_METHOD(classname,function)                               \
 ZEND_METHOD(classname,function){                                                \
     zend_bool b;                                                                \
