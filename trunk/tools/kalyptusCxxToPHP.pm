@@ -449,7 +449,7 @@ print CLASS "/*
 #include <iostream>
 using namespace std;
 
-#include \"../php_qt.h\n";
+#include \"../php_qt.h\"\n";
 
 	# ancestors
 	my @ancestors = ();
@@ -529,6 +529,7 @@ using namespace std;
 		sub { print CLASS ""; print CLASS ""; }
 	);
 
+    print CLASS "\n";
 	close CLASS;
 	$nullctor = 0;
 
@@ -728,54 +729,53 @@ sub listMember
     	        print CLASS "\t",$function, " *",$function,"_ptr = new ",$function,"();\n";
             }
 
-            print CLASS "\tif(ZEND_NUM_ARGS() == ",$paramCount,"){\n";
-            print CLASS "\t\t/*",$pinvokeargs,"*/\n";            
+            if($paramCount > 0){
+                print CLASS "\tif(ZEND_NUM_ARGS() == ",$paramCount,"){\n";
+                print CLASS "\t\t/*",$pinvokeargs,"*/\n";            
 
-            my $typeCount = 0;
-		    foreach my $info ( @PHPinformations ) {
-                if(@{$info}[0] eq "long"){
-                    $PHPzend_parse_parameters_s .= "l";
-                    $PHPzend_parse_parameters_vars .= ", &var$typeCount";
-                } else {
-                    $PHPzend_parse_parameters_s .= "o";
-                    $PHPzend_parse_parameters_vars .= ", &var$typeCount";
+                my $typeCount = 0;
+		        foreach my $info ( @PHPinformations ) {
+                    if(@{$info}[0] eq "long"){
+                        $PHPzend_parse_parameters_s .= "l";
+                        $PHPzend_parse_parameters_vars .= ", &var$typeCount";
+                    } else {
+                        $PHPzend_parse_parameters_s .= "o";
+                        $PHPzend_parse_parameters_vars .= ", &var$typeCount";
+                    }
+                    print CLASS "\t\t",@{$info}[0]," var",$typeCount++,";\n";
                 }
-                print CLASS "\t\t",@{$info}[0]," var",$typeCount++,";\n";
-            }
 
-            print CLASS "\t\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,\"",$PHPzend_parse_parameters_s,"\"",$PHPzend_parse_parameters_vars,") == FAILURE) {\n";
-            print CLASS "\t\t\treturn;\n","\t\t}\n"; 
+                print CLASS "\t\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,\"",$PHPzend_parse_parameters_s,"\"",$PHPzend_parse_parameters_vars,") == FAILURE) {\n";
+                print CLASS "\t\t\treturn;\n","\t\t}\n"; 
+            
+                my $typeCount = 0;
+		        foreach my $info ( @PHPinformations ) {
+                    my $Function_ = ucfirst(@{$info}[1]);            
+                    print CLASS "\t\t//zend_update_property(Z_OBJCE_P(getThis()),getThis(),\"@{$info}[1]\",strlen(\"@{$info}[1]\"), var",$typeCount," TSRMLS_CC);\n";
 
-            my $typeCount = 0;
-		    foreach my $info ( @PHPinformations ) {
-                my $Function_ = ucfirst(@{$info}[1]);            
-                print CLASS "\t\t//zend_update_property(Z_OBJCE_P(getThis()),getThis(),\"@{$info}[1]\",strlen(\"@{$info}[1]\"), var",$typeCount," TSRMLS_CC);\n";
-
-                if(@{$info}[0] eq "zval*"){
-                    print CLASS "\t\t",$function," *tmp = (",$function,"*) php_qt_fetch();\n";
-                    print CLASS "\t\t",$function,"_ptr->set$Function_(tmp);\n";                
-                } elsif (@{$info}[0] eq "long"){
-                    print CLASS "\t\t",$function,"_ptr->set$Function_(var",$typeCount,");\n";
+                    if(@{$info}[0] eq "zval*"){
+                        print CLASS "\t\t",$function," *tmp = (",$function,"*) php_qt_fetch();\n";
+                        print CLASS "\t\t",$function,"_ptr->set$Function_(tmp);\n";                
+                    } elsif (@{$info}[0] eq "long"){
+                        print CLASS "\t\t",$function,"_ptr->set$Function_(var",$typeCount,");\n";
+                    }
+                    $typeCount++;
                 }
-                $typeCount++;
+                print CLASS "\t}\n";
             }
-
-            print CLASS "\t}\n";
 
             $constructorCount++;
 
 			if ($PHPparams eq () ) {
 				$nullctor = 1;
 			}
-# --
 # Destructor
 		} elsif ( $returnType =~ /~/  ) {
             print CLASS "\tPHP_QT_REGISTER(",$function,"_ptr);\n";
             print CLASS "\tRETURN_NULL();\n";
 			print CLASS "}\n";        
             $constructorCount = 0;
-			print CLASS "\n// Deconstructor goes here...\n";
-            print CLASS "PHP_QT_DESTRUCT(",$function,");\n\n";
+            print CLASS "\nPHP_QT_DESTRUCT(",$function,");\n\n";
 
 # methods
 		} else {
@@ -786,10 +786,10 @@ sub listMember
 # Class or instance method
 # cplusplusToMacro
             if($returnType eq "int"){
-                print CLASS "\nPHP_QT_RETURN_METHOD(",$class->{astNodeName},", ",$function,",RETURN_LONG);";
+                print CLASS "\nPHP_QT_RETURN_METHOD(",$class->{astNodeName},", ",$function,", RETURN_LONG);";
                 print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$function,");";
             } elsif($returnType eq "char*") {
-                print CLASS "\nPHP_QT_RETURN_METHOD(",$class->{astNodeName},", ",$function,",RETURN_STRING);";
+                print CLASS "\nPHP_QT_RETURN_METHOD(",$class->{astNodeName},", ",$function,", RETURN_STRING);";
                 print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$function,");";
             } else {
                 print CLASS "\n// PHP_QT_","xxx","_METHOD(",$class->{astNodeName},", ",$function,"); ",$returnType;
