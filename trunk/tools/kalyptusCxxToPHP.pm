@@ -298,6 +298,8 @@ sub cplusplusToMacro
 
     print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$functionname,");";
     # code snippets for php_qt.cpp here
+# TODO here: access types like ZEND_ACC_PUBLIC|ZEND_ACC_STATIC
+    print PHP_QT_CPP "\tZEND_ME(",$functionname,",NULL,ZEND_ACC_",uc($cnode->{Access}),")\n";
 
 }
 
@@ -362,6 +364,14 @@ PHP_FUNCTION(SIGNAL);
 PHP_FUNCTION(SLOT);
     \n\n";
 
+    # make zend_php.cpp snippets file
+	my $file_php_qt_cpp = "$outputdir/php_qt.snippets.cpp";
+	open( PHP_QT_CPP, ">$file_php_qt_cpp" ) || die "Couldn't create $file_php_qt_cpp\n";
+	$file_php_qt_cpp =~ s/\.h/.h/;
+
+    print PHP_QT_CPP "/**/\n";
+
+
 	# Document all compound nodes
 	Iter::LocalCompounds( $rootnode, sub { writeClassDoc( shift ); } );
 
@@ -404,6 +414,9 @@ ZEND_END_MODULE_GLOBALS(php_qt)
  */\n
     ";
     close ZEND_PHP_QT;
+
+    print PHP_QT_CPP "\n";
+    close PHP_QT_CPP;
 
 }
 
@@ -482,6 +495,8 @@ print CLASS "/*
 using namespace std;
 
 #include \"../php_qt.h\"\n";
+
+    print PHP_QT_CPP "static zend_function_entry ",$node->{astNodeName},"_methods[] = {\n";
 
 	# ancestors
 	my @ancestors = ();
@@ -564,6 +579,10 @@ using namespace std;
     print CLASS "\n";
 	close CLASS;
 	$nullctor = 0;
+
+    print PHP_QT_CPP "
+	{NULL,NULL,NULL}
+};\n";
 
 	if ( kalyptusDataDict::interfacemap($node->{astNodeName}) ne () ) {
 		close INTERFACE;
