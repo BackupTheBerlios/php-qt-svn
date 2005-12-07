@@ -53,6 +53,8 @@ BEGIN
 EOF
 }
 
+# TODO here:
+# one is needed for php types, one for zend types (e.q. zval)
 sub cplusplusToPHP
 {
 	my ( $cplusplusType )  = @_;
@@ -263,10 +265,40 @@ sub cplusplusToPInvoke
 
 sub cplusplusToMacro
 {
-	my ( $cnode )  = @_;
+	my ( $class, $cnode )  = @_;
+    
+    my $functionname = $cnode->{astNodeName};
+    my $classname = $class->{astNodeName};
+    my $type = "yyy";
     
     # all return types, all param types
-    
+    if($cnode->{Access} eq "public") {
+# void
+        if($cnode->{ReturnType} eq "void"){
+            print CLASS "\n// PHP_QT_RETURN_METHOD(",$classname,", ",$functionname,"); ",$cnode->{ReturnType},"--\n";
+# bool
+        } elsif ($cnode->{ReturnType} eq "bool"){
+            print CLASS "\nPHP_QT_RETURN_METHOD(",$classname,", ",$functionname,",RETURN_BOOL);\n";
+# int
+        } elsif ($cnode->{ReturnType} eq "int"){
+            print CLASS "\nPHP_QT_RETURN_METHOD(",$classname,", ",$functionname,",RETURN_LONG);\n";
+        } 
+# not yet implemented
+        else {
+            print CLASS "\n// PHP_QT_",$type,"_METHOD(",$classname,", ",$functionname,"); ",$cnode->{ReturnType},"\n";
+            print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){";
+            print CLASS "\n\tNOT_YET_IMPLEMENTED";
+            print CLASS "\n\tRETURN_NULL();";
+            print CLASS "\n}\n";
+        }
+    } else {
+        print CLASS "\n// ",$cnode->{Access},": PHP_QT_",$type,"_METHOD(",$classname,", ",$functionname,");\n";
+
+    }
+
+    print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$functionname,");";
+    # code snippets for php_qt.cpp here
+
 }
 
 sub writeDoc
@@ -728,7 +760,8 @@ sub listMember
 			    print CLASS "\n\nZEND_METHOD(",$function, ",__construct){\n";
     	        print CLASS "\t",$function, " *",$function,"_ptr = new ",$function,"();\n";
             }
-
+# args
+# here we should find a better solution for overloading
             if($paramCount > 0){
                 print CLASS "\tif(ZEND_NUM_ARGS() == ",$paramCount,"){\n";
                 print CLASS "\t\t/*",$pinvokeargs,"*/\n";            
@@ -782,19 +815,20 @@ sub listMember
 			if ( $name =~ /.*Event$/ ) {
 				return;
 			}
-
+# +-+-+-
 # Class or instance method
 # cplusplusToMacro
-            if($returnType eq "int"){
-                print CLASS "\nPHP_QT_RETURN_METHOD(",$class->{astNodeName},", ",$function,", RETURN_LONG);";
-                print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$function,");";
-            } elsif($returnType eq "char*") {
-                print CLASS "\nPHP_QT_RETURN_METHOD(",$class->{astNodeName},", ",$function,", RETURN_STRING);";
-                print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$function,");";
-            } else {
-                print CLASS "\n// PHP_QT_","xxx","_METHOD(",$class->{astNodeName},", ",$function,"); ",$returnType;
-                print ZEND_PHP_QT "\n//ZEND_METHOD(",$class->{astNodeName},", ",$function,");";
-            }
+#            if($returnType eq "int"){
+#                print CLASS "\nPHP_QT_RETURN_METHOD(",$class->{astNodeName},", ",$function,", RETURN_LONG);";
+#                print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$function,");";
+#            } elsif($returnType eq "char*") {
+#                print CLASS "\nPHP_QT_RETURN_METHOD(",$class->{astNodeName},", ",$function,", RETURN_STRING);";
+#                print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$function,");";
+#            } else {
+#                print CLASS "\n// PHP_QT_","xxx","_METHOD(",$class->{astNodeName},", ",$function,"); ",$returnType;
+                cplusplusToMacro($class,$m);
+#                print ZEND_PHP_QT "\n//ZEND_METHOD(",$class->{astNodeName},", ",$function,");";
+#            }
    		}
 	}
 	}
