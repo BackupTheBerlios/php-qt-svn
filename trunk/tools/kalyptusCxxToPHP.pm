@@ -617,6 +617,18 @@ using namespace std;
 	{NULL,NULL,NULL}
 };\n";
 
+# TODO here: properties
+    print PHP_QT_CPP "
+void _register_",$node->{astNodeName},"(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,\"",$node->{astNodeName},"\",",$node->{astNodeName},"_methods);
+    ",$node->{astNodeName},"_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
+
+//    zend_declare_property_string(",$node->{astNodeName},"_ce_ptr,\"",$node->{astNodeName},"\",strlen(\"",$node->{astNodeName},"\"),\"\",ZEND_ACC_PROTECTED TSRMLS_CC);
+
+}\n";
+
 	if ( kalyptusDataDict::interfacemap($node->{astNodeName}) ne () ) {
 		close INTERFACE;
     }
