@@ -270,36 +270,58 @@ sub cplusplusToMacro
     my $functionname = $cnode->{astNodeName};
     my $classname = $class->{astNodeName};
     my $type = "yyy";
+    my $access = $cnode->{Access};
+    my $returntype = $cnode->{ReturnType};
+
+    print CLASS "
+/*********************************
+ *    class     ",$classname,"
+ *    function  ",$functionname,"
+ *    \@access   ",$access,"
+ *    \@return   ",$returntype,"
+*********************************/
+";
+
     
     # all return types, all param types
     if($cnode->{Access} eq "public") {
 # void
-        if($cnode->{ReturnType} eq "void"){
-            print CLASS "\n// PHP_QT_RETURN_METHOD(",$classname,", ",$functionname,"); ",$cnode->{ReturnType},"--\n";
+        if($returntype eq "void"){
+            print CLASS "\n// PHP_QT_RETURN_METHOD(",$classname,", ",$functionname,");\n";
+
+            print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){";
+            print CLASS "\n\tNOT_YET_IMPLEMENTED";
+            print CLASS "\n\tRETURN_NULL();";
+            print CLASS "\n}\n";
 # bool
-        } elsif ($cnode->{ReturnType} eq "bool"){
+        } elsif ($returntype eq "bool"){
             print CLASS "\nPHP_QT_RETURN_METHOD(",$classname,", ",$functionname,",RETURN_BOOL);\n";
 # int
-        } elsif ($cnode->{ReturnType} eq "int"){
+        } elsif ($returntype eq "int"){
             print CLASS "\nPHP_QT_RETURN_METHOD(",$classname,", ",$functionname,",RETURN_LONG);\n";
         } 
 # not yet implemented
         else {
-            print CLASS "\n// PHP_QT_",$type,"_METHOD(",$classname,", ",$functionname,"); ",$cnode->{ReturnType},"\n";
+            print CLASS "\n// PHP_QT_",$type,"_METHOD(",$classname,", ",$functionname,"); ",$returntype,"\n";
+
             print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){";
             print CLASS "\n\tNOT_YET_IMPLEMENTED";
             print CLASS "\n\tRETURN_NULL();";
             print CLASS "\n}\n";
         }
     } else {
-        print CLASS "\n// ",$cnode->{Access},": PHP_QT_",$type,"_METHOD(",$classname,", ",$functionname,");\n";
+        print CLASS "\n// ",$cnode->{Access},": PHP_QT_",$type,"_METHOD(",$classname,", ",$functionname,"); access: ",uc($access),"\n";
 
+        print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){";
+        print CLASS "\n\tNOT_YET_IMPLEMENTED";
+        print CLASS "\n\tRETURN_NULL();";
+        print CLASS "\n}\n";
     }
 
     print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$functionname,");";
     # code snippets for php_qt.cpp here
 # TODO here: access types like ZEND_ACC_PUBLIC|ZEND_ACC_STATIC
-    print PHP_QT_CPP "\tZEND_ME(",$functionname,",NULL,ZEND_ACC_",uc($cnode->{Access}),")\n";
+    print PHP_QT_CPP "\tZEND_ME(",$functionname,",NULL,ZEND_ACC_",uc($access),")\n";
 
 }
 
@@ -370,6 +392,14 @@ PHP_FUNCTION(SLOT);
 	$file_php_qt_cpp =~ s/\.h/.h/;
 
     print PHP_QT_CPP "/**/\n";
+
+    # make zend_php.cpp second snippets file PHP_MINIT_FUNCTION
+	my $file_php_qt_minit = "$outputdir/php_qt.snippets2.cpp";
+	open( PHP_QT_MINIT, ">$file_php_qt_minit" ) || die "Couldn't create $file_php_qt_minit\n";
+	$file_php_qt_minit =~ s/\.h/.h/;
+
+    print PHP_QT_CPP "\n";
+    print PHP_QT_MINIT "\n";
 
 
 	# Document all compound nodes
@@ -496,7 +526,9 @@ using namespace std;
 
 #include \"../php_qt.h\"\n";
 
+# php_qt.cpp
     print PHP_QT_CPP "static zend_function_entry ",$node->{astNodeName},"_methods[] = {\n";
+    print PHP_QT_MINIT "\n\t_register_",$node->{astNodeName},"(TSRMLS_C);\n";
 
 	# ancestors
 	my @ancestors = ();
@@ -561,6 +593,7 @@ using namespace std;
 		sub { print CLASS "", $_[0], ""; print JNISOURCE "", $_[0], "";  },
 		sub {	my ($node, $kid ) = @_;
                  generateClassMethodForEnum( $node, $kid );
+
                },
 		sub { print CLASS ""; print JNISOURCE ""; }
 	);
@@ -881,12 +914,12 @@ sub generateClassMethodForEnum
 		if($enum ne " ") {
 			print CLASS "\n\n/*\t\t$PHPaccess enum", $enum,":long {";
 
-			foreach my $enum ( @enums ) {
-				$enum =~ s/\s//g;
-				$enum =~ s/::/./g;
+			foreach my $enum_ ( @enums ) {
+				$enum_ =~ s/\s//g;
+				$enum_ =~ s/::/./g;
 				if($#enums == $enumCount){
 
-					if ( $enum =~ /(.*)=(.*)/ ) {
+					if ( $enum_ =~ /(.*)=(.*)/ ) {
 						print CLASS "\n\t\t\t$1 = $2";
 					} else {
 						print CLASS "\n\t\t\t$enum = $enumCount";
@@ -894,13 +927,16 @@ sub generateClassMethodForEnum
 
 				} else {
 
-					if ( $enum =~ /(.*)=(.*)/ ) {
+					if ( $enum_ =~ /(.*)=(.*)/ ) {
 						print CLASS "\n\t\t\t$1 = $2,";
 					} else {
 						print CLASS "\n\t\t\t$enum = $enumCount,";
 					}
 
 				}
+#                $enum =~ s/=//g;
+                my @constant = split(/=/,$enum_);                
+                print PHP_QT_MINIT "\t	REGISTER_LONG_CONSTANT(\"",uc($class->{astNodeName}),"_",uc($enum),"_",uc($constant[0]),"\", ",$class->{astNodeName},"::",$constant[0],", CONST_CS | CONST_PERSISTENT);\n";                
 				$enumCount++;
 
 			}
