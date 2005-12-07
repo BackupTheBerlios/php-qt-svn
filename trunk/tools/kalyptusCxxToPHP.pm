@@ -15,6 +15,7 @@
 #***************************************************************************/
 
 # TODO: fit cplusplusToPHP, cplusplusToInvoke, cplusplusToMacro
+# TODO: inheritance
 
 package kalyptusCxxToPHP;
 
@@ -588,7 +589,7 @@ using namespace std;
         print ZEND_PHP_QT "\n\n/* $node->{astNodeName} */";
 
 	}
-
+# JNISOURCE? seems to be from JNI
 	Iter::MembersByType ( $node,
 		sub { print CLASS "", $_[0], ""; print JNISOURCE "", $_[0], "";  },
 		sub {	my ($node, $kid ) = @_;
@@ -613,9 +614,11 @@ using namespace std;
 	close CLASS;
 	$nullctor = 0;
 
+# php_qt.cpp
     print PHP_QT_CPP "
 	{NULL,NULL,NULL}
 };\n";
+
 
 # TODO here: properties
     print PHP_QT_CPP "
@@ -624,9 +627,10 @@ void _register_",$node->{astNodeName},"(TSRMLS_D)
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce,\"",$node->{astNodeName},"\",",$node->{astNodeName},"_methods);
     ",$node->{astNodeName},"_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
+";
 
-//    zend_declare_property_string(",$node->{astNodeName},"_ce_ptr,\"",$node->{astNodeName},"\",strlen(\"",$node->{astNodeName},"\"),\"\",ZEND_ACC_PROTECTED TSRMLS_CC);
-
+#//    zend_declare_property_string(",$node->{astNodeName},"_ce_ptr,\"",$node->{astNodeName},"\",strlen(\"",$node->{astNodeName},"\"),\"\",ZEND_ACC_PROTECTED TSRMLS_CC);
+    print PHP_QT_CPP "
 }\n";
 
 	if ( kalyptusDataDict::interfacemap($node->{astNodeName}) ne () ) {
@@ -962,33 +966,33 @@ sub print_r
 {
 
     my ($m) = @_;
-    print CLASS "\n\n/*************************************";
+    print PHP_QT_CPP "\n\n/*************************************";
 
-    print CLASS "\nastNodeName: ",$m->{astNodeName},">";
-    print CLASS "\nNodeType: ",$m->{NodeType},">";
-    print CLASS "\nParent: ",$m->{Parent},">";
-    print CLASS "\nKidHash: ",$m->{KidHash},">";
-    print CLASS "\nDocNode: ",$m->{DocNode},">";
-    print CLASS "\nPath: ",$m->{Path},">";
-    print CLASS "\nRootType: ",$m->{RootType},">";
-    print CLASS "\nKidAccess: ",$m->{KidAccess},">";
-    print CLASS "\nDcopExported: ",$m->{DcopExported},">";
-    print CLASS "\nSource: ",$m->{Source},">";
-    print CLASS "\nParams: ",$m->{Params},">";
-    print CLASS "\nTmpl: ",$m->{Tmpl},">";
-    print CLASS "\nDeprecated: ",$m->{Deprecated},">";
-    print CLASS "\nType: ",$m->{Type},">";
-    print CLASS "\nTmpType: ",$m->{TmplType},">";
-    print CLASS "\nFlags: ",$m->{Flags},">";
-    print CLASS "\nReturnType: ",$m->{ReturnType},">";
-    print CLASS "\nPure: ",$m->{Pure},">";
-    print CLASS "\nParamList: ",$m->{ParamList},">";
-    print CLASS "\nArgType: ",$m->{ArgType},">";
-    print CLASS "\nArgName: ",$m->{ArgName},">";
-    print CLASS "\nDefaultValue: ",$m->{DefaultValue},">";
-    print CLASS "\nValue: ",$m->{Value},">";
+    print PHP_QT_CPP "\nastNodeName: ",$m->{astNodeName},">";
+    print PHP_QT_CPP "\nNodeType: ",$m->{NodeType},">";
+    print PHP_QT_CPP "\nParent: ",$m->{Parent},">";
+    print PHP_QT_CPP "\nKidHash: ",$m->{KidHash},">";
+    print PHP_QT_CPP "\nDocNode: ",$m->{DocNode},">";
+    print PHP_QT_CPP "\nPath: ",$m->{Path},">";
+    print PHP_QT_CPP "\nRootType: ",$m->{RootType},">";
+    print PHP_QT_CPP "\nKidAccess: ",$m->{KidAccess},">";
+    print PHP_QT_CPP "\nDcopExported: ",$m->{DcopExported},">";
+    print PHP_QT_CPP "\nSource: ",$m->{Source},">";
+    print PHP_QT_CPP "\nParams: ",$m->{Params},">";
+    print PHP_QT_CPP "\nTmpl: ",$m->{Tmpl},">";
+    print PHP_QT_CPP "\nDeprecated: ",$m->{Deprecated},">";
+    print PHP_QT_CPP "\nType: ",$m->{Type},">";
+    print PHP_QT_CPP "\nTmpType: ",$m->{TmplType},">";
+    print PHP_QT_CPP "\nFlags: ",$m->{Flags},">";
+    print PHP_QT_CPP "\nReturnType: ",$m->{ReturnType},">";
+    print PHP_QT_CPP "\nPure: ",$m->{Pure},">";
+    print PHP_QT_CPP "\nParamList: ",$m->{ParamList},">";
+    print PHP_QT_CPP "\nArgType: ",$m->{ArgType},">";
+    print PHP_QT_CPP "\nArgName: ",$m->{ArgName},">";
+    print PHP_QT_CPP "\nDefaultValue: ",$m->{DefaultValue},">";
+    print PHP_QT_CPP "\nValue: ",$m->{Value},">";
 
-    print CLASS "\n***************************************/";
+    print PHP_QT_CPP "\n***************************************/";
 
 }
 
