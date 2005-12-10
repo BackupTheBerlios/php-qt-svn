@@ -34,7 +34,7 @@ no strict "subs";
 
 use vars qw/ @clist $host $who $now $gentext %functionId $docTop
 	$lib $rootnode $outputdir $opt $debug $typeprefix $eventHandlerCount
-	$pastaccess $pastname $pastreturn $pastparams $nullctor $constructorCount $paramCount *CLASS *ZEND_PHP_QT *HEADER *QTCTYPES *KDETYPES /;
+	$pastaccess $pastname $pastreturn $pastparams $nullctor $constructorCount $paramCount @properties *CLASS *ZEND_PHP_QT *HEADER *QTCTYPES *KDETYPES /;
 
 BEGIN
 {
@@ -318,10 +318,11 @@ sub cplusplusToMacro
         print CLASS "\n\tRETURN_NULL();";
         print CLASS "\n}\n";
     }
-
+    if( $cnode->{Flags} =~ /s/ ){
+        $access .= "|ZEND_ACC_STATIC";
+    }
     print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$functionname,");";
-    # code snippets for php_qt.cpp here
-# TODO here: access types like ZEND_ACC_PUBLIC|ZEND_ACC_STATIC
+# code snippets for php_qt.cpp here
     print PHP_QT_CPP "\tZEND_ME(",$functionname,",NULL,ZEND_ACC_",uc($access),")\n";
 
 }
@@ -596,6 +597,17 @@ using namespace std;
 		sub { print CLASS ""; print JNISOURCE ""; }
 	);
 
+	Iter::MembersByType ( $node,
+		sub { print CLASS "", $_[0], ""; print CLASS "", $_[0], "";  },
+		sub {	my ($node, $kid ) = @_;
+            if ($kid->{NodeType} eq "property"){
+                push @properties, $kid;
+            }
+        },
+		sub { print CLASS ""; print CLASS ""; }
+	);
+
+
 	%functionId = ();
 	$eventHandlerCount = 0;
 
@@ -661,6 +673,9 @@ void _register_",$node->{astNodeName},"(TSRMLS_D)
 	if ( kalyptusDataDict::interfacemap($node->{astNodeName}) ne () ) {
 		close INTERFACE;
     }
+    
+    undef @properties;
+    
 }
 
 # for every node
@@ -976,35 +991,12 @@ sub generateClassMethodForEnum
 
 sub print_r
 {
+    my ( $cnode ) = @_;
 
-    my ($m) = @_;
-    print PHP_QT_CPP "\n\n/*************************************";
-
-    print PHP_QT_CPP "\nastNodeName: ",$m->{astNodeName},">";
-    print PHP_QT_CPP "\nNodeType: ",$m->{NodeType},">";
-    print PHP_QT_CPP "\nParent: ",$m->{Parent},">";
-    print PHP_QT_CPP "\nKidHash: ",$m->{KidHash},">";
-    print PHP_QT_CPP "\nDocNode: ",$m->{DocNode},">";
-    print PHP_QT_CPP "\nPath: ",$m->{Path},">";
-    print PHP_QT_CPP "\nRootType: ",$m->{RootType},">";
-    print PHP_QT_CPP "\nKidAccess: ",$m->{KidAccess},">";
-    print PHP_QT_CPP "\nDcopExported: ",$m->{DcopExported},">";
-    print PHP_QT_CPP "\nSource: ",$m->{Source},">";
-    print PHP_QT_CPP "\nParams: ",$m->{Params},">";
-    print PHP_QT_CPP "\nTmpl: ",$m->{Tmpl},">";
-    print PHP_QT_CPP "\nDeprecated: ",$m->{Deprecated},">";
-    print PHP_QT_CPP "\nType: ",$m->{Type},">";
-    print PHP_QT_CPP "\nTmpType: ",$m->{TmplType},">";
-    print PHP_QT_CPP "\nFlags: ",$m->{Flags},">";
-    print PHP_QT_CPP "\nReturnType: ",$m->{ReturnType},">";
-    print PHP_QT_CPP "\nPure: ",$m->{Pure},">";
-    print PHP_QT_CPP "\nParamList: ",$m->{ParamList},">";
-    print PHP_QT_CPP "\nArgType: ",$m->{ArgType},">";
-    print PHP_QT_CPP "\nArgName: ",$m->{ArgName},">";
-    print PHP_QT_CPP "\nDefaultValue: ",$m->{DefaultValue},">";
-    print PHP_QT_CPP "\nValue: ",$m->{Value},">";
-
-    print PHP_QT_CPP "\n***************************************/";
+    my @n = Ast::GetProps($cnode);
+    foreach $a ( @n ) {
+        print PHP_QT_CPP ">",$a,": ",$cnode->{$a},"\n";
+    }
 
 }
 
