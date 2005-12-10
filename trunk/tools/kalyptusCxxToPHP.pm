@@ -582,8 +582,6 @@ using namespace std;
 
 # CLASS
 	} else {
-    # erbe
-		my $ancestor;
 
         print CLASS "\n#include <$node->{astNodeName}>\n\n";
         print ZEND_PHP_QT "\n\n/* $node->{astNodeName} */";
@@ -594,7 +592,6 @@ using namespace std;
 		sub { print CLASS "", $_[0], ""; print JNISOURCE "", $_[0], "";  },
 		sub {	my ($node, $kid ) = @_;
                  generateClassMethodForEnum( $node, $kid );
-
                },
 		sub { print CLASS ""; print JNISOURCE ""; }
 	);
@@ -619,8 +616,24 @@ using namespace std;
 	{NULL,NULL,NULL}
 };\n";
 
-
+#my $currentClassName = join( ".", kdocAstUtil::heritage($node) );
+#my $pa = $node->{Parent};
 # TODO here: properties
+        my $ancestor;
+		foreach $ancestor ( @ancestors ) {
+            print PHP_QT_CPP @ancestors[$#ancestors];
+		}
+
+		if ( $#ancestors >= 1 ) {
+			foreach $ancestor ( @ancestors ) {
+				if ( kalyptusDataDict::interfacemap($ancestor) ne () ) {
+# what to do here?
+#					print PHP_QT_CPP ", ".kalyptusDataDict::interfacemap($ancestor);
+				}
+			}
+        }
+
+
     print PHP_QT_CPP "
 void _register_",$node->{astNodeName},"(TSRMLS_D)
 {
@@ -629,7 +642,19 @@ void _register_",$node->{astNodeName},"(TSRMLS_D)
     ",$node->{astNodeName},"_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
 ";
 
-#//    zend_declare_property_string(",$node->{astNodeName},"_ce_ptr,\"",$node->{astNodeName},"\",strlen(\"",$node->{astNodeName},"\"),\"\",ZEND_ACC_PROTECTED TSRMLS_CC);
+	Iter::MembersByType ( $node,
+		sub { print CLASS "", $_[0], ""; print CLASS "", $_[0], "";  },
+		sub {	my ($node, $kid ) = @_;
+            if ($kid->{NodeType} eq "property"){
+                print PHP_QT_CPP "// ",$kid->{READ}," ",$kid->{WRITE}," ",$kid->{NOTIFY},"\n";
+                print PHP_QT_CPP
+#                    "zend_declare_property_string(",$node->{astNodeName},"_ce_ptr,\"",$kid->{astNodeName},"\",strlen(\"",$kid->{astNodeName},"\"),\"\",ZEND_ACC_PROTECTED TSRMLS_CC);";
+                     "\tPHP_QT_DECLARE_PROPERTY(\"$kid->{astNodeName}\");\n";
+            }
+        },
+		sub { print CLASS ""; print JNISOURCE ""; }
+	);
+
     print PHP_QT_CPP "
 }\n";
 
@@ -883,20 +908,7 @@ sub listMember
 			if ( $name =~ /.*Event$/ ) {
 				return;
 			}
-# +-+-+-
-# Class or instance method
-# cplusplusToMacro
-#            if($returnType eq "int"){
-#                print CLASS "\nPHP_QT_RETURN_METHOD(",$class->{astNodeName},", ",$function,", RETURN_LONG);";
-#                print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$function,");";
-#            } elsif($returnType eq "char*") {
-#                print CLASS "\nPHP_QT_RETURN_METHOD(",$class->{astNodeName},", ",$function,", RETURN_STRING);";
-#                print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$function,");";
-#            } else {
-#                print CLASS "\n// PHP_QT_","xxx","_METHOD(",$class->{astNodeName},", ",$function,"); ",$returnType;
-                cplusplusToMacro($class,$m);
-#                print ZEND_PHP_QT "\n//ZEND_METHOD(",$class->{astNodeName},", ",$function,");";
-#            }
+            cplusplusToMacro($class,$m);
    		}
 	}
 	}
