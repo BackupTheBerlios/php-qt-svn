@@ -14,7 +14,7 @@
 # *                                                                         *
 #***************************************************************************/
 
-# TODO: fit cplusplusToPHP, cplusplusToInvoke, cplusplusToMacro
+# TODO: fit cplusplusToZEND, cplusplusToInvoke, cplusplusToMacro
 # TODO: inheritance
 
 package kalyptusCxxToPHP;
@@ -56,13 +56,13 @@ EOF
 
 # TODO here:
 # one is needed for php types, one for zend types (e.q. zval)
-sub cplusplusToPHP
+sub cplusplusToZEND
 {
 	my ( $cplusplusType )  = @_;
 	if ( $cplusplusType =~ /bool/ && kalyptusDataDict::ctypemap($cplusplusType) eq "int" ) {
 		return "bool";
 	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*void\s*\**/ ) {
-		return "int";
+		return "NULL";
 	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*int\s*\&*/ ) {
 		return "long";
 	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*int\s*\*/) {
@@ -74,7 +74,7 @@ sub cplusplusToPHP
 	} elsif ( $cplusplusType =~ /QByteArray/ || $cplusplusType =~ /QBitArray/ ) {
 		return "byte[]";
 	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*char\s*\*\*/ ) {
-		return "string[]";
+		return "char";
 	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*char\s*\**/ ) {
 		return "char* ";
 	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*unsigned int\s*\**/ ) {
@@ -270,9 +270,11 @@ sub cplusplusToMacro
     
     my $functionname = $cnode->{astNodeName};
     my $classname = $class->{astNodeName};
-    my $type = "yyy";
-    my $access = $cnode->{Access};
-    my $returntype = $cnode->{ReturnType};
+
+    my $function = $cnode;  # for better reading
+    my $access = $function->{Access};
+    my $returntype = $function->{ReturnType};
+
 
     print CLASS "
 /*********************************
@@ -282,42 +284,66 @@ sub cplusplusToMacro
  *    \@return   ",$returntype,"
 *********************************/
 ";
+    print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){\n";
 
-    
-    # all return types, all param types
-    if($cnode->{Access} eq "public") {
-# void
-        if($returntype eq "void"){
-            print CLASS "\n// PHP_QT_RETURN_METHOD(",$classname,", ",$functionname,");\n";
+    my $count = 0;
+    my $paratype;
+    my $short = ",\"";
+    my $paraf;
+    my @objects;
 
-            print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){";
-            print CLASS "\n\tNOT_YET_IMPLEMENTED";
-            print CLASS "\n\tRETURN_NULL();";
-            print CLASS "\n}\n";
-# bool
-        } elsif ($returntype eq "bool"){
-            print CLASS "\nPHP_QT_RETURN_METHOD(",$classname,", ",$functionname,",RETURN_BOOL);\n";
-# int
-        } elsif ($returntype eq "int"){
-            print CLASS "\nPHP_QT_RETURN_METHOD(",$classname,", ",$functionname,",RETURN_LONG);\n";
-        } 
-# not yet implemented
-        else {
-            print CLASS "\n// PHP_QT_",$type,"_METHOD(",$classname,", ",$functionname,"); ",$returntype,"\n";
+# write method implementation
+    foreach $b ( @{$cnode->{ParamList}} ) {
 
-            print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){";
-            print CLASS "\n\tNOT_YET_IMPLEMENTED";
-            print CLASS "\n\tRETURN_NULL();";
-            print CLASS "\n}\n";
+        if($count > 0){
+            $paraf .= ", ";
         }
-    } else {
-        print CLASS "\n// ",$cnode->{Access},": PHP_QT_",$type,"_METHOD(",$classname,", ",$functionname,"); access: ",uc($access),"\n";
 
-        print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){";
-        print CLASS "\n\tNOT_YET_IMPLEMENTED";
-        print CLASS "\n\tRETURN_NULL();";
-        print CLASS "\n}\n";
+        if ( $b->{ArgType} =~ /char/ ) {
+            print CLASS "\tchar* var_",$count,";\n";
+            print CLASS "\tint* len_",$count,";\n\n";
+            $paratype .= ", &var_".$count.", &len_".$count;
+            $paraf .= " var_".$count;
+            $short .= "s";
+        } else {
+            print CLASS "\tzval* var_",$count,";\n\n";
+            $paratype .= ", &var_".$count;
+            $paraf .= " var_".$count;
+            $short .= "o";
+            push @objects, "var_".$count;
+        }
+
+        $count++;
     }
+    $short .= "\"";
+
+    if( $count ) {
+        print CLASS "\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC",$short,$paratype,") == FAILURE) {\n";
+        print CLASS "\t\tRETURN_FALSE;\n";
+        print CLASS "\t}\n";
+    }
+
+    my $obj;
+
+        foreach $obj ( @objects ) {
+            print CLASS "\tQObject* tmp_",$obj," = (QObject*) php_qt_fetch(",$obj,");\n";
+            print CLASS "\t",$obj," = tmp_",$obj,"; // hack\n\n";
+        }
+
+        print CLASS "\t$classname *o = ($classname*) PHP_QT_FETCH();\n";
+        my $rt = cplusplusToZEND($returntype);
+
+        if ( $rt eq "NULL" ) {
+            print CLASS "\to->",$functionname,"(",$paraf,");\n";
+            print CLASS "\tRETURN_NULL();\n";
+        } elsif ( $rt =~ /zval/ ) {
+            print CLASS "\tPHP_QT_RET_OBJ(",$returntype,",o->",$functionname,"(",$paraf,"));\n";
+        } else {
+            print CLASS "\tRETURN_",uc($rt),"(o->",$functionname,"(",$paraf,"));\n";
+        }
+
+    print CLASS "}\n";
+
     if( $cnode->{Flags} =~ /s/ ){
         $access .= "|ZEND_ACC_STATIC";
     }
@@ -770,7 +796,7 @@ sub listMember
 			$argType =~ s/^\s*//;
 			$argType =~ s/([\*\&])\s*([\*\&])/$1$2/;
 			$cargType = kalyptusDataDict::ctypemap($argType);
-			$PHPargType = cplusplusToPHP($argType);
+			$PHPargType = cplusplusToZEND($argType);
 			$pinvokeargType = cplusplusToPInvoke($argType);
 
 			if ( $PHPargType eq "" ) {
@@ -996,7 +1022,10 @@ sub print_r
     my @n = Ast::GetProps($cnode);
     foreach $a ( @n ) {
         print PHP_QT_CPP ">",$a,": ",$cnode->{$a},"\n";
+
     }
+
+
 
 }
 
