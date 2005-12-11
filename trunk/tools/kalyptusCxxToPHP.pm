@@ -34,7 +34,7 @@ no strict "subs";
 
 use vars qw/ @clist $host $who $now $gentext %functionId $docTop
 	$lib $rootnode $outputdir $opt $debug $typeprefix $eventHandlerCount
-	$pastaccess $pastname $pastreturn $pastparams $nullctor $constructorCount $paramCount @properties *CLASS *ZEND_PHP_QT *HEADER *QTCTYPES *KDETYPES /;
+	$pastaccess $pastname $pastreturn $pastparams $nullctor $constructorCount $paramCount @properties @functions *CLASS *ZEND_PHP_QT *HEADER *QTCTYPES *KDETYPES /;
 
 BEGIN
 {
@@ -275,21 +275,61 @@ sub cplusplusToMacro
     my $access = $function->{Access};
     my $returntype = $function->{ReturnType};
 
+# skip
+    if ($functionname eq "qObject") {
+        print CLASS "// skip ",$functionname,"\n";
+        return;
+    }
+
+# make sure that this function will be added only at one time
+    my $mark = 0;
+    my $func;
+    foreach $func ( @functions ) {
+        if ( $func eq $functionname ) {
+            print CLASS "// marked for overloading: ",$functionname,"\n";
+            return;
+        }
+    }
+    if (!$mark) {
+        push @functions, $functionname;
+    }
 
     print CLASS "
 /*********************************
  *    class     ",$classname,"
  *    function  ",$functionname,"
+ *    flags:    ",$function->{Flags},"
+ *\n";
+ 
+    my $count = 0;
+    foreach $b ( @{$cnode->{ParamList}} ) {
+        print CLASS " *    \@param   ",$b->{ArgType},"\n";
+    } 
+    if (!$count) {
+        print CLASS " *    \@param   -\n";
+    }
+ 
+    print CLASS "
  *    \@access   ",$access,"
  *    \@return   ",$returntype,"
 *********************************/
 ";
+
+    # skip virtuals
+    if ( $function->{Flags} =~ /v/ ){
+        print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){\n";
+        print CLASS "// marked as virtual, skipped\n";
+        print CLASS "\tphp_printf(\"%s(): virtual functions are not yet implemented",'\n',"\",get_active_function_name(TSRMLS_C));\n";
+        print CLASS "}\n";
+        return;
+    }
+
     print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){\n";
 
     my $count = 0;
-    my $paratype;
+    my $paratype; # for zend
     my $short = ",\"";
-    my $paraf;
+    my $paraf;  # for qt
     my @objects;
 
 # write method implementation
@@ -298,14 +338,20 @@ sub cplusplusToMacro
         if($count > 0){
             $paraf .= ", ";
         }
-
+# todo: bool, double
         if ( $b->{ArgType} =~ /char/ ) {
             print CLASS "\tchar* var_",$count,";\n";
             print CLASS "\tint* len_",$count,";\n\n";
             $paratype .= ", &var_".$count.", &len_".$count;
             $paraf .= " var_".$count;
             $short .= "s";
-        } else {
+        } elsif ( $b->{ArgType} =~ /int/ ) {
+            print CLASS "\tlong var_",$count,";\n";
+            $paratype .= ", &var_".$count;
+            $paraf .= " (".$b->{ArgType}.") var_".$count;
+            $short .= "l";
+        } 
+        else {
             print CLASS "\tzval* var_",$count,";\n\n";
             $paratype .= ", &var_".$count;
             $paraf .= " var_".$count;
@@ -334,28 +380,54 @@ sub cplusplusToMacro
         foreach $obj_tmp ( @properties ) {
             # mostly these methods are setmethods with only one argument
             # maybe source of error
-            print CLASS  "\tzend_update_property(Z_OBJCE_P(getThis()),getThis(),\"",$prop->{astNodeName},"\",strlen(\"",$prop->{astNodeName},"\"),var_0 TSRMLS_CC);\n";
+# todo: test with QLCDNumber            
+            my $postfix = cplusplusToZEND($prop->{type});
+            $postfix =~ s/zval\*//;
+            if ( $postfix ) {    
+                $postfix = "_".cplusplusToZEND($prop->{type});
+            }
+
+            print CLASS  "\tzend_update_property",$postfix,"(Z_OBJCE_P(getThis()),getThis(),\"",$prop->{astNodeName},"\",strlen(\"",$prop->{astNodeName},"\"),var_0 TSRMLS_CC);\n";
+            print CLASS "}\n";
+            return;
         }
        }
     }
+
+    my $rt = cplusplusToZEND($returntype);
 
     my $obj;
 
         foreach $obj ( @objects ) {
             print CLASS "\tQObject* tmp_",$obj," = (QObject*) php_qt_fetch(",$obj,");\n";
-            print CLASS "\t",$obj," = tmp_",$obj,"; // hack\n\n";
+            $paraf =~ s/$obj/tmp_$obj/;
         }
 
         print CLASS "\t$classname *o = ($classname*) PHP_QT_FETCH();\n";
-        my $rt = cplusplusToZEND($returntype);
+
 
         if ( $rt eq "NULL" ) {
             print CLASS "\to->",$functionname,"(",$paraf,");\n";
             print CLASS "\tRETURN_NULL();\n";
         } elsif ( $rt =~ /zval/ ) {
-            print CLASS "\tPHP_QT_RET_OBJ(",$returntype,",o->",$functionname,"(",$paraf,"));\n";
+
+# TODO: consider 'const',
+# and non-pointer types, pointer types
+            print CLASS "\t",$returntype," obj = (",$returntype,") o->",$functionname,"(",$paraf,");\n";
+            print CLASS "\tzend_class_entry *ce;                                   \n";
+#            print CLASS "\tif(obj != NULL) {                                       \n";
+            print CLASS "\t    object_init_ex(return_value, ",$classname,"_ce_ptr);     \n";
+            print CLASS "\t    zend_rsrc_list_entry le;                            \n";
+            print CLASS "\t    le.ptr = &obj;                                       \n";
+            print CLASS "\t    php_qt_register(return_value,le);                   \n";
+            print CLASS "\t    return;                                             \n";
+#            print CLASS "\t}                                                       \n";
+#            print CLASS "\telse                                                    \n";
+#            print CLASS "\t    RETURN_NULL();                                      \n";
+
+
         } else {
-            print CLASS "\tRETURN_",uc($rt),"(o->",$functionname,"(",$paraf,"));\n";
+            print CLASS "\tRETURN_",uc($rt),"(o->",$functionname,"(",$paraf,"));\n" if defined $rt;
         }
 
     print CLASS "}\n";
@@ -363,9 +435,13 @@ sub cplusplusToMacro
     if( $cnode->{Flags} =~ /s/ ){
         $access .= "|ZEND_ACC_STATIC";
     }
+# __construct
     print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$functionname,");";
 # code snippets for php_qt.cpp here
-    print PHP_QT_CPP "\tZEND_ME(",$functionname,",NULL,ZEND_ACC_",uc($access),")\n";
+    $access = uc($access);
+    $access =~ s/_SLOTS//;
+    $access =~ s/_SIGNALS//;
+    print PHP_QT_CPP "\tZEND_ME(",$classname,",",$functionname,",NULL,ZEND_ACC_",$access,")\n";
 
 }
 
@@ -673,12 +749,11 @@ using namespace std;
 # inheritance
         my $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);";
         my $ancestor;
-		if ( $#ancestors >= 1 ) {
-			foreach $ancestor ( @ancestors ) {
-                    $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, ".$ancestor."_ce_ptr,NULL TSRMLS_CC);\n";
-                    last; # skip, not multiple
-			}
-        }
+
+		foreach $ancestor ( @ancestors ) {
+            $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, ".$ancestor."_ce_ptr,NULL TSRMLS_CC);\n";
+            last; # skip, not multiple
+		}
 
     print PHP_QT_CPP "
 void _register_",$node->{astNodeName},"(TSRMLS_D)
@@ -708,7 +783,7 @@ void _register_",$node->{astNodeName},"(TSRMLS_D)
     }
     
     undef @properties;
-    
+    undef @functions;
 }
 
 # for every node
@@ -928,10 +1003,10 @@ sub listMember
                     print CLASS "\t\t//zend_update_property(Z_OBJCE_P(getThis()),getThis(),\"@{$info}[1]\",strlen(\"@{$info}[1]\"), var",$typeCount," TSRMLS_CC);\n";
 
                     if(@{$info}[0] eq "zval*"){
-                        print CLASS "\t\t",$function," *tmp = (",$function,"*) php_qt_fetch();\n";
-                        print CLASS "\t\t",$function,"_ptr->set$Function_(tmp);\n";                
+#                        print CLASS "\t\t",$function," *tmp = (",$function,"*) php_qt_fetch(var",$typeCount,");\n";
+#                        print CLASS "\t\t",$function,"_ptr->set$Function_(tmp);\n";                
                     } elsif (@{$info}[0] eq "long"){
-                        print CLASS "\t\t",$function,"_ptr->set$Function_(var",$typeCount,");\n";
+#                        print CLASS "\t\t",$function,"_ptr->set$Function_(var",$typeCount,");\n";
                     }
                     $typeCount++;
                 }
