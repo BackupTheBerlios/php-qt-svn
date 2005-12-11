@@ -42,6 +42,7 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/basic_widgets/qlineedit.cpp \
   qt/basic_widgets/qpushbutton.cpp \
   qt/basic_widgets/qslider.cpp \
+  qt/basic_widgets/QLCDNumber.cpp \
   qt/layout_management/qlayoutitem.cpp \
   qt/layout_management/qlayout.cpp \
   qt/layout_management/qboxlayout.cpp \

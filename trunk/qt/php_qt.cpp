@@ -30,6 +30,7 @@
 #include <QLineEdit>
 #include <QAbstractSlider>
 #include <QSlider>
+#include <QLCDNumber>
 
 //QOUT();
 
@@ -61,6 +62,7 @@ zend_class_entry *QAbstractSlider_ce_ptr;
 zend_class_entry *QSlider_ce_ptr;
 zend_class_entry *QLineEdit_ce_ptr;
 zend_class_entry *QFrame_ce_ptr;
+zend_class_entry *QLCDNumber_ce_ptr;
 
 /* {{{ php_qt_functions[]
  *
@@ -318,6 +320,16 @@ PHP_MINIT_FUNCTION(php_qt)
         REGISTER_LONG_CONSTANT("QFRAME_SHADOW_SUNKEN", QFrame::Sunken, CONST_CS | CONST_PERSISTENT);
         REGISTER_LONG_CONSTANT("QFRAME__SHADOW_MASK", QFrame::Shadow_Mask, CONST_CS | CONST_PERSISTENT);
         REGISTER_LONG_CONSTANT("QFRAME__SHAPE_MASK", QFrame::Shape_Mask, CONST_CS | CONST_PERSISTENT);
+
+    _register_QLCDNumber(TSRMLS_C);
+        REGISTER_LONG_CONSTANT("QLCDNUMBER_MODE_HEX", QLCDNumber::Hex, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QLCDNUMBER_MODE_DEC", QLCDNumber::Dec, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QLCDNUMBER_MODE_OCT", QLCDNumber::Oct, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QLCDNUMBER_MODE_BIN", QLCDNumber::Bin, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QLCDNUMBER_SEGMENTSTYLE_OUTLINE", QLCDNumber::Outline, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QLCDNUMBER_SEGMENTSTYLE_FILLED", QLCDNumber::Filled, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QLCDNUMBER_SEGMENTSTYLE_FLAT", QLCDNumber::Flat, CONST_CS | CONST_PERSISTENT);
+
 
 //    objects_handle = zend_register_list_destructors_ex(NULL,NULL,"Qt Wrapper",module_number);
 
@@ -1277,6 +1289,7 @@ void _register_QHBoxLayout(TSRMLS_C)
 }
 
 static zend_function_entry QFrame_methods[] = {
+    ZEND_ME(QFrame,__construct,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QFrame,metaObject,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QFrame,className,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QFrame,qt_cast,NULL,ZEND_ACC_PUBLIC)
@@ -1312,6 +1325,42 @@ void _register_QFrame(TSRMLS_D)
     PHP_QT_DECLARE_PROPERTY("midLineWidth");
     PHP_QT_DECLARE_PROPERTY("frameWidth");
     PHP_QT_DECLARE_PROPERTY("frameRect");
+
+}
+
+static zend_function_entry QLCDNumber_methods[] = {
+    ZEND_ME(QLCDNumber,__construct,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,smallDecimalPoint,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,numDigits,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,checkOverflow,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,mode,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,segmentStyle,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,value,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,intValue,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,sizeHint,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,setHexMode,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,setDecMode,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,setOctMode,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,setBinMode,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QLCDNumber,staticMetaObject,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+    ZEND_ME(QLCDNumber,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+    ZEND_ME(QLCDNumber,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QLCDNumber(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QLCDNumber",QLCDNumber_methods);
+    QLCDNumber_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QFrame_ce_ptr,NULL TSRMLS_CC);
+
+    PHP_QT_DECLARE_PROPERTY("smallDecimalPoint");
+    PHP_QT_DECLARE_PROPERTY("numDigits");
+    PHP_QT_DECLARE_PROPERTY("mode");
+    PHP_QT_DECLARE_PROPERTY("segmentStyle");
+    PHP_QT_DECLARE_PROPERTY("value");
+    PHP_QT_DECLARE_PROPERTY("intValue");
 
 }
 

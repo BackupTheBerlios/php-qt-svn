@@ -531,6 +531,7 @@ ZEND_METHOD(QSlider,tickInterval);
 ZEND_METHOD(QSlider,tickPosition);
 
 /* QFrame */
+ZEND_METHOD(QFrame, __construct);
 ZEND_METHOD(QFrame, metaObject);
 ZEND_METHOD(QFrame, className);
 ZEND_METHOD(QFrame, qt_cast);
@@ -551,6 +552,23 @@ ZEND_METHOD(QFrame, tr);
 ZEND_METHOD(QFrame, trUtf8);
 ZEND_METHOD(QFrame, drawFrame);
 
+/* QLCDNumber */
+ZEND_METHOD(QLCDNumber, __construct);
+ZEND_METHOD(QLCDNumber, smallDecimalPoint);
+ZEND_METHOD(QLCDNumber, numDigits);
+ZEND_METHOD(QLCDNumber, checkOverflow);
+ZEND_METHOD(QLCDNumber, mode);
+ZEND_METHOD(QLCDNumber, segmentStyle);
+ZEND_METHOD(QLCDNumber, value);
+ZEND_METHOD(QLCDNumber, intValue);
+ZEND_METHOD(QLCDNumber, sizeHint);
+ZEND_METHOD(QLCDNumber, setHexMode);
+ZEND_METHOD(QLCDNumber, setDecMode);
+ZEND_METHOD(QLCDNumber, setOctMode);
+ZEND_METHOD(QLCDNumber, setBinMode);
+ZEND_METHOD(QLCDNumber, staticMetaObject);
+ZEND_METHOD(QLCDNumber, tr);
+ZEND_METHOD(QLCDNumber, trUtf8);
 
 /* 
   	Declare any global variables you may need between the BEGIN
