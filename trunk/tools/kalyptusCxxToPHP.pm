@@ -633,7 +633,7 @@ using namespace std;
 		sub { print CLASS ""; print CLASS ""; }
 	);
 
-
+# methods
 	%functionId = ();
 	$eventHandlerCount = 0;
 
@@ -654,37 +654,28 @@ using namespace std;
 	{NULL,NULL,NULL}
 };\n";
 
-#my $currentClassName = join( ".", kdocAstUtil::heritage($node) );
-#my $pa = $node->{Parent};
-# TODO here: properties
+# inheritance
+        my $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);";
         my $ancestor;
-		foreach $ancestor ( @ancestors ) {
-            print PHP_QT_CPP @ancestors[$#ancestors];
-		}
-
 		if ( $#ancestors >= 1 ) {
 			foreach $ancestor ( @ancestors ) {
-				if ( kalyptusDataDict::interfacemap($ancestor) ne () ) {
-# what to do here?
-#					print PHP_QT_CPP ", ".kalyptusDataDict::interfacemap($ancestor);
-				}
+                    $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, ".$ancestor."_ce_ptr,NULL TSRMLS_CC);\n";
+                    last; # skip, not multiple
 			}
         }
-
 
     print PHP_QT_CPP "
 void _register_",$node->{astNodeName},"(TSRMLS_D)
 {
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce,\"",$node->{astNodeName},"\",",$node->{astNodeName},"_methods);
-    ",$node->{astNodeName},"_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
+    ",$zend_inherit,"
 ";
 
 	Iter::MembersByType ( $node,
 		sub { print CLASS "", $_[0], ""; print CLASS "", $_[0], "";  },
 		sub {	my ($node, $kid ) = @_;
             if ($kid->{NodeType} eq "property"){
-                print PHP_QT_CPP "// ",$kid->{READ}," ",$kid->{WRITE}," ",$kid->{NOTIFY},"\n";
                 print PHP_QT_CPP
 #                    "zend_declare_property_string(",$node->{astNodeName},"_ce_ptr,\"",$kid->{astNodeName},"\",strlen(\"",$kid->{astNodeName},"\"),\"\",ZEND_ACC_PROTECTED TSRMLS_CC);";
                      "\tPHP_QT_DECLARE_PROPERTY(\"$kid->{astNodeName}\");\n";
