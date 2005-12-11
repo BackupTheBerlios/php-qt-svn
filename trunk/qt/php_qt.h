@@ -357,6 +357,7 @@ void _register_QHBoxLayout();
 void _register_QAbstractSlider();
 void _register_QSlider();
 void _register_QLineEdit();
+void _register_QFrame();
 
 extern zend_class_entry *QString_ce_ptr;
 extern zend_class_entry *QObject_ce_ptr;
@@ -376,3 +377,4 @@ extern zend_class_entry *QSpacerItem_ce_ptr;
 extern zend_class_entry *QAbstractSlider_ce_ptr;
 extern zend_class_entry *QSlider_ce_ptr;
 extern zend_class_entry *QLineEdit_ce_ptr;
+extern zend_class_entry *QFrame_ce_ptr;

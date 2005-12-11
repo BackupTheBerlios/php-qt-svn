@@ -38,6 +38,7 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/abstract_widgets/qabstractbutton.cpp \
   qt/abstract_widgets/qwidget.cpp \
   qt/abstract_widgets/qabstractslider.cpp \
+  qt/abstract_widgets/QFrame.cpp \
   qt/basic_widgets/qlineedit.cpp \
   qt/basic_widgets/qpushbutton.cpp \
   qt/basic_widgets/qslider.cpp \

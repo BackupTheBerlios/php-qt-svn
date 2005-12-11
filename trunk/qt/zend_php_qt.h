@@ -530,6 +530,28 @@ ZEND_METHOD(QSlider,setTickPosition);
 ZEND_METHOD(QSlider,tickInterval);
 ZEND_METHOD(QSlider,tickPosition);
 
+/* QFrame */
+ZEND_METHOD(QFrame, metaObject);
+ZEND_METHOD(QFrame, className);
+ZEND_METHOD(QFrame, qt_cast);
+ZEND_METHOD(QFrame, qt_invoke);
+ZEND_METHOD(QFrame, qt_emit);
+ZEND_METHOD(QFrame, qt_property);
+ZEND_METHOD(QFrame, frameStyle);
+ZEND_METHOD(QFrame, setFrameStyle);
+ZEND_METHOD(QFrame, frameWidth);
+ZEND_METHOD(QFrame, sizeHint);
+ZEND_METHOD(QFrame, frameShape);
+ZEND_METHOD(QFrame, frameShadow);
+ZEND_METHOD(QFrame, lineWidth);
+ZEND_METHOD(QFrame, midLineWidth);
+ZEND_METHOD(QFrame, frameRect);
+ZEND_METHOD(QFrame, staticMetaObject);
+ZEND_METHOD(QFrame, tr);
+ZEND_METHOD(QFrame, trUtf8);
+ZEND_METHOD(QFrame, drawFrame);
+
+
 /* 
   	Declare any global variables you may need between the BEGIN
 	and END macros here:     

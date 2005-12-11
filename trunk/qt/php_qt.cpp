@@ -60,6 +60,7 @@ zend_class_entry *QSpacerItem_ce_ptr;
 zend_class_entry *QAbstractSlider_ce_ptr;
 zend_class_entry *QSlider_ce_ptr;
 zend_class_entry *QLineEdit_ce_ptr;
+zend_class_entry *QFrame_ce_ptr;
 
 /* {{{ php_qt_functions[]
  *
@@ -303,6 +304,20 @@ PHP_MINIT_FUNCTION(php_qt)
 	REGISTER_LONG_CONSTANT("QSLIDER_TICKPOSITION_TICKSBELOW", QSlider::TicksBelow,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QSLIDER_TICKPOSITION_TICKSLEFT", QSlider::TicksLeft,CONST_CS | CONST_PERSISTENT);	
 	REGISTER_LONG_CONSTANT("QSLIDER_TICKPOSITION_TICKSRIGHT", QSlider::TicksRight,CONST_CS | CONST_PERSISTENT);	
+
+    _register_QFrame(TSRMLS_C);
+        REGISTER_LONG_CONSTANT("QFRAME_SHAPE_NOFRAME", QFrame::NoFrame, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME_SHAPE_BOX", QFrame::Box, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME_SHAPE_PANEL", QFrame::Panel, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME_SHAPE_WINPANEL", QFrame::WinPanel, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME_SHAPE_HLINE", QFrame::HLine, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME_SHAPE_VLINE", QFrame::VLine, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME_SHAPE_STYLEDPANEL", QFrame::StyledPanel, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME_SHADOW_PLAIN", QFrame::Plain, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME_SHADOW_RAISED", QFrame::Raised, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME_SHADOW_SUNKEN", QFrame::Sunken, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME__SHADOW_MASK", QFrame::Shadow_Mask, CONST_CS | CONST_PERSISTENT);
+        REGISTER_LONG_CONSTANT("QFRAME__SHAPE_MASK", QFrame::Shape_Mask, CONST_CS | CONST_PERSISTENT);
 
 //    objects_handle = zend_register_list_destructors_ex(NULL,NULL,"Qt Wrapper",module_number);
 
@@ -1261,6 +1276,44 @@ void _register_QHBoxLayout(TSRMLS_C)
    QHBoxLayout_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QBoxLayout_ce_ptr,NULL TSRMLS_CC);
 }
 
+static zend_function_entry QFrame_methods[] = {
+    ZEND_ME(QFrame,metaObject,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,className,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,qt_cast,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,qt_invoke,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,qt_emit,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,qt_property,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,frameStyle,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,setFrameStyle,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,frameWidth,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,sizeHint,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,frameShape,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,frameShadow,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,lineWidth,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,midLineWidth,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,frameRect,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QFrame,staticMetaObject,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+    ZEND_ME(QFrame,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+    ZEND_ME(QFrame,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+    ZEND_ME(QFrame,drawFrame,NULL,ZEND_ACC_PROTECTED)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QFrame(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QFrame",QFrame_methods);
+    QFrame_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QWidget_ce_ptr,NULL TSRMLS_CC);
+
+    PHP_QT_DECLARE_PROPERTY("frameShape");
+    PHP_QT_DECLARE_PROPERTY("frameShadow");
+    PHP_QT_DECLARE_PROPERTY("lineWidth");
+    PHP_QT_DECLARE_PROPERTY("midLineWidth");
+    PHP_QT_DECLARE_PROPERTY("frameWidth");
+    PHP_QT_DECLARE_PROPERTY("frameRect");
+
+}
 
 /* }}} */
 /* The previous line is meant for vim and emacs, so it can correctly fold and 
