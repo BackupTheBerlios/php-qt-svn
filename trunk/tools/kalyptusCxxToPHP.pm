@@ -323,6 +323,21 @@ sub cplusplusToMacro
         print CLASS "\t}\n";
     }
 
+    # we have a nxn relation
+    my $prop;
+    my $obj_tmp;
+    
+    foreach $prop ( @properties ) {
+     
+       if ( $prop->{WRITE} =~ /$functionname/ ) {
+        foreach $obj_tmp ( @properties ) {
+            # mostly these methods are setmethods with only one argument
+            # maybe source of error
+            print CLASS  "\tzend_update_property(Z_OBJCE_P(getThis()),getThis(),\"",$prop->{astNodeName},"\",strlen(\"",$prop->{astNodeName},"\"),var_0 TSRMLS_CC);\n";
+        }
+       }
+    }
+
     my $obj;
 
         foreach $obj ( @objects ) {
