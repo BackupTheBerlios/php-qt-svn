@@ -323,6 +323,7 @@ sub cplusplusToMacro
         print CLASS "\t}\n";
     }
 
+# properties:
     # we have a nxn relation
     my $prop;
     my $obj_tmp;
