@@ -2,35 +2,93 @@ dnl $Id$
 dnl config.m4 for extension php_qt
 
 
-PHP_ARG_WITH(prefix,
+PHP_ARG_WITH(prefix,,
 [  --with-prefix=DIR    php prefix])
 
 if test "$PHP_PREFIX" != "no"; then
+ if test "$PHP_PREFIX" != "yes"; then
     $prefix=$PHP_PREFIX
+ fi
 fi
 
-dnl If your extension references something external, use with:
+dnl runtime
+PHP_ARG_WITH(qtlib,Qt runtime library,
+[  --with-qtlib=DIR    qt runtime library])
 
-dnl PHP_ARG_WITH(php_qt, for php_qt support,
-dnl Make sure that the comment is aligned:
-dnl [  --with-php_qt             Include php_qt support])
+AC_MSG_CHECKING([for Qt runtime])
 
-dnl Otherwise use enable:
+if test "$PHP_QTLIB" != "yes"; then
 
-PHP_ARG_ENABLE(php_qt, whether to enable php_qt support,
-dnl Make sure that the comment is aligned:
-[  --enable-php_qt           Enable php_qt support])
+    if test -z "$PHP_QTLIB"; then
+        AC_MSG_RESULT(found in $PHP_QTLIB)
+    else 
+        AC_MSG_ERROR([Please reinstall the Qt distribution])
+    fi
+
+  PHP_ADD_LIBPATH($PHP_QTLIB/lib/qt4 )
+  PHP_ADD_LIBPATH($PHP_QTLIB/lib)
+  PHP_ADD_LIBPATH(/tmp/buildd/qt4-x11-4.0.1/lib)
+  PHP_ADD_LIBPATH($PHP_QTLIB/X11R6/lib)
+
+else
+    if test "$PHP_QTLIB" != "no"; then
+        PHP_ADD_LIBPATH(/usr/lib/qt4 )
+        PHP_ADD_LIBPATH(/usr/lib)
+        PHP_ADD_LIBPATH(/tmp/buildd/qt4-x11-4.0.1/lib)
+        PHP_ADD_LIBPATH(/usr/X11R6/lib)
+        AC_MSG_RESULT([default path])
+    else
+        AC_MSG_RESULT([skipped])
+    fi
+fi
+
+
+dnl build
+PHP_ARG_WITH(php_qt, for php_qt support,
+[  --with-php_qt=DIR           Include Qt support])
 
 if test "$PHP_PHP_QT" != "no"; then
 
+  SEARCH_PATH="/usr/local /usr"
+  SEARCH_FOR="/include/qt4/Qt/qobject.h"
+  SEARCH_FOR_OTHER="/include/Qt/qobject.h"
+  if test -r $PHP_PHP_QT/$SEARCH_FOR_OTHER; then 
+    PHP_QT_DIR=$PHP_PHP_QT
+    AC_MSG_RESULT(Qt header files found in $PHP_QT_DIR)
+  else 
+    AC_MSG_CHECKING([for Qt files in default path])
+    for i in $SEARCH_PATH ; do
+      if test -r $i/$SEARCH_FOR; then
+        PHP_QT_DIR=$i
+        AC_MSG_RESULT(found in $i)
+      fi
+    done
+  fi
+
+  if test -z "$PHP_QT_DIR"; then
+    AC_MSG_RESULT([not found])
+    AC_MSG_ERROR([Please reinstall the Qt distribution])
+  fi
+
+  PHP_ADD_INCLUDE($PHP_QT_DIR/include)
+
+
+  dnl from qmake
+  LDFLAGS="$LDFLAGS -lQtGui -laudio -lXt -lpng -lSM -lICE -lXi -lXrender -lXrandr -lXcursor -lXinerama -lfreetype -lXext -lX11 -lm -lQtCore -lfontconfig -lz -ldl -lpthread"
+
   PHP_REQUIRE_CXX
 
-  PHP_ADD_MAKEFILE_FRAGMENT(Makefile.qt)
-
-  PHP_ADD_INCLUDE(/usr/share/qt4/mkspecs/linux-g++)
-  PHP_ADD_INCLUDE(/usr/include/qt4/QtGui)
-  PHP_ADD_INCLUDE(/usr/include/qt4/QtCore)
-  PHP_ADD_INCLUDE(/usr/include/qt4)
+  if test -r $PHP_PHP_QT/$SEARCH_FOR_OTHER; then 
+    PHP_ADD_INCLUDE($PHP_QT_DIR/mkspecs/linux-g++)
+    PHP_ADD_INCLUDE($PHP_QT_DIR/include/QtGui)
+    PHP_ADD_INCLUDE($PHP_QT_DIR/include/QtCore)
+    PHP_ADD_INCLUDE($PHP_QT_DIR/include/)
+  else
+    PHP_ADD_INCLUDE($PHP_QT_DIR/share/qt4/mkspecs/linux-g++)
+    PHP_ADD_INCLUDE($PHP_QT_DIR/include/qt4/QtGui)
+    PHP_ADD_INCLUDE($PHP_QT_DIR/include/qt4/QtCore)
+    PHP_ADD_INCLUDE($PHP_QT_DIR/include/qt4)
+  fi
 
   PHP_NEW_EXTENSION(php_qt, \
   qt/main_window/qapplication.cpp \
@@ -58,3 +116,4 @@ if test "$PHP_PHP_QT" != "no"; then
   PHP_ADD_BUILD_DIR($ext_builddir/qt)
 
 fi
+
