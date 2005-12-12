@@ -19,10 +19,10 @@ AC_MSG_CHECKING([for Qt runtime])
 
 if test "$PHP_QTLIB" != "yes"; then
 
-    if test -z "$PHP_QTLIB"; then
+    if test -r "$PHP_QTLIB"; then
         AC_MSG_RESULT(found in $PHP_QTLIB)
     else 
-        AC_MSG_ERROR([Please reinstall the Qt distribution])
+        AC_MSG_ERROR([Please reinstall the Qt distribution] $PHP_QTLIB)
     fi
 
   PHP_ADD_LIBPATH($PHP_QTLIB/lib/qt4 )
