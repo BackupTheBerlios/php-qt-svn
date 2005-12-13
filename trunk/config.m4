@@ -13,9 +13,9 @@ fi
 
 dnl runtime
 PHP_ARG_WITH(qtlib,Qt runtime library,
-[  --with-qtlib=DIR    qt runtime library])
+[  --with-qtlib=DIR         Qt library binaries])
 
-AC_MSG_CHECKING([for Qt runtime])
+AC_MSG_CHECKING([for Qt binaries])
 
 if test "$PHP_QTLIB" != "yes"; then
 
@@ -44,24 +44,35 @@ fi
 
 
 dnl build
-PHP_ARG_WITH(php_qt, for php_qt support,
-[  --with-php_qt=DIR           Include Qt support])
+
+
+PHP_ARG_WITH(php_qt, for php_qt,
+[  --with-php_qt=DIR        Include Qt support and look for headers in /usr/local/include/qt4 /usr/include/qt4 /usr/lib/qt4/include])
 
 if test "$PHP_PHP_QT" != "no"; then
 
-  SEARCH_PATH="/usr/local /usr"
-  SEARCH_FOR="/include/qt4/Qt/qobject.h"
+  SEARCH_OBJ="/Qt/qobject.h"
+
+  SEARCH_PATH="/usr/local /usr /usr/lib/qt4"
+  SEARCH_FOR="/include/qt4 /include"
   SEARCH_FOR_OTHER="/include/Qt/qobject.h"
+
   if test -r $PHP_PHP_QT/$SEARCH_FOR_OTHER; then 
     PHP_QT_DIR=$PHP_PHP_QT
     AC_MSG_RESULT(Qt header files found in $PHP_QT_DIR)
   else 
-    AC_MSG_CHECKING([for Qt files in default path])
+    AC_MSG_CHECKING([for Qt headers in default path])
+    AC_MSG_RESULT(trying different pathes)
     for i in $SEARCH_PATH ; do
-      if test -r $i/$SEARCH_FOR; then
+     for j in $SEARCH_FOR ; do
+      AC_MSG_CHECKING(for $i$j$SEARCH_OBJ)
+      if test -r $i$j/$SEARCH_OBJ; then
         PHP_QT_DIR=$i
         AC_MSG_RESULT(found in $i)
+      else
+        AC_MSG_RESULT(not found)
       fi
+     done
     done
   fi
 
