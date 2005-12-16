@@ -67,8 +67,8 @@ if test "$PHP_PHP_QT" != "no"; then
      for j in $SEARCH_FOR ; do
       AC_MSG_CHECKING(for $i$j$SEARCH_OBJ)
       if test -r $i$j/$SEARCH_OBJ; then
-        PHP_QT_DIR=$i
-        AC_MSG_RESULT(found in $i)
+        PHP_QT_DIR=$i$j
+        AC_MSG_RESULT(found)
       else
         AC_MSG_RESULT(not found)
       fi
@@ -83,23 +83,14 @@ if test "$PHP_PHP_QT" != "no"; then
 
   PHP_ADD_INCLUDE($PHP_QT_DIR/include)
 
-
   dnl from qmake
   LDFLAGS="$LDFLAGS -lQtGui -laudio -lXt -lpng -lSM -lICE -lXi -lXrender -lXrandr -lXcursor -lXinerama -lfreetype -lXext -lX11 -lm -lQtCore -lfontconfig -lz -ldl -lpthread"
 
   PHP_REQUIRE_CXX
 
-  if test -r $PHP_PHP_QT/$SEARCH_FOR_OTHER; then 
-    PHP_ADD_INCLUDE($PHP_QT_DIR/mkspecs/linux-g++)
-    PHP_ADD_INCLUDE($PHP_QT_DIR/include/QtGui)
-    PHP_ADD_INCLUDE($PHP_QT_DIR/include/QtCore)
-    PHP_ADD_INCLUDE($PHP_QT_DIR/include/)
-  else
-    PHP_ADD_INCLUDE($PHP_QT_DIR/share/qt4/mkspecs/linux-g++)
-    PHP_ADD_INCLUDE($PHP_QT_DIR/include/qt4/QtGui)
-    PHP_ADD_INCLUDE($PHP_QT_DIR/include/qt4/QtCore)
-    PHP_ADD_INCLUDE($PHP_QT_DIR/include/qt4)
-  fi
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtGui)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtCore)
+  PHP_ADD_INCLUDE($PHP_QT_DIR)
 
   PHP_NEW_EXTENSION(php_qt, \
   qt/main_window/qapplication.cpp \
