@@ -14,8 +14,12 @@
 # *                                                                         *
 #***************************************************************************/
 
-# TODO: fit cplusplusToZEND, cplusplusToInvoke, cplusplusToMacro
-# TODO: inheritance
+# TODO 
+#   - method overloading
+#   - support for all types in method calls
+#   - fit cplusplusToZEND, cplusplusToInvoke, cplusplusToMacro
+#   - multiple inheritance
+#   - setter methods support only one php property (adequate, I believe)
 
 package kalyptusCxxToPHP;
 
@@ -417,6 +421,7 @@ sub cplusplusToMacro
         push @functions, $functionname;
     }
 
+# print doc in phpDocumentor style
     print CLASS "
 /*********************************
  *    class     ",$classname,"
@@ -558,7 +563,7 @@ sub cplusplusToMacro
     if( $cnode->{Flags} =~ /s/ ){
         $access .= "|ZEND_ACC_STATIC";
     }
-# __construct
+
     print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$functionname,");";
 # code snippets for php_qt.cpp here
     $access = uc($access);
