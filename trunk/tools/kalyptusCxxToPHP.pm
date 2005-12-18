@@ -34,7 +34,7 @@ no strict "subs";
 
 use vars qw/ @clist $host $who $now $gentext %functionId $docTop
 	$lib $rootnode $outputdir $opt $debug $typeprefix $eventHandlerCount
-	$pastaccess $pastname $pastreturn $pastparams $nullctor $constructorCount $paramCount @properties @functions *CLASS *ZEND_PHP_QT *HEADER *QTCTYPES *KDETYPES /;
+	$pastaccess $pastname $pastreturn $pastparams $nullctor $ctorCount @properties @functions @constructors *CLASS *ZEND_PHP_QT *HEADER *QTCTYPES *KDETYPES /;
 
 BEGIN
 {
@@ -162,6 +162,129 @@ sub cplusplusToZEND
  		return kalyptusDataDict::ctypemap($cplusplusType);
 	}
 }
+
+# zend.h:
+#/* data types */
+#/* All data types <= IS_BOOL have their constructor/destructors skipped */
+#define IS_NULL		0
+#define IS_LONG		1
+#define IS_DOUBLE	2
+#define IS_BOOL		3
+#define IS_ARRAY	4
+#define IS_OBJECT	5
+#define IS_STRING	6
+#define IS_RESOURCE	7
+#define IS_CONSTANT	8
+#define IS_CONSTANT_ARRAY	9
+
+
+sub cplusplusToZENDType
+{
+	my ( $cplusplusType )  = @_;
+	if ( $cplusplusType =~ /bool/ && kalyptusDataDict::ctypemap($cplusplusType) eq "int" ) {
+		return "BOOL";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*void\s*\**/ ) {
+		return "NULL";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*int\s*\&*/ ) {
+		return "LONG";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*int\s*\*/) {
+		return "ARRAY";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*double\s*\*/ ) {
+		return "ARRAY";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*short\s*\*/ ) {
+		return "ARRAY";
+	} elsif ( $cplusplusType =~ /QByteArray/ || $cplusplusType =~ /QBitArray/ ) {
+		return "ARRAY";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*char\s*\*\*/ ) {
+		return "STRING";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*char\s*\**/ ) {
+		return "STRING";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*unsigned int\s*\**/ ) {
+		return "LONG";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*unsigned short\s*\**/ ) {
+		return "LONG";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*unsigned long\s*\**/ ) {
+		return "LONG";
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*unsigned char\s*\**/ ) {
+		return "STRING";
+	} elsif ( $cplusplusType =~ /^GUID/ ) {
+		return "System.Guid";
+	} elsif ( $cplusplusType =~ /^FILE/ ) {
+		return "STRING";
+	} elsif ( $cplusplusType =~ /^_NPStream/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QPtrCollection/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QStyleHintReturn/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^type/i ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^Key/ || $cplusplusType =~ /^key_type/ || $cplusplusType =~ /^K/) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QUnknownInterface/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^GDHandle/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QTextParag/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QDiskFont/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QDomNodePrivate/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^Display/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QUuid/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^Q_REFCOUNT/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^EventRef/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^MSG/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QWSEvent/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^XEvent/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^CGContextRef/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QWSDecoration/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QTextFormat/ || $cplusplusType =~ /^QTextDocument/ || $cplusplusType =~ /^QTextCursor/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^QSqlRecordPrivate/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^Text/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^Event/ ) {
+		return "OBJECT";
+	} elsif ( $cplusplusType =~ /^NavDirection/ ) {
+		return "OBJECT";
+	} elsif (
+			$cplusplusType =~ /^pointer$/
+			 || $cplusplusType =~/T\*$/
+			 || $cplusplusType =~/T\&*$/
+			 || $cplusplusType =~/T1\&*$/
+			 || $cplusplusType =~/T2\&*$/
+			 || $cplusplusType =~/^Iterator/i
+			 || $cplusplusType =~/^_iterator/i
+			 || $cplusplusType =~/^reference/
+			 || $cplusplusType =~/^_reference/) {
+		return "OBJECT";
+	} elsif ($cplusplusType =~ /::/ || kalyptusDataDict::ctypemap($cplusplusType) =~ /::/ ||
+			 $cplusplusType =~ /&$/ || kalyptusDataDict::ctypemap($cplusplusType) =~ /&$/ ||
+			 $cplusplusType =~ /\*/ || kalyptusDataDict::ctypemap($cplusplusType) =~ /\*/) {
+
+#		$cplusplusType =~ s/::/./g;
+#		$cplusplusType =~ s/&//g;
+#		$cplusplusType =~ s/\*//g;
+#		return $cplusplusType;
+        return "OBJECT";
+
+	} else {
+ 		return kalyptusDataDict::ctypemap($cplusplusType);
+	}
+}
+
 
 sub cplusplusToPInvoke
 {
@@ -574,8 +697,7 @@ sub writeClassDoc
 {
 	my( $node ) = @_;
 
-    $constructorCount = 0;
-    $paramCount = 0;
+    $ctorCount = 0;
 
 	print "Enter: $node->{astNodeName}\n" if $debug;
 	if( exists $node->{ExtSource} ) {
@@ -738,6 +860,56 @@ using namespace std;
 	);
 
     print CLASS "\n";
+
+# creating the constructor
+    my $function = $node->{astNodeName};
+
+    print CLASS "\n\nZEND_METHOD(",$function, ",__construct){\n";
+    print CLASS "\n\t",$function, " *",$function,"_ptr = new ",$function,"();\n";
+
+    my $pc = 0;
+    foreach my $constructor (@constructors){
+
+        my $PHPzend_parse_parameters_s;
+        my $PHPzend_parse_parameters_vars;
+
+        my @ctor_params = @{$constructor};
+        my $pCount = @ctor_params;
+        print CLASS "\n";
+
+        do {
+                print CLASS "\tif(ZEND_NUM_ARGS() == ",$pCount,"){\n";
+
+                my $typeCount = 0;
+                foreach my $info ( @ctor_params ) {
+                    print CLASS "\t\tzval* param_",$typeCount++,";\n";
+                    $PHPzend_parse_parameters_s .= "z";
+                    $PHPzend_parse_parameters_vars .= ", &param_$typeCount";
+                } #if defined @{$info};
+
+                print CLASS "\t\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,\"",$PHPzend_parse_parameters_s,"\"",$PHPzend_parse_parameters_vars,") == FAILURE) {\n";
+                print CLASS "\t\t\treturn;\n","\t\t}\n"; 
+
+                $typeCount = 0;
+                foreach my $info ( @ctor_params ) {
+                 do {
+                    print CLASS "\t\t /*",@{$info}[0]," ",@{$info}[1]," ",@{$info}[2],"*/\n";
+                    print CLASS "\t\tif(Z_TYPE_P(param_",$typeCount,") == IS_",cplusplusToZENDType(@{$info}[2]),") {\n";
+                    print CLASS "\t\t\t",@{$info}[2]," tmp(Z_STRVAL_P(param_",$typeCount++,"));\n";
+                    print CLASS "\t\t\t",$function,"_ptr = new ",$function,"(tmp);\n";
+                    print CLASS "\t\t}\n";
+                    } if defined @{$info};
+                }
+                print CLASS "\t}\n";
+    } if defined @ctor_params;
+    
+}
+    print CLASS "\n\tPHP_QT_REGISTER(",$function,"_ptr);\n";
+    print CLASS "\tRETURN_NULL();\n";
+	print CLASS "}\n";        
+# destructor
+    print CLASS "\nPHP_QT_DESTRUCT(",$function,");\n\n";
+
 	close CLASS;
 	$nullctor = 0;
 
@@ -747,13 +919,13 @@ using namespace std;
 };\n";
 
 # inheritance
-        my $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);";
-        my $ancestor;
+    my $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);";
+    my $ancestor;
 
-		foreach $ancestor ( @ancestors ) {
-            $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, ".$ancestor."_ce_ptr,NULL TSRMLS_CC);\n";
-            last; # skip, not multiple
-		}
+	foreach $ancestor ( @ancestors ) {
+        $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, ".$ancestor."_ce_ptr,NULL TSRMLS_CC);\n";
+        last; # skip, not multiple
+	}
 
     print PHP_QT_CPP "
 void _register_",$node->{astNodeName},"(TSRMLS_D)
@@ -784,6 +956,7 @@ void _register_",$node->{astNodeName},"(TSRMLS_D)
     
     undef @properties;
     undef @functions;
+    undef @constructors;
 }
 
 # for every node
@@ -794,9 +967,9 @@ sub listMember
     my $function;
 	my $PHPaccess;
 	my $PHPparams;
-    my $PHPzend_parse_parameters_s;
-    my $PHPzend_parse_parameters_vars;
-    my @PHPinformations;
+    my $pCount;
+
+    my @ctor_params;
 	my $returnType;
 
 	$name = $m->{astNodeName} ;
@@ -904,10 +1077,10 @@ sub listMember
 				 $pinvokeargType =~ s/RawObject/IntPtr/;
 			}
 
-            @PHPinformations[$paramCount] = [$PHPargType,$arg];
+# save these attributes for ctor
+            @ctor_params[$pCount++] = [$PHPargType,$arg,$argType];
 
             $PHPparams .= "$PHPargType $arg, ";
-            $paramCount++;
             $pinvokeparams .= "$pinvokeargType $arg, ";
 		}
 		$cparams =~ s/, $//;
@@ -968,64 +1141,13 @@ sub listMember
 		if($currentmethod ne $pastmethod) {
 
 # make the cpp file
+# constructor
 		if ( $name eq $class->{astNodeName} ) {
-
-# Constructor
-            if($constructorCount == 0){
-
-			    print CLASS "\n\nZEND_METHOD(",$function, ",__construct){\n";
-    	        print CLASS "\t",$function, " *",$function,"_ptr = new ",$function,"();\n";
-            }
-# args
-# here we should find a better solution for overloading
-            if($paramCount > 0){
-                print CLASS "\tif(ZEND_NUM_ARGS() == ",$paramCount,"){\n";
-                print CLASS "\t\t/*",$pinvokeargs,"*/\n";            
-
-                my $typeCount = 0;
-		        foreach my $info ( @PHPinformations ) {
-                    if(@{$info}[0] eq "long"){
-                        $PHPzend_parse_parameters_s .= "l";
-                        $PHPzend_parse_parameters_vars .= ", &var$typeCount";
-                    } else {
-                        $PHPzend_parse_parameters_s .= "o";
-                        $PHPzend_parse_parameters_vars .= ", &var$typeCount";
-                    }
-                    print CLASS "\t\t",@{$info}[0]," var",$typeCount++,";\n";
-                }
-
-                print CLASS "\t\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,\"",$PHPzend_parse_parameters_s,"\"",$PHPzend_parse_parameters_vars,") == FAILURE) {\n";
-                print CLASS "\t\t\treturn;\n","\t\t}\n"; 
-            
-                my $typeCount = 0;
-		        foreach my $info ( @PHPinformations ) {
-                    my $Function_ = ucfirst(@{$info}[1]);            
-                    print CLASS "\t\t//zend_update_property(Z_OBJCE_P(getThis()),getThis(),\"@{$info}[1]\",strlen(\"@{$info}[1]\"), var",$typeCount," TSRMLS_CC);\n";
-
-                    if(@{$info}[0] eq "zval*"){
-#                        print CLASS "\t\t",$function," *tmp = (",$function,"*) php_qt_fetch(var",$typeCount,");\n";
-#                        print CLASS "\t\t",$function,"_ptr->set$Function_(tmp);\n";                
-                    } elsif (@{$info}[0] eq "long"){
-#                        print CLASS "\t\t",$function,"_ptr->set$Function_(var",$typeCount,");\n";
-                    }
-                    $typeCount++;
-                }
-                print CLASS "\t}\n";
-            }
-
-            $constructorCount++;
-
+            @constructors[$ctorCount++] = [@ctor_params];
+# ?
 			if ($PHPparams eq () ) {
 				$nullctor = 1;
 			}
-# Destructor
-		} elsif ( $returnType =~ /~/  ) {
-            print CLASS "\tPHP_QT_REGISTER(",$function,"_ptr);\n";
-            print CLASS "\tRETURN_NULL();\n";
-			print CLASS "}\n";        
-            $constructorCount = 0;
-            print CLASS "\nPHP_QT_DESTRUCT(",$function,");\n\n";
-
 # methods
 		} else {
 			if ( $name =~ /.*Event$/ ) {
@@ -1041,11 +1163,7 @@ sub listMember
 	$pastparams = $PHPparams;
 
 	$PHPparams = "";
-    $PHPzend_parse_parameters_s = "";
-    $PHPzend_parse_parameters_vars = "";
 
-# paramCount counts params ;)
-    $paramCount = 0;
 }
 
 sub generateClassMethodForEnum
