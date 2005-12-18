@@ -476,8 +476,13 @@ sub cplusplusToMacro
         } elsif ( $b->{ArgType} =~ /int/ ) {
             print CLASS "\tlong var_",$count,";\n";
             $paratype .= ", &var_".$count;
-            $paraf .= " (".$b->{ArgType}.") var_".$count;
+            $paraf .= "(".$b->{ArgType}.") var_".$count;
             $short .= "l";
+        } elsif ( $b->{ArgType} =~ /bool/ ) {
+            print CLASS "\tbool* var_",$count,";\n";
+            $paratype .= ", &var_".$count;
+            $paraf .= "(".$b->{ArgType}.") var_".$count;
+            $short .= "b";
         } 
         else {
             print CLASS "\tzval* var_",$count,";\n\n";
@@ -724,8 +729,9 @@ sub writeClassDoc
 	} else {
 		$typeprefix = "kde_";
 	}
-# make the file
-	my $file = "$outputdir/".join("__", kdocAstUtil::heritage($node)).".cpp";
+# make the class file
+	my $file = join("__", kdocAstUtil::heritage($node)).".cpp";
+    $file = "$outputdir/".lc($file);
 	my $docnode = $node->{DocNode};
 	my @list = ();
 	my $version = undef;
