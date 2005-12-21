@@ -15,11 +15,10 @@
 #***************************************************************************/
 
 # TODO 
-#   - method overloading
 #   - support for all types in method calls
 #   - fit cplusplusToZEND, cplusplusToInvoke, cplusplusToMacro
-#   - multiple inheritance
 #   - setter methods support only one php property (adequate, I believe)
+#   - marshalling method arguments
 
 package kalyptusCxxToPHP;
 
@@ -414,34 +413,44 @@ sub cplusplusToMacro
     foreach $func ( @functions ) {
         if ( $func eq $functionname ) {
             print CLASS "// marked for overloading: ",$functionname,"\n";
-            return;
+            $mark = 1;
         }
-    }
-    if (!$mark) {
-        push @functions, $functionname;
     }
 
 # print doc in phpDocumentor style
-    print CLASS "
+    if(!$mark){
+    
+        my $c = @functions;
+        if($c>0){
+            print CLASS "\t}\n";
+            print CLASS "}\n";
+        }
+    
+        push @functions, $functionname;
+        print CLASS "
+
 /*********************************
  *    class     ",$classname,"
  *    function  ",$functionname,"
  *    flags:    ",$function->{Flags},"
  *\n";
  
-    my $count = 0;
-    foreach $b ( @{$cnode->{ParamList}} ) {
-        print CLASS " *    \@param   ",$b->{ArgType},"\n";
-    } 
-    if (!$count) {
-        print CLASS " *    \@param   -\n";
-    }
+        my $count = 0;
+        foreach $b ( @{$cnode->{ParamList}} ) {
+            print CLASS " *    \@param   ",$b->{ArgType},"\n";
+        } 
+        if (!$count) {
+            print CLASS " *    \@param   -\n";
+        }
  
-    print CLASS "
+        print CLASS "
  *    \@access   ",$access,"
  *    \@return   ",$returntype,"
 *********************************/
 ";
+    } else {
+        print CLASS "\t}\n";
+    }
 
     # skip virtuals
     if ( $function->{Flags} =~ /v/ ){
@@ -451,8 +460,13 @@ sub cplusplusToMacro
         print CLASS "}\n";
         return;
     }
+    
+    if(!$mark){
+        print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){\n";
+    }
 
-    print CLASS "ZEND_METHOD(",$classname,", ",$functionname,"){\n";
+    my $p = @{$cnode->{ParamList}};
+    print CLASS "\tif (ZEND_NUM_ARGS() == ",$p,"){\n";
 
     my $count = 0;
     my $paratype; # for zend
@@ -468,24 +482,24 @@ sub cplusplusToMacro
         }
 # todo: long, double
         if ( $b->{ArgType} =~ /char/ ) {
-            print CLASS "\tchar* var_",$count,";\n";
-            print CLASS "\tint* len_",$count,";\n\n";
+            print CLASS "\t\tchar* var_",$count,";\n";
+            print CLASS "\t\tint* len_",$count,";\n\n";
             $paratype .= ", &var_".$count.", &len_".$count;
             $paraf .= " var_".$count;
             $short .= "s";
         } elsif ( $b->{ArgType} =~ /int/ ) {
-            print CLASS "\tlong var_",$count,";\n";
+            print CLASS "\t\tlong var_",$count,";\n";
             $paratype .= ", &var_".$count;
             $paraf .= "(".$b->{ArgType}.") var_".$count;
             $short .= "l";
         } elsif ( $b->{ArgType} =~ /bool/ ) {
-            print CLASS "\tbool* var_",$count,";\n";
+            print CLASS "\t\tbool* var_",$count,";\n";
             $paratype .= ", &var_".$count;
             $paraf .= "(".$b->{ArgType}.") var_".$count;
             $short .= "b";
         } 
         else {
-            print CLASS "\tzval* var_",$count,";\n\n";
+            print CLASS "\t\tzval* var_",$count,";\n\n";
             $paratype .= ", &var_".$count;
             $paraf .= " var_".$count;
             $short .= "o";
@@ -496,10 +510,12 @@ sub cplusplusToMacro
     }
     $short .= "\"";
 
+
+
     if( $count ) {
-        print CLASS "\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC",$short,$paratype,") == FAILURE) {\n";
-        print CLASS "\t\tRETURN_FALSE;\n";
-        print CLASS "\t}\n";
+        print CLASS "\t\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC",$short,$paratype,") == FAILURE) {\n";
+        print CLASS "\t\t\tRETURN_FALSE;\n";
+        print CLASS "\t\t}\n";
     }
 
 # properties:
@@ -520,8 +536,8 @@ sub cplusplusToMacro
                 $postfix = "_".cplusplusToZEND($prop->{type});
             }
 
-            print CLASS  "\tzend_update_property",$postfix,"(Z_OBJCE_P(getThis()),getThis(),\"",$prop->{astNodeName},"\",strlen(\"",$prop->{astNodeName},"\"),var_0 TSRMLS_CC);\n";
-            print CLASS "}\n";
+            print CLASS  "\t\tzend_update_property",$postfix,"(Z_OBJCE_P(getThis()),getThis(),\"",$prop->{astNodeName},"\",strlen(\"",$prop->{astNodeName},"\"),var_0 TSRMLS_CC);\n";
+            print CLASS "\t}\n";
             return;
         }
        }
@@ -532,38 +548,35 @@ sub cplusplusToMacro
     my $obj;
 
         foreach $obj ( @objects ) {
-            print CLASS "\tQObject* tmp_",$obj," = (QObject*) php_qt_fetch(",$obj,");\n";
+            print CLASS "\t\tQObject* tmp_",$obj," = (QObject*) php_qt_fetch(",$obj,");\n";
             $paraf =~ s/$obj/tmp_$obj/;
         }
 
-        print CLASS "\t$classname *o = ($classname*) PHP_QT_FETCH();\n";
+        print CLASS "\t\t$classname *o = ($classname*) PHP_QT_FETCH();\n";
 
 
         if ( $rt eq "NULL" ) {
-            print CLASS "\to->",$functionname,"(",$paraf,");\n";
-            print CLASS "\tRETURN_NULL();\n";
+            print CLASS "\t\to->",$functionname,"(",$paraf,");\n";
+            print CLASS "\t\tRETURN_NULL();\n";
         } elsif ( $rt =~ /zval/ ) {
 
 # TODO: consider 'const',
 # and non-pointer types, pointer types
-            print CLASS "\t",$returntype," obj = (",$returntype,") o->",$functionname,"(",$paraf,");\n";
-            print CLASS "\tzend_class_entry *ce;                                   \n";
+            print CLASS "\t\t",$returntype," obj = (",$returntype,") o->",$functionname,"(",$paraf,");\n";
+            print CLASS "\t\tzend_class_entry *ce;                                   \n";
 #            print CLASS "\tif(obj != NULL) {                                       \n";
-            print CLASS "\t    object_init_ex(return_value, ",$classname,"_ce_ptr);     \n";
-            print CLASS "\t    zend_rsrc_list_entry le;                            \n";
-            print CLASS "\t    le.ptr = &obj;                                       \n";
-            print CLASS "\t    php_qt_register(return_value,le);                   \n";
-            print CLASS "\t    return;                                             \n";
+            print CLASS "\t\t    object_init_ex(return_value, ",$classname,"_ce_ptr);     \n";
+            print CLASS "\t\t    zend_rsrc_list_entry le;                            \n";
+            print CLASS "\t\t    le.ptr = &obj;                                       \n";
+            print CLASS "\t\t    php_qt_register(return_value,le);                   \n";
+            print CLASS "\t\t    return;                                             \n";
 #            print CLASS "\t}                                                       \n";
 #            print CLASS "\telse                                                    \n";
 #            print CLASS "\t    RETURN_NULL();                                      \n";
 
-
         } else {
-            print CLASS "\tRETURN_",uc($rt),"(o->",$functionname,"(",$paraf,"));\n" if defined $rt;
+            print CLASS "\t\tRETURN_",uc($rt),"(o->",$functionname,"(",$paraf,"));\n" if defined $rt;
         }
-
-    print CLASS "}\n";
 
     if( $cnode->{Flags} =~ /s/ ){
         $access .= "|ZEND_ACC_STATIC";
@@ -874,6 +887,9 @@ using namespace std;
 
 # creating the constructor
     my $function = $node->{astNodeName};
+# brace comes from previous method
+    print CLASS "\t}\n";
+    print CLASS "}\n";
 
     print CLASS "\n\nZEND_METHOD(",$function, ",__construct){\n";
     print CLASS "\n\t",$function, " *",$function,"_ptr = new ",$function,"();\n";
@@ -1158,20 +1174,20 @@ sub listMember
 
 # make the cpp file
 # constructor
-		if ( $name eq $class->{astNodeName} ) {
-            @constructors[$ctorCount++] = [@ctor_params];
+		    if ( $name eq $class->{astNodeName} ) {
+                @constructors[$ctorCount++] = [@ctor_params];
 # ?
-			if ($PHPparams eq () ) {
-				$nullctor = 1;
-			}
+			    if ($PHPparams eq () ) {
+				    $nullctor = 1;
+			    }
 # methods
-		} else {
-			if ( $name =~ /.*Event$/ ) {
-				return;
-			}
-            cplusplusToMacro($class,$m);
-   		}
-	}
+		    } else {
+			    if ( $name =~ /.*Event$/ ) {
+				    return;
+			    }
+                cplusplusToMacro($class,$m);
+   		    }
+	    }
 	}
 	#Part of the duplicate methods check.
 	$pastname = $name;
