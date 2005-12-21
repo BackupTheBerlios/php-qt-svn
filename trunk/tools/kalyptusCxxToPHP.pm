@@ -466,7 +466,7 @@ sub cplusplusToMacro
         if($count > 0){
             $paraf .= ", ";
         }
-# todo: bool, double
+# todo: long, double
         if ( $b->{ArgType} =~ /char/ ) {
             print CLASS "\tchar* var_",$count,";\n";
             print CLASS "\tint* len_",$count,";\n\n";
@@ -933,9 +933,14 @@ using namespace std;
     my $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);";
     my $ancestor;
 
+    my $first = 1;
 	foreach $ancestor ( @ancestors ) {
-        $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, ".$ancestor."_ce_ptr,NULL TSRMLS_CC);\n";
-        last; # skip, not multiple
+        if($first) {
+            $zend_inherit = $node->{astNodeName}."_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, ".$ancestor."_ce_ptr,NULL TSRMLS_CC);\n";
+            $first = 0;
+        } else {
+           $zend_inherit .= "\tzend_do_inheritance(".$node->{astNodeName}."_ce_ptr, ".$ancestor."_ce_ptr TSRMLS_CC);\n";
+        }
 	}
 
     print PHP_QT_CPP "
