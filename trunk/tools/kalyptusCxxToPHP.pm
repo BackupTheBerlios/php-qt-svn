@@ -41,9 +41,9 @@ use vars qw/ @clist $host $who $now $gentext %functionId $docTop
 
 BEGIN
 {
-	@clist = ();
+    @clist = ();
 
-	# Page footer
+    # Page footer
 
 	$who = kdocUtil::userName();
 	$host = kdocUtil::hostName();
@@ -1402,6 +1402,7 @@ sub mergeEquals {
         $skip = 0;
 # add method name
         $tmp{ $paramstring }->AddProp("methodname",$method->{astNodeName});
+        $tmp{ $paramstring }->AddProp("ReturnType",$method->{ReturnType});
 
     }
 
@@ -1421,9 +1422,8 @@ sub marshal {
         $return .= "\n\tif (ZEND_NUM_ARGS() == ".$count."){\n";
     }
 
-
     my $c = 0;                  # helping variable
-    my $tmp_count = 0;          # helping
+    my $run = 0;
 
 # node is the method
     foreach my $key (keys %args){
@@ -1433,6 +1433,8 @@ sub marshal {
 #            $return .= " */\n";
 #        }
 
+# handle arguments at first
+
         # initialize vars and agruments for zend_parse_parameters
         my $d = 0;                  # helping variable
         my $paratype;               # for zend
@@ -1441,10 +1443,11 @@ sub marshal {
         my @objects;                # object stack
         my $method = $args{$key};   # helping
         my $object_selection = "";
+        my $tmp_count = 0;          # helping
 
 # identical strings grouped
-        $return .= "\t/* ".$key." */\n";
-
+        $return .= "\t\t/* ".$key." */\n";
+        $run = $key."_";
 # first parameters are static, the others coincides with this
 # exception: objects
         my $params = @{$method->{params}}[0];
@@ -1460,83 +1463,99 @@ sub marshal {
             # the types
 # char
             if ( $first_param->{ArgType} =~ /char/ ) {
-                $return .= "\t\tchar* var_".$c.";   // default: ".$first_param->{DefaultValue}."\n";
-                $return .= "\t\tint* len_".$c.";\n\n";
+                $return .= "\t\tchar* var_".$run.$c.";   // default: ".$first_param->{DefaultValue}."\n";
+                $return .= "\t\tint* len_".$run.$c.";\n\n";
 
                 $paratype .= ", &var_".$c.", &len_".$c;
                 $param_zend_function .= " var_".$c;
                 $shortstring .= "s";
 # int
             } elsif ( $first_param->{ArgType} =~ /int/ ) {
-                $return .= "\t\tlong var_".$c.";    // default: ".$first_param->{DefaultValue}."\n";
+                $return .= "\t\tlong var_".$run.$c.";    // default: ".$first_param->{DefaultValue}."\n";
 
-                $paratype .= ", &var_".$c;
-                $param_zend_function .= "(".$first_param->{ArgType}.") var_".$c;
+                $paratype .= ", &var_".$run.$c;
+                $param_zend_function .= "(".$first_param->{ArgType}.") var_".$run.$c;
                 $shortstring .= "l";
 # bool
             } elsif ( $first_param->{ArgType} =~ /bool/ ) {
-                $return .= "\t\tbool* var_".$c.";   // _default: ".$first_param->{DefaultValue}."\n";
+                $return .= "\t\tbool* var_".$run.$c.";   // _default: ".$first_param->{DefaultValue}."\n";
 
-                $paratype .= ", &var_".$c;
-                $param_zend_function .= "(".$first_param->{ArgType}.") var_".$c;
+                $paratype .= ", &var_".$run.$c;
+                $param_zend_function .= "(".$first_param->{ArgType}.") var_".$run.$c;
                 $shortstring .= "b";
 # objects
             } else {
 # while overloading, only one object will be created, query for name
 
-                $return .= "\t\tzval* var_".$c.";   // default: ".$first_param->{DefaultValue}."\n";
+                $return .= "\t\tzval* var_".$run.$c.";   // default: ".$first_param->{DefaultValue}."\n";
 
-                $paratype .= ", &var_".$c;
-                $param_zend_function .= " var_".$c;
+                $paratype .= ", &var_".$run.$c;
+                $param_zend_function .= "() var_o_".$c; # deprecated
                 $shortstring .= "o";
-                push @objects, "var_".$c;   # ?
+                push @objects, "var_o_".$c;   # ?
                 # name query
-                $object_selection .= "\n\t\t\tQString tmp_".$tmp_count."(o->metaObject()->className());\n\n";
-#                $object_selection .= "\t\t\tif(tmp_".$tmp_count." == \"".$first_param->{ArgType}."\"){
-#                RETURN_BOOL(obj->".$method->{methodname}."((".$first_param->{ArgType}.")o, stretch)) \n\t\t\t}";
+                $object_selection .= "\t\t\tQString tmp_".$tmp_count++."(var_o_".$c."->metaObject()->className());\n";
             }
             if(exists $first_param->{DefaultValue} != ""){
                 $shortstring .= "|";
             }
-        $c++;
-        $d++;
+            $c++;
+            $d++;
         }
-
-        my $skip_first = 1;
+        $return .= "\n";
+# add additional objects
+        
         foreach my $params (@{$method->{params}}){
-# skip first, this was already created
-            if($skip_first == 1){
-                $skip_first = 0;
-                $object_selection .= "\t\t\t";
-#                next;
-            } else {
-                $object_selection .= " else ";
-            }
+            
+            my $skip_first = 1;
+            $tmp_count = 0;
+            $c = 0;
 
+# skip first, this was already created
+            my $object_test;
+            my $object_call;
+            my $obj_first = 1;
 # parse the rest
             foreach my $param ( @{$params->{ParamList}} ) {
+
+                if($skip_first == 1){
+                    $object_selection .= "\t\t\t";
+                    $skip_first = 0;
+                } else {
+                    $object_call .= ", ";
+                }
 # skip all excepting objects
                 if ( $param->{ArgType} =~ /char/ ) {
+                    $object_call .= "(".$param->{ArgType}.") var_".$run.$c;
                 } elsif ( $param->{ArgType} =~ /int/ ) {
+                    $object_call .= "(".$param->{ArgType}.") var_".$run.$c;
                 } elsif ( $param->{ArgType} =~ /bool/ ) {
+                    $object_call .= "(".$param->{ArgType}.") var_".$run.$c;
                 } else {
 #print_r($method);
-                    $object_selection .= "if(tmp_".$tmp_count." == \"".$param->{ArgType}."\") {
-                    RETURN_BOOL(obj->".$method->{methodname}."((".$param->{ArgType}.")o, ".$param_zend_function.")) \n\t\t\t}";
-                    $return .= "\t\n";
+                    if($obj_first == 1){
+                        $obj_first = 0;
+                    } else {
+                        $object_test .= " && ";
+                    }
+                    $object_test .= "tmp_".$tmp_count++." == \"".$param->{ArgType}."\"";
+                    $object_call .= "(".$param->{ArgType}.") ".$objects[$c++];
                 }
-            } # foreach
-        }
+            } # foreach param
+
+            if(!$obj_first){
+                $object_selection .= "\n\t\t\tif(".$object_test.") {\n";
+                $object_selection .= "\t\t\t\tRETURN_BOOL(obj->".$method->{methodname}."(".$object_call.")); \n\t\t\t}";
+            }
+        } # foreach params
 
         $shortstring .= "\"";
-#        $object_selection .= "\n";
 
-# return value
         my $returntype = $method->{ReturnType};
         my $zend_return_type = cplusplusToZEND($returntype);
 
 # write zend_parse_parameters method
-        $return .= "\t\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,".$shortstring.", ".$param_zend_function.") == SUCCESS) {\n";
+        $return .= "\t\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,".$shortstring.$paratype.") == SUCCESS) {\n";
         $return .= "\t\t\t".$classname." *obj = (".$classname."*) PHP_QT_FETCH();\n";
 
 # objects as return type
@@ -1545,36 +1564,40 @@ sub marshal {
             $return .= "\t\t\tQObject* ".$obj." = (QObject*) php_qt_fetch(".$obj.");\n";
 #            $paraf =~ s/$obj/tmp_$obj/;
         }
-
+# add object handling
         my $not_empty = %args;
         if($not_empty){
-            $return .= $object_selection;
+            $return .= "\n".$object_selection;
             undef $object_selection;
             $return .= "\n";
+# $c counts objects, if there is no object the return mechanism has to be created
+            if($c>0){
+                $return .= "\t\t}\n";
+                next;
+            }
         }
 
-#        $return .= "\t\t$classname *o = ($classname*) PHP_QT_FETCH();\n";
-
+# handle return value here
 # if no return type specified
         if ( $zend_return_type eq "NULL" ) {
-            $return .=  "\t\to->".$method->{methodname}."(".$param_zend_function.");\n";
-            $return .=  "\t\tRETURN_NULL();\n";
+            $return .=  "\t\t\tobj->".$method->{methodname}."(".$param_zend_function.");\n";
+            $return .=  "\t\t\tRETURN_NULL();\n";
 # if return type is an object
         } elsif ( $zend_return_type =~ /zval/ ) {
         # TODO: consider 'const',
         # and non-pointer types, pointer types
-            $return .=  "\t\t".$returntype." obj = (".$returntype.") o->".$method->{methodname}."(".$param_zend_function.");\n";
-            $return .=  "\t\tzend_class_entry *ce;                                   \n";
-            $return .=  "\t\t    object_init_ex(return_value, ".$classname."_ce_ptr);     \n";
-            $return .=  "\t\t    zend_rsrc_list_entry le;                            \n";
-            $return .=  "\t\t    le.ptr = &obj;                                       \n";
-            $return .=  "\t\t    php_qt_register(return_value,le);                   \n";
-            $return .=  "\t\t    return;                                             \n";
+            $return .=  "\t\t\t".$returntype." obj = (".$returntype.") o->".$method->{methodname}."(".$param_zend_function.");\n";
+            $return .=  "\t\t\tzend_class_entry *ce;                                   \n";
+            $return .=  "\t\t\tobject_init_ex(return_value, ".$classname."_ce_ptr);     \n";
+            $return .=  "\t\t\tzend_rsrc_list_entry le;                            \n";
+            $return .=  "\t\t\tle.ptr = &obj;                                       \n";
+            $return .=  "\t\t\tphp_qt_register(return_value,le);                   \n";
+            $return .=  "\t\t\treturn;                                             \n";
         } else {
-            $return .=  "\t\tRETURN_".uc($zend_return_type)."(o->".$method->{methodname}."(".$param_zend_function."));\n" if defined $zend_return_type;
+            $return .=  "\t\t\tRETURN_".uc($zend_return_type)."(o->".$method->{methodname}."(".$param_zend_function."));\n" if defined $zend_return_type;
         }
         $return .= "\t\t}\n";
-        $tmp_count++;
+        $tmp_count=0;
     } # foreach args
 
     my $not_empty = %args;
