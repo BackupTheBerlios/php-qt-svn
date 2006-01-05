@@ -920,6 +920,7 @@ using namespace std;
                 }
 # copy
                 if($count == 0){
+                    print CLASS createReturn($node->{astNodeName}, $n_,"");
                 } elsif($count == 1){
                     push @one, $n_;
                 } elsif($count == 2){
@@ -950,18 +951,16 @@ using namespace std;
             my %five_ = mergeEquals($node->{astNodeName},5,@five);
             print CLASS marshal($node->{astNodeName},5,%five_);
 
-            print CLASS "}\n"; # ZEND_METHOD
+#            print CLASS "}\n"; # ZEND_METHOD
 
         }
+        print CLASS "}\n";
     }
 
     print CLASS "\n";
 
 # creating the constructor
     my $function = $node->{astNodeName};
-# brace comes from previous method
-    print CLASS "\t}\n";
-    print CLASS "}\n";
 
     print CLASS "\n\nZEND_METHOD(",$function, ",__construct){\n";
     print CLASS "\n\t",$function, " *",$function,"_ptr = new ",$function,"();\n";
@@ -1261,7 +1260,7 @@ sub listMember
 # prepare arguments
                 mergeNumbers($class,$m);
 # deprecated
-                cplusplusToMacro($class,$m);
+#                cplusplusToMacro($class,$m);
    		    }
 	    }
 	}
@@ -1445,6 +1444,8 @@ sub marshal {
         my $object_selection = "";
         my $tmp_count = 0;          # helping
 
+# informations about return type
+
 # identical strings grouped
         $return .= "\t\t/* ".$key." */\n";
         $run = $key."_";
@@ -1545,14 +1546,12 @@ sub marshal {
 
             if(!$obj_first){
                 $object_selection .= "\n\t\t\tif(".$object_test.") {\n";
-                $object_selection .= "\t\t\t\tRETURN_BOOL(obj->".$method->{methodname}."(".$object_call.")); \n\t\t\t}";
+                $object_selection .= "\t".createReturn($classname, $method, $object_call);
+                $object_selection .=  "\t\t\t}";
             }
         } # foreach params
 
         $shortstring .= "\"";
-
-        my $returntype = $method->{ReturnType};
-        my $zend_return_type = cplusplusToZEND($returntype);
 
 # write zend_parse_parameters method
         $return .= "\t\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,".$shortstring.$paratype.") == SUCCESS) {\n";
@@ -1562,8 +1561,8 @@ sub marshal {
         my $obj;
         foreach $obj ( @objects ) {
             $return .= "\t\t\tQObject* ".$obj." = (QObject*) php_qt_fetch(".$obj.");\n";
-#            $paraf =~ s/$obj/tmp_$obj/;
         }
+
 # add object handling
         my $not_empty = %args;
         if($not_empty){
@@ -1573,29 +1572,14 @@ sub marshal {
 # $c counts objects, if there is no object the return mechanism has to be created
             if($c>0){
                 $return .= "\t\t}\n";
+# break run if there are objects
                 next;
             }
         }
 
-# handle return value here
-# if no return type specified
-        if ( $zend_return_type eq "NULL" ) {
-            $return .=  "\t\t\tobj->".$method->{methodname}."(".$param_zend_function.");\n";
-            $return .=  "\t\t\tRETURN_NULL();\n";
-# if return type is an object
-        } elsif ( $zend_return_type =~ /zval/ ) {
-        # TODO: consider 'const',
-        # and non-pointer types, pointer types
-            $return .=  "\t\t\t".$returntype." obj = (".$returntype.") o->".$method->{methodname}."(".$param_zend_function.");\n";
-            $return .=  "\t\t\tzend_class_entry *ce;                                   \n";
-            $return .=  "\t\t\tobject_init_ex(return_value, ".$classname."_ce_ptr);     \n";
-            $return .=  "\t\t\tzend_rsrc_list_entry le;                            \n";
-            $return .=  "\t\t\tle.ptr = &obj;                                       \n";
-            $return .=  "\t\t\tphp_qt_register(return_value,le);                   \n";
-            $return .=  "\t\t\treturn;                                             \n";
-        } else {
-            $return .=  "\t\t\tRETURN_".uc($zend_return_type)."(o->".$method->{methodname}."(".$param_zend_function."));\n" if defined $zend_return_type;
-        }
+# return handling
+        $return .= createReturn($classname, $method, $param_zend_function);
+
         $return .= "\t\t}\n";
         $tmp_count=0;
     } # foreach args
@@ -1605,6 +1589,49 @@ sub marshal {
         $return .= "\t}\n";
     }
 
+    return $return;
+}
+
+sub createReturn {
+
+    my ($classname, $method, $param_zend_function) = @_;
+    my $return;
+
+# no arguments, no object created
+    if($param_zend_function == ""){
+        $return .= "\t\t\t".$classname." *obj = (".$classname.") PHP_QT_FETCH();\n";
+    }
+
+    my $methodname;
+    if (defined $method->{methodname}) {
+        $methodname = $method->{methodname}
+    } else {
+        $methodname = $method->{astNodeName} if defined $method->{astNodeName};
+    }
+
+    my $returntype = $method->{ReturnType};
+    my $zend_return_type = cplusplusToZEND($returntype);
+
+# handle return value here
+# if no return type specified
+        if ( $zend_return_type eq "NULL" ) {
+            $return .=  "\t\t\tobj->".$methodname."(".$param_zend_function.");\n";
+            $return .=  "\t\t\tRETURN_NULL();\n";
+# if return type is an object
+        } elsif ( $zend_return_type =~ /zval/ ) {
+        # TODO: consider 'const',
+        # and non-pointer types, pointer types
+            $return .=  "\t\t\t".$returntype." return_object = (".$returntype.") obj->".$methodname."(".$param_zend_function.");\n";
+            $return .=  "\t\t\tzend_class_entry *ce;                                   \n";
+            $return .=  "\t\t\tobject_init_ex(return_value, ".$classname."_ce_ptr);     \n";
+            $return .=  "\t\t\tzend_rsrc_list_entry le;                            \n";
+            $return .=  "\t\t\tle.ptr = &return_object;                                       \n";
+            $return .=  "\t\t\tphp_qt_register(return_value,le);                   \n";
+            $return .=  "\t\t\treturn;                                             \n";
+# simple types
+        } else {
+            $return .=  "\t\t\tRETURN_".uc($zend_return_type)."(obj->".$methodname."(".$param_zend_function."));\n" if defined $zend_return_type;
+        }
 
     return $return;
 
