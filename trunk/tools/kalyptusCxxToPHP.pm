@@ -18,7 +18,7 @@
 #   - support for all types in method calls
 #   - fit cplusplusToZEND, cplusplusToInvoke, cplusplusToMacro
 #   - setter methods support only one php property (adequate, I believe)
-#   - marshalling method arguments
+#   - snippets for the config.m4 file and the QDate_ce_ptr pointer
 
 package kalyptusCxxToPHP;
 
@@ -37,7 +37,7 @@ no strict "subs";
 
 use vars qw/ @clist $host $who $now $gentext %functionId $docTop
 	$lib $rootnode $outputdir $opt $debug $typeprefix $eventHandlerCount
-	$pastaccess $pastname $pastreturn $pastparams $nullctor $ctorCount @properties @functions @constructors %methods *CLASS *ZEND_PHP_QT *HEADER *QTCTYPES *KDETYPES /;
+	$pastaccess $pastname $pastreturn $pastparams $nullctor $ctorCount @properties @functions @constructors %methods *CLASS *ZEND_PHP_QT *HEADER *AG_ZEND_CLASS_ENTRY *AG_EXTERN_ZEND_CLASS_ENTRY *AG_VOID_REGISTER *AG_ZEND_PHP_QT *AG_CONFIGM4 *AG_QT_MINIT *AG_PHP_QT_CPP *QTCTYPES *KDETYPES /;
 
 BEGIN
 {
@@ -584,11 +584,14 @@ sub cplusplusToMacro
     }
 
     print ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$functionname,");";
+    print AG_ZEND_PHP_QT "\nZEND_METHOD(",$class->{astNodeName},", ",$functionname,");";
+
 # code snippets for php_qt.cpp here
     $access = uc($access);
     $access =~ s/_SLOTS//;
     $access =~ s/_SIGNALS//;
-    print PHP_QT_CPP "\tZEND_ME(",$classname,",",$functionname,",NULL,ZEND_ACC_",$access,")\n";
+#    print PHP_QT_CPP "\tZEND_ME(",$classname,",",$functionname,",NULL,ZEND_ACC_",$access,")\n";
+    print AG_PHP_QT_CPP "\tZEND_ME(",$classname,",",$functionname,",NULL,ZEND_ACC_",$access,")\n";
 
 }
 
@@ -599,11 +602,48 @@ sub writeDoc
 	$debug = $main::debuggen;
 
 	mkpath( $outputdir ) unless -f $outputdir;
+    mkpath( $outputdir."/generated/" ) unless -f $outputdir."/generated/";
 
+# open files
     # make zend_php_qt.h header file
 	my $file_zend_php_qt = "$outputdir/zend_php_qt.h";
 	open( ZEND_PHP_QT, ">$file_zend_php_qt" ) || die "Couldn't create $file_zend_php_qt\n";
 	$file_zend_php_qt =~ s/\.h/.h/;
+
+    # AG_ZEND_CLASS_ENTRY
+    my $file_ag_zend_class_entry = "$outputdir/ag_zend_class_entry.h";
+    open( AG_ZEND_CLASS_ENTRY, ">$file_ag_zend_class_entry" ) || die "Couldn't create $file_ag_zend_class_entry\n";
+    $file_ag_zend_class_entry =~ s/\.h/.h/;
+
+    # AG_EXTERN_ZEND_CLASS_ENTRY
+    my $file_ag_extern_zend_class_entry = "$outputdir/ag_extern_zend_class_entry.h";
+    open( AG_EXTERN_ZEND_CLASS_ENTRY, ">$file_ag_extern_zend_class_entry" ) || die "Couldn't create $file_ag_extern_zend_class_entry\n";
+    $file_ag_extern_zend_class_entry =~ s/\.h/.h/;
+
+#     # AG_VOID_REGISTER
+#     my $file_ag_void_register = "$outputdir/ag_void_register.h";
+#     open( AG_VOID_REGISTER, ">$file_ag_void_register" ) || die "Couldn't create $file_ag_void_register\n";
+#     $file_ag_void_register =~ s/\.h/.h/;
+
+    # AG_ZEND_PHP_QT
+    my $file_ag_zend_php_qt = "$outputdir/ag_zend_php_qt.h";
+    open( AG_ZEND_PHP_QT, ">$file_ag_zend_php_qt" ) || die "Couldn't create $file_ag_zend_php_qt\n";
+    $file_ag_zend_php_qt =~ s/\.h/.h/;
+
+    # AG_CONFIGM4
+    my $file_ag_configm4 = "$outputdir/ag_configm4.h";
+    open( AG_CONFIGM4, ">$file_ag_configm4" ) || die "Couldn't create $file_ag_configm4\n";
+    $file_ag_configm4 =~ s/\.h/.h/;
+
+    # AG_QT_MINIT
+    my $file_ag_qt_minit = "$outputdir/ag_qt_minit.h";
+    open( AG_QT_MINIT, ">$file_ag_qt_minit" ) || die "Couldn't create $file_ag_qt_minit\n";
+    $file_ag_qt_minit =~ s/\.h/.h/;
+
+    # AG_PHP_QT_CPP
+    my $file_ag_php_qt_cpp = "$outputdir/ag_php_qt_cpp.h";
+    open( AG_PHP_QT_CPP, ">$file_ag_php_qt_cpp" ) || die "Couldn't create $file_ag_php_qt_cpp\n";
+    $file_ag_php_qt_cpp =~ s/\.h/.h/;
 
     print ZEND_PHP_QT "/*
   +----------------------------------------------------------------------+
@@ -653,19 +693,21 @@ PHP_FUNCTION(SIGNAL);
 PHP_FUNCTION(SLOT);
     \n\n";
 
+# deprecated
     # make zend_php.cpp snippets file
-	my $file_php_qt_cpp = "$outputdir/php_qt.snippets.cpp";
-	open( PHP_QT_CPP, ">$file_php_qt_cpp" ) || die "Couldn't create $file_php_qt_cpp\n";
-	$file_php_qt_cpp =~ s/\.h/.h/;
+# 	my $file_php_qt_cpp = "$outputdir/php_qt.snippets.cpp";
+# 	open( PHP_QT_CPP, ">$file_php_qt_cpp" ) || die "Couldn't create $file_php_qt_cpp\n";
+# 	$file_php_qt_cpp =~ s/\.h/.h/;
 
-    print PHP_QT_CPP "/**/\n";
+#    print PHP_QT_CPP "/**/\n";
 
+# deprecated
     # make zend_php.cpp second snippets file PHP_MINIT_FUNCTION
 	my $file_php_qt_minit = "$outputdir/php_qt.snippets2.cpp";
 	open( PHP_QT_MINIT, ">$file_php_qt_minit" ) || die "Couldn't create $file_php_qt_minit\n";
 	$file_php_qt_minit =~ s/\.h/.h/;
 
-    print PHP_QT_CPP "\n";
+#    print PHP_QT_CPP "\n";
     print PHP_QT_MINIT "\n";
 
 
@@ -710,10 +752,20 @@ ZEND_END_MODULE_GLOBALS(php_qt)
  * vim<600: noet sw=4 ts=4
  */\n
     ";
-    close ZEND_PHP_QT;
 
-    print PHP_QT_CPP "\n";
-    close PHP_QT_CPP;
+# close files
+#    close ZEND_PHP_QT;
+
+#    print PHP_QT_CPP "\n";
+#    close PHP_QT_CPP;
+
+    close AG_ZEND_CLASS_ENTRY;
+    close AG_EXTERN_ZEND_CLASS_ENTRY;
+#    close AG_VOID_REGISTER;
+    close AG_ZEND_PHP_QT;
+    close AG_CONFIGM4;
+    close AG_QT_MINIT;
+    close AG_PHP_QT_CPP;
 
 }
 
@@ -745,7 +797,7 @@ sub writeClassDoc
 	}
 # make the class file
 	my $file = join("__", kdocAstUtil::heritage($node)).".cpp";
-    $file = "$outputdir/".lc($file);
+    $file = $outputdir."generated/".lc($file);
 	my $docnode = $node->{DocNode};
 	my @list = ();
 	my $version = undef;
@@ -794,8 +846,19 @@ using namespace std;
 #include \"../php_qt.h\"\n";
 
 # php_qt.cpp
-    print PHP_QT_CPP "static zend_function_entry ",$node->{astNodeName},"_methods[] = {\n";
+#    print PHP_QT_CPP "static zend_function_entry ",$node->{astNodeName},"_methods[] = {\n";
+    print AG_PHP_QT_CPP "static zend_function_entry ",$node->{astNodeName},"_methods[] = {\n";
+
+
+    print AG_ZEND_CLASS_ENTRY "zend_class_entry *",$node->{astNodeName},"_ce_ptr;\n";
+    print AG_CONFIGM4 "\tqt/generated/",uc($node->{astNodeName}),".cpp \\ \n";
+    print AG_EXTERN_ZEND_CLASS_ENTRY "extern zend_class_entry *",$node->{astNodeName},"_ce_ptr;\n";
+    print AG_EXTERN_ZEND_CLASS_ENTRY "void \t_register_",$node->{astNodeName},"();\n";
+
+
     print PHP_QT_MINIT "\n\t_register_",$node->{astNodeName},"(TSRMLS_C);\n";
+    print AG_QT_MINIT "\n\t_register_",$node->{astNodeName},"(TSRMLS_C);\n";
+
 
 	# ancestors
 	my @ancestors = ();
@@ -1012,8 +1075,11 @@ using namespace std;
 	$nullctor = 0;
 
 # php_qt.cpp
-    print PHP_QT_CPP "
-	{NULL,NULL,NULL}
+#     print PHP_QT_CPP "
+# 	{NULL,NULL,NULL}
+# };\n";
+    print AG_PHP_QT_CPP "
+    {NULL,NULL,NULL}
 };\n";
 
 # inheritance
@@ -1030,7 +1096,14 @@ using namespace std;
         }
 	}
 
-    print PHP_QT_CPP "
+#     print PHP_QT_CPP "
+# void _register_",$node->{astNodeName},"(TSRMLS_D)
+# {
+#     zend_class_entry ce;
+#     INIT_CLASS_ENTRY(ce,\"",$node->{astNodeName},"\",",$node->{astNodeName},"_methods);
+#     ",$zend_inherit,"
+# ";
+    print AG_PHP_QT_CPP "
 void _register_",$node->{astNodeName},"(TSRMLS_D)
 {
     zend_class_entry ce;
@@ -1042,16 +1115,24 @@ void _register_",$node->{astNodeName},"(TSRMLS_D)
 		sub { print CLASS "", $_[0], ""; print CLASS "", $_[0], "";  },
 		sub {	my ($node, $kid ) = @_;
             if ($kid->{NodeType} eq "property"){
-                print PHP_QT_CPP
+#                 print PHP_QT_CPP
+# #                    "zend_declare_property_string(",$node->{astNodeName},"_ce_ptr,\"",$kid->{astNodeName},"\",strlen(\"",$kid->{astNodeName},"\"),\"\",ZEND_ACC_PROTECTED TSRMLS_CC);";
+#                      "\tPHP_QT_DECLARE_PROPERTY(\"$kid->{astNodeName}\");\n";
+                print AG_PHP_QT_CPP
 #                    "zend_declare_property_string(",$node->{astNodeName},"_ce_ptr,\"",$kid->{astNodeName},"\",strlen(\"",$kid->{astNodeName},"\"),\"\",ZEND_ACC_PROTECTED TSRMLS_CC);";
                      "\tPHP_QT_DECLARE_PROPERTY(\"$kid->{astNodeName}\");\n";
+
             }
         },
 		sub { print CLASS ""; print JNISOURCE ""; }
 	);
 
-    print PHP_QT_CPP "
+#     print PHP_QT_CPP "
+# }\n";
+    print AG_PHP_QT_CPP "
 }\n";
+
+
 
 	if ( kalyptusDataDict::interfacemap($node->{astNodeName}) ne () ) {
 		close INTERFACE;
@@ -1313,6 +1394,7 @@ sub generateClassMethodForEnum
 #                $enum =~ s/=//g;
                 my @constant = split(/=/,$enum_);
                 print PHP_QT_MINIT "\t	REGISTER_LONG_CONSTANT(\"",uc($class->{astNodeName}),"_",uc($enum),"_",uc($constant[0]),"\", ",$class->{astNodeName},"::",$constant[0],", CONST_CS | CONST_PERSISTENT);\n";
+                print AG_QT_MINIT "\t  REGISTER_LONG_CONSTANT(\"",uc($class->{astNodeName}),"_",uc($enum),"_",uc($constant[0]),"\", ",$class->{astNodeName},"::",$constant[0],", CONST_CS | CONST_PERSISTENT);\n";
 				$enumCount++;
 
 			}
@@ -1402,6 +1484,8 @@ sub mergeEquals {
 # add method name
         $tmp{ $paramstring }->AddProp("methodname",$method->{astNodeName});
         $tmp{ $paramstring }->AddProp("ReturnType",$method->{ReturnType});
+        $tmp{ $paramstring }->AddProp("Access",$method->{Access});
+        $tmp{ $paramstring }->AddProp("Flags",$method->{Flags});
 
     }
 
@@ -1441,6 +1525,7 @@ sub marshal {
         my $param_zend_function;    # parameter for zend function
         my @objects;                # object stack
         my $method = $args{$key};   # helping
+        my $access = $method->{Access};
         my $object_selection = "";
         my $tmp_count = 0;          # helping
 
@@ -1582,6 +1667,22 @@ sub marshal {
 
         $return .= "\t\t}\n";
         $tmp_count=0;
+
+        # write code snippets
+        if( $method->{Flags} =~ /s/ ){
+            $access .= "|ZEND_ACC_STATIC";
+        }
+    
+#        print ZEND_PHP_QT "\nZEND_METHOD(",$classname,", ",$method->{methodname},");";
+        print AG_ZEND_PHP_QT "\nZEND_METHOD(",$classname,", ",$method->{methodname},");";
+    
+    # code snippets for php_qt.cpp here
+        $access = uc($access);
+        $access =~ s/_SLOTS//;
+        $access =~ s/_SIGNALS//;
+#        print PHP_QT_CPP "\tZEND_ME(",$classname,",",$method->{methodname},",NULL,ZEND_ACC_",$access,")\n";
+        print AG_PHP_QT_CPP "\tZEND_ME(",$classname,",",$method->{methodname},",NULL,ZEND_ACC_",$access,")\n";
+
     } # foreach args
 
     my $not_empty = %args;
