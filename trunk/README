@@ -17,7 +17,7 @@ Note: at this time it is only possible to compile it in a unix envireonment.
 Compiling and installation
 ==========================
 
-After unpacking or checking out from SVN copy the php_qt directory into the 
+After unpacking or checking out from SVN copy the unpacked php_qt directory into the 
 php-5.1xxx/ext/ directory.
 
 We prefer to build PHP-Qt as module!
@@ -31,7 +31,7 @@ phpize
 
 If you have two or more php installations you can specify the path with
 
---with-prefix=/path/to/php5
+--prefix=/path/to/php5
 
 To remove old objectfiles run 
 
@@ -57,9 +57,9 @@ user discussion
 -----------------
 users mailing list
 
-address:        php-qt-users@lists.berlios.de.
-Subscription:   https://lists.berlios.de/mailman/listinfo/php-qt-users
-Archive:        https://lists.berlios.de/pipermail/php-qt-users/
+address:        php-qt-users@lists.sourceforge.net
+Subscription:   https://lists.sourceforge.net/lists/listinfo/php-qt-users
+Archive:        http://sourceforge.net/mailarchive/forum.php?forum=php-qt-users
 
 Subversion commits
 --------------------

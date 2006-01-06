@@ -2,15 +2,6 @@ dnl $Id$
 dnl config.m4 for extension php_qt
 
 
-PHP_ARG_WITH(prefix,,
-[  --with-prefix=DIR    php prefix])
-
-if test "$PHP_PREFIX" != "no"; then
- if test "$PHP_PREFIX" != "yes"; then
-    $prefix=$PHP_PREFIX
- fi
-fi
-
 dnl runtime
 PHP_ARG_WITH(qtlib,Qt runtime library,
 [  --with-qtlib=DIR         Qt library binaries])
