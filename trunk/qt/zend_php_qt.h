@@ -570,6 +570,8 @@ ZEND_METHOD(QLCDNumber, staticMetaObject);
 ZEND_METHOD(QLCDNumber, tr);
 ZEND_METHOD(QLCDNumber, trUtf8);
 
+#include "ag_zend_php_qt.h"
+
 /* 
   	Declare any global variables you may need between the BEGIN
 	and END macros here:     

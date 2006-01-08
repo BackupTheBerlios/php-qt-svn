@@ -1,0 +1,24 @@
+
+ZEND_METHOD(QDate, longDayName);
+ZEND_METHOD(QDate, isValid);
+ZEND_METHOD(QDate, setYMD);
+ZEND_METHOD(QDate, shortMonthName);
+ZEND_METHOD(QDate, isLeapYear);
+ZEND_METHOD(QDate, fromJulianDay);
+ZEND_METHOD(QDate, addDays);
+ZEND_METHOD(QDate, gregorianToJulian);
+ZEND_METHOD(QDate, longMonthName);
+ZEND_METHOD(QDate, julianToGregorian);
+ZEND_METHOD(QDate, shortDayName);
+ZEND_METHOD(QDate, weekNumber);
+ZEND_METHOD(QDate, addMonths);
+ZEND_METHOD(QDate, addYears);
+ZEND_METHOD(QDateTime, setTime_t);
+ZEND_METHOD(QDateTime, addDays);
+ZEND_METHOD(QDateTime, addMonths);
+ZEND_METHOD(QDateTime, addSecs);
+ZEND_METHOD(QDateTime, addYears);
+ZEND_METHOD(QTime, isValid);
+ZEND_METHOD(QTime, addSecs);
+ZEND_METHOD(QTime, addMSecs);
+ZEND_METHOD(QTime, setHMS);

@@ -380,3 +380,5 @@ extern zend_class_entry *QSlider_ce_ptr;
 extern zend_class_entry *QLineEdit_ce_ptr;
 extern zend_class_entry *QFrame_ce_ptr;
 extern zend_class_entry *QLCDNumber_ce_ptr;
+
+#include "ag_extern_zend_class_entry.h"
