@@ -24,6 +24,8 @@
 #   - setter methods support only one php property (adequate, I believe)
 #   - marshalling in constructor, destructor
 
+#   - enum types support goes wrong
+
 package kalyptusCxxToPHP;
 
 use File::Path;
@@ -689,9 +691,9 @@ PHP_FUNCTION(SIGNAL);
 PHP_FUNCTION(SLOT);
     \n\n";
 
-	my $file_php_qt_minit = "$outputdir/php_qt.snippets2.cpp";
-	open( PHP_QT_MINIT, ">$file_php_qt_minit" ) || die "Couldn't create $file_php_qt_minit\n";
-	$file_php_qt_minit =~ s/\.h/.h/;
+#	my $file_php_qt_minit = "$outputdir/php_qt.snippets2.cpp";
+#	open( PHP_QT_MINIT, ">$file_php_qt_minit" ) || die "Couldn't create $file_php_qt_minit\n";
+#	$file_php_qt_minit =~ s/\.h/.h/;
 
     print PHP_QT_MINIT "\n";
 
@@ -1289,7 +1291,7 @@ sub listMember
 # make the cpp file
 # constructor
 		    if ( $name eq $class->{astNodeName} ) {
-                @constructors[$ctorCount++] = [@ctor_params];
+#                @constructors[$ctorCount++] = [@ctor_params];
 # ?
 			    if ($PHPparams eq () ) {
 				    $nullctor = 1;
@@ -1395,7 +1397,6 @@ sub mergeNumbers
     # add new
     $methods{ $functionname } = Ast::New( $functionname );
     $methods{ $functionname }->AddPropList("method",$cnode);
-
 
 }
 
@@ -1517,9 +1518,9 @@ sub marshal {
 # char
             if ( $first_param->{ArgType} =~ /char/ ) {
                 $return .= "\t\tchar* var_".$run.$c__.";   // default: ".$first_param->{DefaultValue}."\n";
-                $return .= "\t\tint* len_".$run.$c__.";\n\n";
+                $return .= "\t\tint len_".$run.$c__.";\n\n";
 
-                $paratype .= ", &var_".$run.$c__.", &len_".$run.$c__;
+                $paratype .= ", &var_".$run.$c__.", len_".$run.$c__;
                 $param_zend_function .= " (".$first_param->{ArgType}.") var_".$run.$c__;
                 $shortstring .= "s";
 # int
@@ -1527,11 +1528,16 @@ sub marshal {
                 $return .= "\t\tlong var_".$run.$c__.";    // default: ".$first_param->{DefaultValue}."\n";
 
                 $paratype .= ", &var_".$run.$c__;
-                $param_zend_function .= "(".$first_param->{ArgType}.") var_".$run.$c__;
+# cast if param is an enum
+                if(defined $first_param->{cast}){
+                    $param_zend_function .= "(".$first_param->{cast}.") var_".$run.$c__;
+                } else {
+                    $param_zend_function .= "(".$first_param->{ArgType}.") var_".$run.$c__;
+                }
                 $shortstring .= "l";
 # bool
             } elsif ( $first_param->{ArgType} =~ /bool/ ) {
-                $return .= "\t\tbool* var_".$run.$c__.";   // _default: ".$first_param->{DefaultValue}."\n";
+                $return .= "\t\tlong* var_".$run.$c__.";   // _default: ".$first_param->{DefaultValue}."\n";
 
                 $paratype .= ", &var_".$run.$c__;
                 $param_zend_function .= "(".$first_param->{ArgType}.") var_".$run.$c__;
@@ -1584,21 +1590,22 @@ sub marshal {
                 if ( $param->{ArgType} =~ /char/ ) {
                     $object_call .= "(".$param->{ArgType}.") var_".$run.$c;
                 } elsif ( $param->{ArgType} =~ /int/ ) {
-                    $object_call .= "(".$param->{ArgType}.") var_".$run.$c;
+
+                    if(defined $param->{cast}){
+                        $object_call .= "(".$param->{cast}.") var_".$run.$c;
+                    } else {
+                        $object_call .= "(".$param->{ArgType}.") var_".$run.$c;
+                    }
+
                 } elsif ( $param->{ArgType} =~ /bool/ ) {
                     $object_call .= "(".$param->{ArgType}.") var_".$run.$c;
                 } else {
-#print_r($method);
                     if($obj_first == 1){
                         $obj_first = 0;
                     } else {
                         $object_test .= " && ";
                     }
                     $object_test .= "tmp_".$run.$tmp_count++." == \"".$param->{ArgType}."\"";
-# here: check Qt::anymember
-#                     if($param->{ArgType} =~ /Qt::/){
-#                         $param->{ArgType} = kalyptusDataDict::ctypemap($param->{ArgType});
-#                     }
 
                     $object_call .= "(".$param->{ArgType}.") ".$objects[$c_++];
 
@@ -1621,8 +1628,10 @@ sub marshal {
 
 # objects as return type
         my $obj;
+        my $objc = 0;
         foreach $obj ( @objects ) {
             $return .= "\t\t\tQObject* ".$obj." = (QObject*) php_qt_fetch(z_".$obj.");\n";
+            $objc++;
         }
 
 # add object handling
@@ -1632,7 +1641,10 @@ sub marshal {
             undef $object_selection;
             $return .= "\n";
 # $c counts objects, if there is no object the return mechanism has to be created
-            if($c>0){
+            if($objc == 0){
+                $return .= createReturn($classname, $method, $param_zend_function);
+            }
+            if($c > 0){
                 $return .= "\t\t}\n";
 # break run if there are objects
                 next;
@@ -1640,7 +1652,7 @@ sub marshal {
         }
 
 # return handling
-        $return .= createReturn($classname, $method, $param_zend_function);
+#        $return .= createReturn($classname, $method, $param_zend_function);
 
         $return .= "\t\t}\n";
         $tmp_count=0;
@@ -1699,12 +1711,12 @@ sub createReturn {
         # TODO: consider 'const',
         # and non-pointer types, pointer types
             $return .=  "\t\t\t".$returntype." return_object = (".$returntype.") obj->".$methodname."(".$param_zend_function.");\n";
-            $return .=  "\t\t\tzend_class_entry *ce;                                   \n";
-            $return .=  "\t\t\tobject_init_ex(return_value, ".$classname."_ce_ptr);     \n";
-            $return .=  "\t\t\tzend_rsrc_list_entry le;                            \n";
-            $return .=  "\t\t\tle.ptr = &return_object;                                       \n";
-            $return .=  "\t\t\tphp_qt_register(return_value,le);                   \n";
-            $return .=  "\t\t\treturn;                                             \n";
+            $return .=  "\t\t\t\tzend_class_entry *ce;                                   \n";
+            $return .=  "\t\t\t\tobject_init_ex(return_value, ".$classname."_ce_ptr);     \n";
+            $return .=  "\t\t\t\tzend_rsrc_list_entry le;                            \n";
+            $return .=  "\t\t\t\tle.ptr = &return_object;                                       \n";
+            $return .=  "\t\t\t\tphp_qt_register(return_value,le);                   \n";
+            $return .=  "\t\t\t\treturn;                                             \n";
 # simple types
         } else {
             $return .=  "\t\t\tRETURN_".uc($zend_return_type)."(obj->".$methodname."(".$param_zend_function."));\n" if defined $zend_return_type;
@@ -1725,7 +1737,10 @@ sub checkEnum(){
             $ArgType = "int";
         }
 
+# copy the arg type for typecast
+        $param->AddProp("cast",$param->{ArgType});
         $param->{ArgType} = $ArgType;
+
     }
 
     return $param;
