@@ -1290,14 +1290,17 @@ sub listMember
 
 # make the cpp file
 # constructor
-		    if ( $name eq $class->{astNodeName} ) {
-#                @constructors[$ctorCount++] = [@ctor_params];
-# ?
-			    if ($PHPparams eq () ) {
-				    $nullctor = 1;
-			    }
-# methods
-		    } else {
+            if ( $name eq $class->{astNodeName} ) {
+                $m->{astNodeName} = "__construct";
+            }
+# 		    if ( $name eq $class->{astNodeName} ) {
+# #                @constructors[$ctorCount++] = [@ctor_params];
+# # ?
+# 			    if ($PHPparams eq () ) {
+# 				    $nullctor = 1;
+# 			    }
+# # methods
+#		    } else {
 			    if ( $name =~ /.*Event$/ ) {
 				    return;
 			    }
@@ -1305,7 +1308,7 @@ sub listMember
                 mergeNumbers($class,$m);
 # deprecated
 #                cplusplusToMacro($class,$m);
-   		    }
+   		    #}
 	    }
 	}
 	#Part of the duplicate methods check.
@@ -1537,7 +1540,7 @@ sub marshal {
                 $shortstring .= "l";
 # bool
             } elsif ( $first_param->{ArgType} =~ /bool/ ) {
-                $return .= "\t\tlong* var_".$run.$c__.";   // _default: ".$first_param->{DefaultValue}."\n";
+                $return .= "\t\tbool var_".$run.$c__.";   // _default: ".$first_param->{DefaultValue}."\n";
 
                 $paratype .= ", &var_".$run.$c__;
                 $param_zend_function .= "(".$first_param->{ArgType}.") var_".$run.$c__;
