@@ -70,7 +70,7 @@ ZEND_METHOD(QString,arg){
 
 ZEND_METHOD(QString,at){
 
-    int *i;
+    int i;
     QString *QString_ptr = (QString *) PHP_QT_FETCH();
 
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l", &i) != FAILURE) {

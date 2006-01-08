@@ -413,7 +413,7 @@ PHP_FUNCTION(confirm_php_qt_compiled)
 PHP_FUNCTION(SIGNAL)
 {
     const char* string;
-    int* string_len;
+    int string_len;
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&string,&string_len)) {
         return;
     }
@@ -433,7 +433,7 @@ PHP_FUNCTION(SIGNAL)
 PHP_FUNCTION(SLOT)
 {
     const char* string;
-    int* string_len;
+    int string_len;
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&string,&string_len)) {
         return;
     }

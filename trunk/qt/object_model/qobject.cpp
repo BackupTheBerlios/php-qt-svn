@@ -259,7 +259,7 @@ ZEND_METHOD(QObject,isWidgetType){
 }
 
 ZEND_METHOD(QObject,killTimer){
-    long *id_;
+    long id_;
     if(zend_parse_parameters_ex(0,ZEND_NUM_ARGS() TSRMLS_CC,"l", &id_) == FAILURE) {
         return;
     }
@@ -362,7 +362,7 @@ ZEND_METHOD(QObject,signalsBlocked){
 }
 
 ZEND_METHOD(QObject,startTimer){    
-    long *interval;
+    long interval;
     if(zend_parse_parameters_ex(0,ZEND_NUM_ARGS() TSRMLS_CC,"l", &interval) == FAILURE) {
         return;
     }
