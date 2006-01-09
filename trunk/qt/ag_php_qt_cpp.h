@@ -1,18 +1,4 @@
 static zend_function_entry QDate_methods[] = {
-	ZEND_ME(QDate,longDayName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QDate,isValid,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QDate,setYMD,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QDate,shortMonthName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QDate,isLeapYear,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QDate,fromJulianDay,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QDate,addDays,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QDate,gregorianToJulian,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QDate,longMonthName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QDate,julianToGregorian,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QDate,shortDayName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QDate,weekNumber,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QDate,addMonths,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QDate,addYears,NULL,ZEND_ACC_PUBLIC)
 
     {NULL,NULL,NULL}
 };
@@ -25,11 +11,6 @@ void _register_QDate(TSRMLS_D)
 
 }
 static zend_function_entry QDateTime_methods[] = {
-	ZEND_ME(QDateTime,setTime_t,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QDateTime,addDays,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QDateTime,addMonths,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QDateTime,addSecs,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QDateTime,addYears,NULL,ZEND_ACC_PUBLIC)
 
     {NULL,NULL,NULL}
 };
@@ -42,10 +23,6 @@ void _register_QDateTime(TSRMLS_D)
 
 }
 static zend_function_entry QTime_methods[] = {
-	ZEND_ME(QTime,isValid,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QTime,addSecs,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QTime,addMSecs,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QTime,setHMS,NULL,ZEND_ACC_PUBLIC)
 
     {NULL,NULL,NULL}
 };
