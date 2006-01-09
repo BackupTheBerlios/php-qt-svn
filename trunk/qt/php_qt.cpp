@@ -2092,6 +2092,12 @@ void _register_QInternal(TSRMLS_D)
 
 }
 static zend_function_entry Qt_methods[] = {
+	ZEND_ME(Qt,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(Qt,qt_invoke,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(Qt,qt_emit,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(Qt,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(Qt,qt_property,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(Qt,qt_cast,NULL,ZEND_ACC_PUBLIC)
 
     {NULL,NULL,NULL}
 };
