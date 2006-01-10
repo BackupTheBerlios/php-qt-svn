@@ -109,7 +109,6 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/classes/qdate.cpp \ 
   qt/classes/qdatetime.cpp \ 
   qt/classes/qtime.cpp \ 
-
   qt/php_qt.cpp,$ext_shared)
 
   PHP_ADD_BUILD_DIR($ext_builddir/qt)
