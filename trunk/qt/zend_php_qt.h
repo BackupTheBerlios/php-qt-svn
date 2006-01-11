@@ -570,14 +570,6 @@ ZEND_METHOD(QLCDNumber, staticMetaObject);
 ZEND_METHOD(QLCDNumber, tr);
 ZEND_METHOD(QLCDNumber, trUtf8);
 
-/* internals */
-ZEND_METHOD(Qt, tr);
-ZEND_METHOD(Qt, qt_invoke);
-ZEND_METHOD(Qt, qt_emit);
-ZEND_METHOD(Qt, trUtf8);
-ZEND_METHOD(Qt, qt_property);
-ZEND_METHOD(Qt, qt_cast);
-
 #include "ag_zend_php_qt.h"
 
 /* 

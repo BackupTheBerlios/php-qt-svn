@@ -100,15 +100,13 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/layout_management/qhboxlayout.cpp \
   qt/layout_management/qvboxlayout.cpp \
   qt/object_model/qobject.cpp \
-  qt/qobject_model/qinternal.cpp \ 
-  qt/qobject_model/qt.cpp \ 
   qt/text_related/qstring.cpp \
   qt/text_related/qlatin1string.cpp \
   qt/text_related/qchar.cpp \
   qt/event/qevent.cpp \
-  qt/classes/qdate.cpp \ 
-  qt/classes/qdatetime.cpp \ 
-  qt/classes/qtime.cpp \ 
+  qt/classes/qdate.cpp \
+  qt/classes/qdatetime.cpp \
+  qt/classes/qtime.cpp \
   qt/php_qt.cpp,$ext_shared)
 
   PHP_ADD_BUILD_DIR($ext_builddir/qt)

@@ -63,9 +63,6 @@ zend_class_entry *QSlider_ce_ptr;
 zend_class_entry *QLineEdit_ce_ptr;
 zend_class_entry *QFrame_ce_ptr;
 zend_class_entry *QLCDNumber_ce_ptr;
-zend_class_entry *QInternal_ce_ptr;
-zend_class_entry *Qt_ce_ptr;
-
 
 #include "ag_zend_class_entry.h"
 
@@ -336,7 +333,6 @@ PHP_MINIT_FUNCTION(php_qt)
         REGISTER_LONG_CONSTANT("QLCDNUMBER_SEGMENTSTYLE_FLAT", QLCDNumber::Flat, CONST_CS | CONST_PERSISTENT);
 
 // handfixed:
-	_register_QInternal(TSRMLS_C);
 	  REGISTER_LONG_CONSTANT("QINTERNAL_PAINTDEVICEFLAGS_UNKNOWNDEVICE", QInternal::UnknownDevice, CONST_CS | CONST_PERSISTENT);
 	  REGISTER_LONG_CONSTANT("QINTERNAL_PAINTDEVICEFLAGS_WIDGET", QInternal::Widget, CONST_CS | CONST_PERSISTENT);
 	  REGISTER_LONG_CONSTANT("QINTERNAL_PAINTDEVICEFLAGS_PIXMAP", QInternal::Pixmap, CONST_CS | CONST_PERSISTENT);
@@ -348,7 +344,6 @@ PHP_MINIT_FUNCTION(php_qt)
 	  REGISTER_LONG_CONSTANT("QINTERNAL_RELAYOUTTYPE_RELAYOUTDRAGGING", QInternal::RelayoutDragging, CONST_CS | CONST_PERSISTENT);
 	  REGISTER_LONG_CONSTANT("QINTERNAL_RELAYOUTTYPE_RELAYOUTDROPPED", QInternal::RelayoutDropped, CONST_CS | CONST_PERSISTENT);
 
-	_register_Qt(TSRMLS_C);
 	  REGISTER_LONG_CONSTANT("QT_GLOBALCOLOR_COLOR0", Qt::color0, CONST_CS | CONST_PERSISTENT);
 	  REGISTER_LONG_CONSTANT("QT_GLOBALCOLOR_COLOR1", Qt::color1, CONST_CS | CONST_PERSISTENT);
 	  REGISTER_LONG_CONSTANT("QT_GLOBALCOLOR_BLACK", Qt::black, CONST_CS | CONST_PERSISTENT);
@@ -1124,7 +1119,7 @@ PHP_FUNCTION(confirm_php_qt_compiled)
 PHP_FUNCTION(SIGNAL)
 {
     const char* string;
-    int* string_len;
+    int string_len;
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&string,&string_len)) {
         return;
     }
@@ -1144,7 +1139,7 @@ PHP_FUNCTION(SIGNAL)
 PHP_FUNCTION(SLOT)
 {
     const char* string;
-    int* string_len;
+    int string_len;
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&string,&string_len)) {
         return;
     }
@@ -2078,38 +2073,6 @@ void _register_QLCDNumber(TSRMLS_D)
     PHP_QT_DECLARE_PROPERTY("intValue");
 
 }
-
-static zend_function_entry QInternal_methods[] = {
-
-    {NULL,NULL,NULL}
-};
-
-void _register_QInternal(TSRMLS_D)
-{
-    zend_class_entry ce;
-    INIT_CLASS_ENTRY(ce,"QInternal",QInternal_methods);
-    QInternal_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
-
-}
-static zend_function_entry Qt_methods[] = {
-	ZEND_ME(Qt,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(Qt,qt_invoke,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(Qt,qt_emit,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(Qt,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(Qt,qt_property,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(Qt,qt_cast,NULL,ZEND_ACC_PUBLIC)
-
-    {NULL,NULL,NULL}
-};
-
-void _register_Qt(TSRMLS_D)
-{
-    zend_class_entry ce;
-    INIT_CLASS_ENTRY(ce,"Qt",Qt_methods);
-    Qt_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
-
-}
-
 
 #include "ag_php_qt_cpp.h"
 

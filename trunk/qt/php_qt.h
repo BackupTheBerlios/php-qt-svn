@@ -381,10 +381,5 @@ extern zend_class_entry *QLineEdit_ce_ptr;
 extern zend_class_entry *QFrame_ce_ptr;
 extern zend_class_entry *QLCDNumber_ce_ptr;
 
-extern zend_class_entry *QInternal_ce_ptr;
-void 	_register_QInternal();
-extern zend_class_entry *Qt_ce_ptr;
-void 	_register_Qt();
-
 
 #include "ag_extern_zend_class_entry.h"
