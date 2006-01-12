@@ -31,6 +31,7 @@
 #include <QAbstractSlider>
 #include <QSlider>
 #include <QLCDNumber>
+#include <QStringList>
 
 //QOUT();
 
@@ -63,8 +64,9 @@ zend_class_entry *QSlider_ce_ptr;
 zend_class_entry *QLineEdit_ce_ptr;
 zend_class_entry *QFrame_ce_ptr;
 zend_class_entry *QLCDNumber_ce_ptr;
+zend_class_entry *QMimeSource_ce_ptr;
 
-#include "ag_zend_class_entry.h"
+#include "ag_zend_class_entry.inc"
 
 /* {{{ php_qt_functions[]
  *
@@ -1041,7 +1043,7 @@ PHP_MINIT_FUNCTION(php_qt)
 
 //    objects_handle = zend_register_list_destructors_ex(NULL,NULL,"Qt Wrapper",module_number);
 
-#include "ag_qt_minit.h"
+#include "ag_qt_minit.inc"
 
 	return SUCCESS;
 }
@@ -2074,7 +2076,7 @@ void _register_QLCDNumber(TSRMLS_D)
 
 }
 
-#include "ag_php_qt_cpp.h"
+#include "ag_php_qt_cpp.inc"
 
 /* }}} */
 /* The previous line is meant for vim and emacs, so it can correctly fold and 
