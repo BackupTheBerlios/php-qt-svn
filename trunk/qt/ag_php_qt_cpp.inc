@@ -584,7 +584,7 @@ static zend_function_entry QLabel_methods[] = {
 	ZEND_ME(QLabel,qt_cast,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,metaObject,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,setScaledContents,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QLabel,event,NULL,ZEND_ACC_PROTECTED)
+	ZEND_ME(QLabel,event,NULL,ZEND_ACC_PUBLI)	// changed manually
 	ZEND_ME(QLabel,indent,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,qt_emit,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,pixmap,NULL,ZEND_ACC_PUBLIC)
