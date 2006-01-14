@@ -102,7 +102,7 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/object_model/qobject.cpp \
   qt/text_related/qstring.cpp \
   qt/text_related/qlatin1string.cpp \
-  qt/text_related/qchar.cpp \
+  qt/classes/qchar.cpp \
   qt/event/qevent.cpp \
 	qt/classes/qactionevent.cpp \ 
 	qt/classes/qcharref.cpp \ 

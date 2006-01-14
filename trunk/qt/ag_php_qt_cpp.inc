@@ -18,6 +18,7 @@ static zend_function_entry QChar_methods[] = {
 	ZEND_ME(QChar,isUpper,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QChar,joining,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QChar,row,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QChar, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QChar,isSymbol,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QChar,category,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QChar,isPrint,NULL,ZEND_ACC_PUBLIC)
@@ -162,6 +163,7 @@ static zend_function_entry QDate_methods[] = {
 	ZEND_ME(QDate,gregorianToJulian,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QDate,longMonthName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QDate,julianToGregorian,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QDate, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QDate,shortDayName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QDate,fromString,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QDate,dayOfYear,NULL,ZEND_ACC_PUBLIC)
@@ -198,6 +200,7 @@ static zend_function_entry QDateTime_methods[] = {
 	ZEND_ME(QDateTime,timeSpec,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QDateTime,setTime,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QDateTime,addMonths,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDateTime, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QDateTime,addSecs,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QDateTime,setDate,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QDateTime,currentDateTime,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -372,6 +375,7 @@ static zend_function_entry QFont_methods[] = {
 	ZEND_ME(QFont,setStyleHint,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QFont,substitutions,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QFont,setFamily,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QFont, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QFont,bold,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QFont,style,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QFont,setPointSize,NULL,ZEND_ACC_PUBLIC)
@@ -401,6 +405,7 @@ void _register_QFont(TSRMLS_D)
 static zend_function_entry QGridLayout_methods[] = {
 	ZEND_ME(QGridLayout,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QGridLayout,addLayout,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QGridLayout, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QGridLayout,qt_invoke,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QGridLayout,addItem,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QGridLayout,rowMinimumHeight,NULL,ZEND_ACC_PUBLIC)
@@ -543,18 +548,6 @@ void _register_QInputMethodEvent(TSRMLS_D)
 
 
 }
-static zend_function_entry Attribute_methods[] = {
-
-    {NULL,NULL,NULL}
-};
-
-void _register_Attribute(TSRMLS_D)
-{
-    zend_class_entry ce;
-    INIT_CLASS_ENTRY(ce,"Attribute",Attribute_methods);
-    Attribute_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
-
-}
 static zend_function_entry QKeyEvent_methods[] = {
 	ZEND_ME(QKeyEvent,count,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QKeyEvent,text,NULL,ZEND_ACC_PUBLIC)
@@ -584,7 +577,7 @@ static zend_function_entry QLabel_methods[] = {
 	ZEND_ME(QLabel,qt_cast,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,metaObject,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,setScaledContents,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QLabel,event,NULL,ZEND_ACC_PUBLI)	// changed manually
+	ZEND_ME(QLabel,event,NULL,ZEND_ACC_PROTECTED)
 	ZEND_ME(QLabel,indent,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,qt_emit,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,pixmap,NULL,ZEND_ACC_PUBLIC)
@@ -610,6 +603,7 @@ static zend_function_entry QLabel_methods[] = {
 	ZEND_ME(QLabel,setWordWrap,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QLabel,qt_property,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLabel, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QLabel,setIndent,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,margin,NULL,ZEND_ACC_PUBLIC)
 
@@ -626,6 +620,7 @@ void _register_QLabel(TSRMLS_D)
 }
 static zend_function_entry QLatin1Char_methods[] = {
 	ZEND_ME(QLatin1Char,unicode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLatin1Char, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QLatin1Char,toLatin1,NULL,ZEND_ACC_PUBLIC)
 
     {NULL,NULL,NULL}
@@ -776,6 +771,7 @@ static zend_function_entry QPainter_methods[] = {
 	ZEND_ME(QPainter,strokePath,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QPainter,setBrush,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QPainter,drawPoint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPainter, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QPainter,setRedirected,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QPainter,compositionMode,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QPainter,setFont,NULL,ZEND_ACC_PUBLIC)
@@ -904,6 +900,7 @@ static zend_function_entry QTime_methods[] = {
 	ZEND_ME(QTime,restart,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QTime,fromString,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QTime,second,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QTime, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QTime,addSecs,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QTime,addMSecs,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QTime,currentTime,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -935,6 +932,7 @@ static zend_function_entry QTimer_methods[] = {
 	ZEND_ME(QTimer,metaObject,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QTimer,stop,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QTimer,isActive,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QTimer, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QTimer,qt_emit,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QTimer,interval,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QTimer,setSingleShot,NULL,ZEND_ACC_PUBLIC)
@@ -1021,6 +1019,7 @@ static zend_function_entry QWidgetItem_methods[] = {
 	ZEND_ME(QWidgetItem,hasHeightForWidth,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QWidgetItem,isEmpty,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QWidgetItem,setGeometry,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QWidgetItem, __construct,NULL,ZEND_ACC_PUBLIC);
 	ZEND_ME(QWidgetItem,minimumSize,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QWidgetItem,sizeHint,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QWidgetItem,maximumSize,NULL,ZEND_ACC_PUBLIC)
