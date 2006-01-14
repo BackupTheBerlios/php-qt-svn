@@ -214,10 +214,10 @@ ZEND_METHOD(QChar, joining){
  *    flags:    c
  */
 ZEND_METHOD(QChar, row){
-	if (ZEND_NUM_ARGS() == 0){
+/*	if (ZEND_NUM_ARGS() == 0){
 			QChar *obj = (QChar*) PHP_QT_FETCH();
 			RETURN_CHAR* (obj->row());
-	}
+	}*/
 }
 
 /*********************************
@@ -257,24 +257,24 @@ ZEND_METHOD(QChar, __construct){
 			QString tmp_o_0(var_o_2->metaObject()->className());
 			
 			if(tmp_o_0 == "QLatin1Char") {
-				QChar *QChar_ptr = new QChar((QLatin1Char) var_o_2);
+/*				QChar *QChar_ptr = new QChar((QLatin1Char) var_o_2);
 			PHP_QT_REGISTER(QChar_ptr);
-			RETURN_NULL();
+*/			RETURN_NULL();
 			}			
 			if(tmp_o_0 == "ushort") {
-				QChar *QChar_ptr = new QChar((ushort) var_o_2);
+/*				QChar *QChar_ptr = new QChar((ushort) var_o_2);
 			PHP_QT_REGISTER(QChar_ptr);
-			RETURN_NULL();
+*/			RETURN_NULL();
 			}			
 			if(tmp_o_0 == "short") {
-				QChar *QChar_ptr = new QChar((short) var_o_2);
+/*				QChar *QChar_ptr = new QChar((short) var_o_2);
 			PHP_QT_REGISTER(QChar_ptr);
-			RETURN_NULL();
+*/			RETURN_NULL();
 			}			
 			if(tmp_o_0 == "SpecialCharacter") {
-				QChar *QChar_ptr = new QChar((SpecialCharacter) var_o_2);
+/*				QChar *QChar_ptr = new QChar((SpecialCharacter) var_o_2);
 			PHP_QT_REGISTER(QChar_ptr);
-			RETURN_NULL();
+*/			RETURN_NULL();
 			}
 		}
 	}
@@ -642,10 +642,10 @@ ZEND_METHOD(QChar, isLetterOrNumber){
  *    flags:    c
  */
 ZEND_METHOD(QChar, cell){
-	if (ZEND_NUM_ARGS() == 0){
+/*	if (ZEND_NUM_ARGS() == 0){
 			QChar *obj = (QChar*) PHP_QT_FETCH();
 			RETURN_CHAR* (obj->cell());
-	}
+	}*/
 }
 
 /*********************************
