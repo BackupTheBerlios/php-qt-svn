@@ -3,6 +3,8 @@
      **
      ** Qt tutorial 1
      **
+     ** http://doc.trolltech.com/4.0/tutorial-t1.html
+     **
      ****************************************************************/
 
 	if(!extension_loaded('php_qt')) {

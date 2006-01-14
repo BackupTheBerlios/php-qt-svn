@@ -3,6 +3,8 @@
     **
     ** Qt tutorial 5
     **
+    ** http://doc.trolltech.com/4.0/tutorial-t5.html
+    **
     ****************************************************************/
 
 	if(!extension_loaded('php_qt')) {

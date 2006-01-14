@@ -4,6 +4,8 @@
     **
     ** Qt tutorial 4
     **
+    ** http://doc.trolltech.com/4.0/tutorial-t4.html
+    **
     ****************************************************************/
                 
 	if(!extension_loaded('php_qt')) {
