@@ -102,8 +102,8 @@ ZEND_METHOD(QGridLayout, addLayout){
  */
 ZEND_METHOD(QGridLayout, __construct){
 	if (ZEND_NUM_ARGS() == 0){
-			QGridLayout *obj = (QGridLayout*) PHP_QT_FETCH();
-//			obj->QGridLayout();
+			QGridLayout *QGridLayout_ptr = new QGridLayout();
+			PHP_QT_REGISTER(QGridLayout_ptr);
 			RETURN_NULL();
 	}
 
@@ -113,15 +113,15 @@ ZEND_METHOD(QGridLayout, __construct){
 
 		/* QWidget* parent,  */
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o", &z_var_o_0) == SUCCESS) {
-			QGridLayout *obj = (QGridLayout*) PHP_QT_FETCH();
+//			QGridLayout *obj = (QGridLayout*) PHP_QT_FETCH();
 			QObject* var_o_0 = (QObject*) php_qt_fetch(z_var_o_0);
 
 			QString tmp_o_0(var_o_0->metaObject()->className());
 			
-			if(tmp_o_0 == "QWidget*") {
+			if(tmp_o_0 == "QWidget") {
 				QGridLayout *QGridLayout_ptr = new QGridLayout((QWidget*) var_o_0);
-			PHP_QT_REGISTER(QGridLayout_ptr);
-			RETURN_NULL();
+				PHP_QT_REGISTER(QGridLayout_ptr);
+				RETURN_NULL();
 			}
 		}
 	}
@@ -505,9 +505,12 @@ ZEND_METHOD(QGridLayout, addWidget){
 
 			QString tmp_o_0(var_o_0->metaObject()->className());
 			
-			if(tmp_o_0 == "QWidget*") {
+			if(tmp_o_0 == "QWidget") {
 				obj->addWidget((QWidget*) var_o_0);
-			RETURN_NULL();
+			  php_error(E_WARNING,"added");
+				RETURN_NULL();
+			} else {
+			  php_error(E_WARNING,"error");
 			}
 		}
 	}
