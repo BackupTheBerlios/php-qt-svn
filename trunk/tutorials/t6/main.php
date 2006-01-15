@@ -52,10 +52,10 @@
     //        $this->quit->setFont(QFont("Times", 18, QFont::Bold));
             $this->connect($this->quit, SIGNAL("clicked()"), QApplication::instance(), SLOT("quit()"));
     
-            $this->grid = new QGridLayout($this);
+            $this->grid = new QGridLayout();
             for ($row = 0; $row < 4; ++$row) {
                 for ($column = 0; $column < 4; ++$column) {
-                    $this->grid->addWidget(new LCDRange(), $row, $column);
+                    $this->grid->addWidget(new LCDRange(), $row, $column, 0);
                 }
             }
 
