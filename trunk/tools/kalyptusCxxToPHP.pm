@@ -22,9 +22,10 @@
 #   - support for all types in method calls
 #   - fit cplusplusToZEND, cplusplusToInvoke, cplusplusToMacro
 #   - setter methods support only one php property (adequate, I believe)
-#   - marshalling in constructor, destructor
 
-#   - enum types support goes wrong
+#   php properties, enums
+#   RETURN_BYTE[]
+
 
 package kalyptusCxxToPHP;
 
@@ -72,9 +73,9 @@ sub cplusplusToZEND
 		return "bool";
 	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*void\s*\**/ ) {
 		return "NULL";
-	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*int\s*\&*/ ) {
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*\bint\s*\&*/) {
 		return "long";
-	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*int\s*\*/) {
+	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*\bint\s*\*/) {
 		return "int[]";
 	} elsif ( kalyptusDataDict::ctypemap($cplusplusType) =~ /\s*double\s*\*/ ) {
 		return "double[]";
@@ -294,7 +295,7 @@ sub cplusplusToZENDType
 	}
 }
 
-
+# function is not used yet
 sub cplusplusToPInvoke
 {
 	my ( $cplusplusType )  = @_;
@@ -614,32 +615,32 @@ sub writeDoc
 # open files
 
     # AG_ZEND_CLASS_ENTRY
-    my $file_ag_zend_class_entry = "$outputdir/ag_zend_class_entry.h";
+    my $file_ag_zend_class_entry = "$outputdir/ag_zend_class_entry.inc";
     open( AG_ZEND_CLASS_ENTRY, ">$file_ag_zend_class_entry" ) || die "Couldn't create $file_ag_zend_class_entry\n";
     $file_ag_zend_class_entry =~ s/\.h/.h/;
 
     # AG_EXTERN_ZEND_CLASS_ENTRY
-    my $file_ag_extern_zend_class_entry = "$outputdir/ag_extern_zend_class_entry.h";
+    my $file_ag_extern_zend_class_entry = "$outputdir/ag_extern_zend_class_entry.inc";
     open( AG_EXTERN_ZEND_CLASS_ENTRY, ">$file_ag_extern_zend_class_entry" ) || die "Couldn't create $file_ag_extern_zend_class_entry\n";
     $file_ag_extern_zend_class_entry =~ s/\.h/.h/;
 
     # AG_ZEND_PHP_QT
-    my $file_ag_zend_php_qt = "$outputdir/ag_zend_php_qt.h";
+    my $file_ag_zend_php_qt = "$outputdir/ag_zend_php_qt.inc";
     open( AG_ZEND_PHP_QT, ">$file_ag_zend_php_qt" ) || die "Couldn't create $file_ag_zend_php_qt\n";
     $file_ag_zend_php_qt =~ s/\.h/.h/;
 
     # AG_CONFIGM4
-    my $file_ag_configm4 = "$outputdir/ag_configm4.h";
+    my $file_ag_configm4 = "$outputdir/ag_configm4.inc";
     open( AG_CONFIGM4, ">$file_ag_configm4" ) || die "Couldn't create $file_ag_configm4\n";
     $file_ag_configm4 =~ s/\.h/.h/;
 
     # AG_QT_MINIT
-    my $file_ag_qt_minit = "$outputdir/ag_qt_minit.h";
+    my $file_ag_qt_minit = "$outputdir/ag_qt_minit.inc";
     open( AG_QT_MINIT, ">$file_ag_qt_minit" ) || die "Couldn't create $file_ag_qt_minit\n";
     $file_ag_qt_minit =~ s/\.h/.h/;
 
     # AG_PHP_QT_CPP
-    my $file_ag_php_qt_cpp = "$outputdir/ag_php_qt_cpp.h";
+    my $file_ag_php_qt_cpp = "$outputdir/ag_php_qt_cpp.inc";
     open( AG_PHP_QT_CPP, ">$file_ag_php_qt_cpp" ) || die "Couldn't create $file_ag_php_qt_cpp\n";
     $file_ag_php_qt_cpp =~ s/\.h/.h/;
 
@@ -691,10 +692,6 @@ PHP_FUNCTION(SIGNAL);
 PHP_FUNCTION(SLOT);
     \n\n";
 
-#	my $file_php_qt_minit = "$outputdir/php_qt.snippets2.cpp";
-#	open( PHP_QT_MINIT, ">$file_php_qt_minit" ) || die "Couldn't create $file_php_qt_minit\n";
-#	$file_php_qt_minit =~ s/\.h/.h/;
-
     print PHP_QT_MINIT "\n";
 
 	# Document all compound nodes
@@ -744,6 +741,7 @@ ZEND_END_MODULE_GLOBALS(php_qt)
     close AG_ZEND_CLASS_ENTRY;
     close AG_EXTERN_ZEND_CLASS_ENTRY;
 
+    print AG_ZEND_PHP_QT "\n";
     close AG_ZEND_PHP_QT;
     close AG_CONFIGM4;
     close AG_QT_MINIT;
@@ -756,6 +754,35 @@ sub writeClassDoc
 	my( $node ) = @_;
 
     $ctorCount = 0;
+
+    if(
+            $node->{astNodeName} eq "QAbstractButton"
+        ||  $node->{astNodeName} eq "QLCDNumber"
+        ||  $node->{astNodeName} eq "QLatin1String"
+||  $node->{astNodeName} eq "QApplication"
+||  $node->{astNodeName} eq "QCoreApplication"
+||  $node->{astNodeName} eq "QBoxLayout"
+||  $node->{astNodeName} eq "QAbstractSlider"
+||  $node->{astNodeName} eq "QWidget"
+||  $node->{astNodeName} eq "QLayoutItem"
+||  $node->{astNodeName} eq "QLineEdit"
+||  $node->{astNodeName} eq "QObject"
+||  $node->{astNodeName} eq "QPushButton"
+||  $node->{astNodeName} eq "QLayout"
+||  $node->{astNodeName} eq "QHBoxLayout"
+||  $node->{astNodeName} eq "QFrame"
+||  $node->{astNodeName} eq "QPushButton"
+||  $node->{astNodeName} eq "QSlider"
+||  $node->{astNodeName} eq "QSpacerItem"
+||  $node->{astNodeName} eq "QString"
+||  $node->{astNodeName} eq "QVBoxLayout"
+||  $node->{astNodeName} eq "Qt"
+||  $node->{astNodeName} eq "QInternal"
+||  $node->{astNodeName} eq "Attribute"
+    ){
+        print $node->{astNodeName}," skipped\n";
+        return;
+    }
 
 	print "Enter: $node->{astNodeName}\n" if $debug;
 	if( exists $node->{ExtSource} ) {
@@ -779,7 +806,7 @@ sub writeClassDoc
 	}
 # make the class file
 	my $file = join("__", kdocAstUtil::heritage($node)).".cpp";
-    $file = $outputdir."classes/".lc($file);
+    $file = $outputdir."/classes/".lc($file);
 	my $docnode = $node->{DocNode};
 	my @list = ();
 	my $version = undef;
@@ -827,6 +854,8 @@ using namespace std;\n";
 
     print CLASS "\n#include <$node->{astNodeName}>\n";
     print CLASS "#include \"../php_qt.h\"\n\n";
+
+    print CLASS checkIncludes($node);
 
     print AG_PHP_QT_CPP "static zend_function_entry ",$node->{astNodeName},"_methods[] = {\n";
 
@@ -888,12 +917,14 @@ using namespace std;
 
 #include \"../php_qt.h\"
 ";
-		}
+		} # ancestors < 0
+
+#        print CLASS "\n#include <",$node->{astNodeName},">\n\n";
 
 # CLASS
 	} else {
 
-        print CLASS "\n#include <",$node->{astNodeName},">\n\n";
+#        print CLASS "\n#include <",$node->{astNodeName},">\n\n";
         print ZEND_PHP_QT "\n\n/* $node->{astNodeName} */";
 
 	}
@@ -901,6 +932,7 @@ using namespace std;
 	Iter::MembersByType ( $node,
 		sub { print CLASS "", $_[0], ""; print JNISOURCE "", $_[0], "";  },
 		sub {	my ($node, $kid ) = @_;
+
                  generateClassMethodForEnum( $node, $kid );
                },
 		sub { print CLASS ""; print JNISOURCE ""; }
@@ -938,6 +970,12 @@ using namespace std;
         my @three;
         my @four;
         my @five;
+        my @six;
+        my @seven;
+        my @eight;
+        my @nine;
+        my @ten;
+
 
         print CLASS "
 /*********************************
@@ -949,13 +987,37 @@ using namespace std;
 # params
             foreach my $n_ (@{$m_}){
 
+# skip destructor
+            if($n_->{ReturnType} =~ /~/){ next; }
+
             if($first == 1){
                 $first = 0;
                 print CLASS "/*
  *    function  ",$n_->{astNodeName},"
  *    flags:    ",$n_->{Flags},"
  */\n";
-                print CLASS "ZEND_METHOD(",$node->{astNodeName},", ",$n_->{astNodeName},"){\n";
+#print_r($n_);
+# write class related stuff
+# check whether method is a ctor
+                if($node->{astNodeName} eq $n_->{astNodeName}){
+                    print CLASS "ZEND_METHOD(",$node->{astNodeName},", __construct){\n";
+                    $n_->AddProp("ctor","ctor");
+                    print AG_ZEND_PHP_QT "\nZEND_METHOD(",$node->{astNodeName},", __construct);";
+                    print AG_PHP_QT_CPP "\tZEND_ME(",$node->{astNodeName},", __construct,NULL,ZEND_ACC_PUBLIC)\n";
+# normal
+                } else {
+                    print CLASS "ZEND_METHOD(",$node->{astNodeName},", ",$n_->{astNodeName},"){\n";
+
+                    my $access = $n_->{Access};
+                    if( $n_->{Flags} =~ /s/ ){
+                        $access .= "|ZEND_ACC_STATIC";
+                    }
+                    $access = uc($access);
+                    $access =~ s/_SLOTS//;
+                    $access =~ s/_SIGNALS//;
+                    print AG_PHP_QT_CPP "\tZEND_ME(",$node->{astNodeName},",",$n_->{astNodeName},",NULL,ZEND_ACC_",$access,")\n";
+                    print AG_ZEND_PHP_QT "\nZEND_METHOD(",$node->{astNodeName},", ",$n_->{astNodeName},");";
+                }
             }
 
                 my $count = 0;
@@ -964,7 +1026,17 @@ using namespace std;
                 }
 # copy
                 if($count == 0){
-                    print CLASS createReturn($node->{astNodeName}, $n_,"");
+                    if(!(
+                        $n_->{astNodeName} =~ /className/
+                        || $n_->{astNodeName} =~ /qt_/
+                        || $n_->{astNodeName} =~ /staticMetaObject/
+                        || $n_->{astNodeName} =~ /qObject/
+                        )
+                    ){
+                        print CLASS "\tif (ZEND_NUM_ARGS() == 0){\n";
+                        print CLASS createReturn($node->{astNodeName}, $n_,"");
+                        print CLASS "\t}\n";
+                    }
                 } elsif($count == 1){
                     push @one, $n_;
                 } elsif($count == 2){
@@ -975,6 +1047,16 @@ using namespace std;
                     push @four, $n_;
                 } elsif($count == 5){
                     push @five, $n_;
+                } elsif($count == 6){
+                    push @six, $n_;
+                } elsif($count == 7){
+                    push @seven, $n_;
+                } elsif($count == 8){
+                    push @eight, $n_;
+                } elsif($count == 9){
+                    push @nine, $n_;
+                } elsif($count == 10){
+                    push @ten, $n_;
                 } else {
                     print "error, too much args: ",$count," ",$node->{astNodeName}," ",$n_->{astNodeName},"\n";
                 }
@@ -995,6 +1077,21 @@ using namespace std;
             my %five_ = mergeEquals($node->{astNodeName},5,@five);
             print CLASS marshal($node->{astNodeName},5,%five_);
 
+            my %six_ = mergeEquals($node->{astNodeName},6,@six);
+            print CLASS marshal($node->{astNodeName},6,%six_);
+
+            my %seven_ = mergeEquals($node->{astNodeName},7,@seven);
+            print CLASS marshal($node->{astNodeName},7,%seven_);
+
+            my %eight_ = mergeEquals($node->{astNodeName},8,@eight);
+            print CLASS marshal($node->{astNodeName},8,%eight_);
+
+            my %nine_ = mergeEquals($node->{astNodeName},9,@nine);
+            print CLASS marshal($node->{astNodeName},9,%nine_);
+
+            my %ten_ = mergeEquals($node->{astNodeName},10,@ten);
+            print CLASS marshal($node->{astNodeName},105,%ten_);
+
 #            print CLASS "}\n"; # ZEND_METHOD
 
         }
@@ -1003,53 +1100,11 @@ using namespace std;
 
     print CLASS "\n";
 
+
 # creating the constructor
-    my $function = $node->{astNodeName};
+     my $function = $node->{astNodeName};
 
-    print CLASS "\n\nZEND_METHOD(",$function, ",__construct){\n";
-    print CLASS "\n\t",$function, " *",$function,"_ptr = new ",$function,"();\n";
-
-    my $pc = 0;
-    foreach my $constructor (@constructors){
-
-        my $PHPzend_parse_parameters_s;
-        my $PHPzend_parse_parameters_vars;
-
-        my @ctor_params = @{$constructor};
-        my $pCount = @ctor_params;
-        print CLASS "\n";
-
-        do {
-                print CLASS "\tif(ZEND_NUM_ARGS() == ",$pCount,"){\n";
-
-                my $typeCount = 0;
-                foreach my $info ( @ctor_params ) {
-                    print CLASS "\t\tzval* param_",$typeCount++,";\n";
-                    $PHPzend_parse_parameters_s .= "z";
-                    $PHPzend_parse_parameters_vars .= ", &param_$typeCount";
-                } #if defined @{$info};
-
-                print CLASS "\t\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,\"",$PHPzend_parse_parameters_s,"\"",$PHPzend_parse_parameters_vars,") == FAILURE) {\n";
-                print CLASS "\t\t\treturn;\n","\t\t}\n";
-
-                $typeCount = 0;
-                foreach my $info ( @ctor_params ) {
-                 do {
-                    print CLASS "\t\t /*",@{$info}[0]," ",@{$info}[1]," ",@{$info}[2],"*/\n";
-                    print CLASS "\t\tif(Z_TYPE_P(param_",$typeCount,") == IS_",cplusplusToZENDType(@{$info}[2]),") {\n";
-                    print CLASS "\t\t\t",@{$info}[2]," tmp(Z_STRVAL_P(param_",$typeCount++,"));\n";
-                    print CLASS "\t\t\t",$function,"_ptr = new ",$function,"(tmp);\n";
-                    print CLASS "\t\t}\n";
-                    } if defined @{$info};
-                }
-                print CLASS "\t}\n";
-    } if defined @ctor_params;
-
-}
-    print CLASS "\n\tPHP_QT_REGISTER(",$function,"_ptr);\n";
-    print CLASS "\tRETURN_NULL();\n";
-	print CLASS "}\n";
-# destructor
+#destructor
     print CLASS "\nPHP_QT_DESTRUCT(",$function,");\n\n";
 
 	close CLASS;
@@ -1286,29 +1341,13 @@ sub listMember
 		#This is to make sure we have no duplicate methods...
 		my $currentmethod .= "$name $returnType $PHPparams";
 		my $pastmethod .= "$pastname $pastreturn $pastparams";
-		if($currentmethod ne $pastmethod) {
 
-# make the cpp file
-# constructor
-            if ( $name eq $class->{astNodeName} ) {
-                $m->{astNodeName} = "__construct";
+        if($currentmethod ne $pastmethod) {
+            if ( $name =~ /.*Event$/ ) {
+                return;
             }
-# 		    if ( $name eq $class->{astNodeName} ) {
-# #                @constructors[$ctorCount++] = [@ctor_params];
-# # ?
-# 			    if ($PHPparams eq () ) {
-# 				    $nullctor = 1;
-# 			    }
-# # methods
-#		    } else {
-			    if ( $name =~ /.*Event$/ ) {
-				    return;
-			    }
 # prepare arguments
-                mergeNumbers($class,$m);
-# deprecated
-#                cplusplusToMacro($class,$m);
-   		    #}
+            mergeNumbers($class,$m);
 	    }
 	}
 	#Part of the duplicate methods check.
@@ -1359,10 +1398,17 @@ sub generateClassMethodForEnum
 				}
 #                $enum =~ s/=//g;
                 my @constant = split(/=/,$enum_);
-                print PHP_QT_MINIT "\t	REGISTER_LONG_CONSTANT(\"",uc($class->{astNodeName}),"_",uc($enum),"_",uc($constant[0]),"\", ",$class->{astNodeName},"::",$constant[0],", CONST_CS | CONST_PERSISTENT);\n";
-                print AG_QT_MINIT "\t  REGISTER_LONG_CONSTANT(\"",uc($class->{astNodeName}),"_",uc($enum),"_",uc($constant[0]),"\", ",$class->{astNodeName},"::",$constant[0],", CONST_CS | CONST_PERSISTENT);\n";
-				$enumCount++;
 
+# what to skip?
+                    if(!(
+                            $class->{astNodeName} =~ /QContextMenuEvent/
+                        ||  $class->{astNodeName} =~ /QInputMethodEvent/
+                        ||  $class->{astNodeName} =~ /QPainter/
+                        ||  $class->{astNodeName} =~ /QTabletEvent/
+                    )){
+                        print AG_QT_MINIT "\t  REGISTER_LONG_CONSTANT(\"",uc($class->{astNodeName}),"_",uc($enum),"_",uc($constant[0]),"\", ",$class->{astNodeName},"::",$constant[0],", CONST_CS | CONST_PERSISTENT);\n";
+                        $enumCount++;
+                    }
 			}
 
 			print CLASS "\n\t\t}\n*/";
@@ -1418,11 +1464,20 @@ sub mergeEquals {
         my $paramstring = "";
         foreach my $param ( @{$method->{ParamList}} ) {
 
+# add cast type
+            $param->AddProp("cast",$param->{ArgType});
+            $param->{cast} = checkCast($param->{cast});
+
             $param = checkEnum($param);
 
-            if ( $param->{ArgType} =~ /char/ ) {
+# TODO: test it with QByteArray
+            if ( $param->{ArgType} =~ /const char/ ) {
                 $paramstring .= "s";
+            } elsif ( $param->{ArgType} =~ /char/ ) {
+                $paramstring .= "l";
             } elsif ( $param->{ArgType} =~ /int/ ) {
+                $paramstring .= "l";
+            } elsif ( $param->{ArgType} =~ /double/ ) {
                 $paramstring .= "l";
             } elsif ( $param->{ArgType} =~ /bool/ ) {
                 $paramstring .= "b";
@@ -1455,8 +1510,12 @@ sub mergeEquals {
         $tmp{ $paramstring }->AddProp("Access",$method->{Access});
         $tmp{ $paramstring }->AddProp("Flags",$method->{Flags});
 
-    }
+        if($classname eq $tmp{ $paramstring }->{methodname} ) {
+            $tmp{ $paramstring }->AddProp("ctor","ctor");
+        }
 
+    }
+    
     return %tmp;
 
 }
@@ -1493,15 +1552,27 @@ sub marshal {
         my $param_zend_function;    # parameter for zend function
         my @objects;                # object stack
         my $method = $args{$key};   # helping
-        my $access = $method->{Access};
+# skip qt_xxx
+        if(
+            $method->{methodname} =~ /qt_/
+            || $method->{methodname} =~ /className/
+        ){
+            last;
+        }
+
         my $object_selection = "";
         my $tmp_count = 0;          # helping
         my $c__ = $c;                # ugly
-
-# informations about return type
+        my $param_comment = "\t\t/* ";
 
 # identical strings grouped
-        $return .= "\t\t/* ".$key." */\n";
+        $return .= "\t\t/* ".$key." ".$method->{Access}."*/\n";
+
+# skip protected method
+        if($method->{Access} eq "protected"){
+            next;
+        }
+
         $run = $key."_";
 # first parameters are static, the others coincides with this
 # exception: objects
@@ -1509,6 +1580,9 @@ sub marshal {
 
 # parse the first parameters
         foreach my $first_param (@{$params->{ParamList}})  {
+
+# just a comment
+            $param_comment .= $first_param->{ArgType}." ".$first_param->{ArgName}.", ";
 
             # comma for param_zend_function params
             if($d > 0){
@@ -1519,7 +1593,7 @@ sub marshal {
 
             # the types
 # char
-            if ( $first_param->{ArgType} =~ /char/ ) {
+            if ( $first_param->{ArgType} =~ /const char/ ) {
                 $return .= "\t\tchar* var_".$run.$c__.";   // default: ".$first_param->{DefaultValue}."\n";
                 $return .= "\t\tint len_".$run.$c__.";\n\n";
 
@@ -1527,7 +1601,13 @@ sub marshal {
                 $param_zend_function .= " (".$first_param->{ArgType}.") var_".$run.$c__;
                 $shortstring .= "s";
 # int
-            } elsif ( $first_param->{ArgType} =~ /int/ ) {
+            } elsif (
+                $first_param->{ArgType} =~ /int/
+                || $first_param->{ArgType} =~ /char/
+                || $first_param->{ArgType} =~ /short/
+                || $first_param->{ArgType} =~ /double/
+            ) {
+
                 $return .= "\t\tlong var_".$run.$c__.";    // default: ".$first_param->{DefaultValue}."\n";
 
                 $paratype .= ", &var_".$run.$c__;
@@ -1566,12 +1646,16 @@ sub marshal {
         }
         $return .= "\n";
 # add additional objects
+        $param_comment .= " */\n";
+        $return .= $param_comment;
 
         foreach my $params (@{$method->{params}}){
 
             my $skip_first = 1;
             $tmp_count = 0;
 #            $c = $c__;
+# found in qpainter
+            $c__ = $c;
             my $c_ = 0;
 
 # skip first, this was already created
@@ -1589,31 +1673,41 @@ sub marshal {
                 } else {
                     $object_call .= ", ";
                 }
-# skip all excepting objects
+
+# char
                 if ( $param->{ArgType} =~ /char/ ) {
-                    $object_call .= "(".$param->{ArgType}.") var_".$run.$c;
-                } elsif ( $param->{ArgType} =~ /int/ ) {
-
+                    $object_call .= "(".$param->{ArgType}.") var_".$run.$c__;
+# int
+# short
+# double
+                } elsif (
+                    $param->{ArgType} =~ /int/
+                    || $param->{ArgType} =~ /short/
+                    || $param->{ArgType} =~ /double/
+                ) {
                     if(defined $param->{cast}){
-                        $object_call .= "(".$param->{cast}.") var_".$run.$c;
+                        $object_call .= "(".$param->{cast}.") var_".$run.$c__;
                     } else {
-                        $object_call .= "(".$param->{ArgType}.") var_".$run.$c;
+                        $object_call .= "(".$param->{ArgType}.") var_".$run.$c__;
                     }
-
+# bool
                 } elsif ( $param->{ArgType} =~ /bool/ ) {
-                    $object_call .= "(".$param->{ArgType}.") var_".$run.$c;
+                    $object_call .= "(".$param->{ArgType}.") var_".$run.$c__;
+# object
                 } else {
                     if($obj_first == 1){
                         $obj_first = 0;
                     } else {
                         $object_test .= " && ";
                     }
-                    $object_test .= "tmp_".$run.$tmp_count++." == \"".$param->{ArgType}."\"";
-
-                    $object_call .= "(".$param->{ArgType}.") ".$objects[$c_++];
+# temporarly
+                    my $objectname = $param->{ArgType};
+                    $objectname =~ s/[*&]//;
+                    $object_test .= "tmp_".$run.$tmp_count++." == \"".checkCast($objectname)."\"";
+                    $object_call .= "(".checkCast($param->{ArgType}).") ".$objects[$c_++];
 
                 }
-                $c++;
+                $c__++;
             } # foreach param
 
             if(!$obj_first){
@@ -1627,7 +1721,10 @@ sub marshal {
 
 # write zend_parse_parameters method
         $return .= "\t\tif(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,".$shortstring.$paratype.") == SUCCESS) {\n";
-        $return .= "\t\t\t".$classname." *obj = (".$classname."*) PHP_QT_FETCH();\n";
+# only if ctor
+        if(!($method->{ctor} eq "ctor")) {
+            $return .= "\t\t\t".$classname." *obj = (".$classname."*) PHP_QT_FETCH();\n";
+        }
 
 # objects as return type
         my $obj;
@@ -1660,20 +1757,6 @@ sub marshal {
         $return .= "\t\t}\n";
         $tmp_count=0;
 
-        # write code snippets
-        if( $method->{Flags} =~ /s/ ){
-            $access .= "|ZEND_ACC_STATIC";
-        }
-    
-#        print ZEND_PHP_QT "\nZEND_METHOD(",$classname,", ",$method->{methodname},");";
-        print AG_ZEND_PHP_QT "\nZEND_METHOD(",$classname,", ",$method->{methodname},");";
-    
-    # code snippets for php_qt.cpp here
-        $access = uc($access);
-        $access =~ s/_SLOTS//;
-        $access =~ s/_SIGNALS//;
-        print AG_PHP_QT_CPP "\tZEND_ME(",$classname,",",$method->{methodname},",NULL,ZEND_ACC_",$access,")\n";
-
     } # foreach args
 
     my $not_empty = %args;
@@ -1689,6 +1772,22 @@ sub createReturn {
     my ($classname, $method, $param_zend_function) = @_;
     my $return;
 
+# sometimes it goes wrong
+# it is more secure to re-check that
+    if($classname eq $method->{astNodeName} ) {
+        $method->AddProp("ctor","ctor");
+    }
+
+
+# constructor
+    if($method->{ctor} eq "ctor"){
+        $return .= "\t\t\t".$classname." *".$classname."_ptr = new ".$classname."(".$param_zend_function.");\n";
+        $return .= "\t\t\tPHP_QT_REGISTER(".$classname."_ptr);\n";
+# php class members here
+        $return .= "\t\t\tRETURN_NULL();\n";
+        return $return;
+    }
+
 # no arguments, no object created
     if($param_zend_function eq ""){
         $return .= "\t\t\t".$classname." *obj = (".$classname."*) PHP_QT_FETCH();\n";
@@ -1702,28 +1801,39 @@ sub createReturn {
     }
 
     my $returntype = $method->{ReturnType};
+
     my $zend_return_type = cplusplusToZEND($returntype);
 
 # handle return value here
 # if no return type specified
-        if ( $zend_return_type eq "NULL" ) {
+        if ( $zend_return_type eq "NULL" || !defined $zend_return_type) {
             $return .=  "\t\t\tobj->".$methodname."(".$param_zend_function.");\n";
             $return .=  "\t\t\tRETURN_NULL();\n";
-# if return type is an object
+# const char*
+        } elsif ( $zend_return_type =~ /char/ ){
+            $return .=  "\t\t\tRETURN_STRING((char*) obj->".$methodname."(".$param_zend_function."), 1);\n" if defined $zend_return_type;
+        } elsif ( $zend_return_type =~ /byte/ ) {
+            $return .= "\t\t// bytearray, skipped\n";
+            $return .= "\t\tRETURN_NULL();\n";
+#if return type is an object
         } elsif ( $zend_return_type =~ /zval/ ) {
-        # TODO: consider 'const',
-        # and non-pointer types, pointer types
-            $return .=  "\t\t\t".$returntype." return_object = (".$returntype.") obj->".$methodname."(".$param_zend_function.");\n";
+#        TODO: consider 'const',
+#        and non-pointer types, pointer types
+            $return .=  "\t\t\t".checkCast($returntype)." return_object = (".checkCast($returntype).") obj->".$methodname."(".$param_zend_function.");\n";
             $return .=  "\t\t\t\tzend_class_entry *ce;                                   \n";
             $return .=  "\t\t\t\tobject_init_ex(return_value, ".$classname."_ce_ptr);     \n";
             $return .=  "\t\t\t\tzend_rsrc_list_entry le;                            \n";
-            $return .=  "\t\t\t\tle.ptr = &return_object;                                       \n";
+            $return .=  "\t\t\t\tle.ptr = (void*) &return_object;                                       \n";
             $return .=  "\t\t\t\tphp_qt_register(return_value,le);                   \n";
             $return .=  "\t\t\t\treturn;                                             \n";
-# simple types
+#simple types
         } else {
             $return .=  "\t\t\tRETURN_".uc($zend_return_type)."(obj->".$methodname."(".$param_zend_function."));\n" if defined $zend_return_type;
         }
+
+    if(!defined $zend_return_type){
+        $return .= "";
+    }
 
     return $return;
 
@@ -1732,22 +1842,61 @@ sub createReturn {
 sub checkEnum(){
     my ($param) = @_;
 
-    if($param->{ArgType} =~ /Qt::/){
-
         my $ArgType = kalyptusDataDict::ctypemap($param->{ArgType});
 
+    if(!($param->{ArgType} =~ /qt_/)){
         if($ArgType eq ""){
             $ArgType = "int";
+            $ArgType = $param->{ArgType};
         }
 
-# copy the arg type for typecast
-        $param->AddProp("cast",$param->{ArgType});
         $param->{ArgType} = $ArgType;
-
     }
 
     return $param;
 }
+
+# check additional header files
+sub checkIncludes(){
+    my ($class) = @_;
+    my $return;
+
+    if($class->{astNodeName} eq "QFont") {
+        $return .= "#include <QStringList>\n";
+    }
+    if($class->{astNodeName} eq "QPainter") {
+        $return .= "#include <QPainterPath>\n";
+    }
+
+    return $return;
+
+}
+
+sub checkCast(){
+
+    my ($returntype) = @_;
+
+    if($returntype eq 'Style') {
+        $returntype = "QFont::Style";
+    }
+    if($returntype eq 'StyleHint') {
+        $returntype = "QFont::StyleHint";
+    }
+    if($returntype eq 'StyleStrategy') {
+        $returntype = "QFont::StyleStrategy";
+    }
+    if($returntype eq 'CompositionMode') {
+        $returntype = "QPainter::CompositionMode";
+    }
+    if($returntype eq 'RenderHint') {
+        $returntype = "QPainter::RenderHint";
+    }
+
+    $returntype =~ s/qt_//;
+
+    return $returntype;
+}
+
 
 1;
 
