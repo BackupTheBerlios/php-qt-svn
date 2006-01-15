@@ -44,8 +44,6 @@ extern zend_class_entry *QInputEvent_ce_ptr;
 void 	_register_QInputEvent();
 extern zend_class_entry *QInputMethodEvent_ce_ptr;
 void 	_register_QInputMethodEvent();
-extern zend_class_entry *Attribute_ce_ptr;
-void 	_register_Attribute();
 extern zend_class_entry *QKeyEvent_ce_ptr;
 void 	_register_QKeyEvent();
 extern zend_class_entry *QLabel_ce_ptr;

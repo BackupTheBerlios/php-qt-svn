@@ -21,7 +21,6 @@ zend_class_entry *QHoverEvent_ce_ptr;
 zend_class_entry *QIconDragEvent_ce_ptr;
 zend_class_entry *QInputEvent_ce_ptr;
 zend_class_entry *QInputMethodEvent_ce_ptr;
-zend_class_entry *Attribute_ce_ptr;
 zend_class_entry *QKeyEvent_ce_ptr;
 zend_class_entry *QLabel_ce_ptr;
 zend_class_entry *QLatin1Char_ce_ptr;

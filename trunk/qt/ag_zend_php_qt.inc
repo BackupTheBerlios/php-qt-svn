@@ -254,7 +254,6 @@ ZEND_METHOD(QInputMethodEvent, replacementStart);
 ZEND_METHOD(QInputMethodEvent, setCommitString);
 ZEND_METHOD(QInputMethodEvent, replacementLength);
 ZEND_METHOD(QInputMethodEvent, preeditString);
-ZEND_METHOD(Attribute, __construct);
 ZEND_METHOD(QKeyEvent, count);
 ZEND_METHOD(QKeyEvent, text);
 ZEND_METHOD(QKeyEvent, isAutoRepeat);

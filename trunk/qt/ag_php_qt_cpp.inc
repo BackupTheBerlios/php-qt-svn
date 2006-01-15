@@ -300,7 +300,7 @@ void _register_QDropEvent(TSRMLS_D)
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce,"QDropEvent",QDropEvent_methods);
     QDropEvent_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QEvent_ce_ptr,NULL TSRMLS_CC);
-//	zend_do_inheritance(QDropEvent_ce_ptr, QMimeSource_ce_ptr TSRMLS_CC);
+	zend_do_inheritance(QDropEvent_ce_ptr, QMimeSource_ce_ptr TSRMLS_CC);
 
 
 }
@@ -577,7 +577,7 @@ static zend_function_entry QLabel_methods[] = {
 	ZEND_ME(QLabel,qt_cast,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,metaObject,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,setScaledContents,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QLabel,event,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLabel,event,NULL,ZEND_ACC_PROTECTED)
 	ZEND_ME(QLabel,indent,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,qt_emit,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QLabel,pixmap,NULL,ZEND_ACC_PUBLIC)
