@@ -1,0 +1,5 @@
+
+- handling of optional method arguments
+- custom SLOTS/SIGNALS
+- cpp class members as php class members
+- virtual methods
