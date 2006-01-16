@@ -12,20 +12,23 @@ PHP-Qt requires PHP 5.1RC1 or greater and Qt4 header files.
 PHP5: You should have a the header files and the development scripts.
 Qt4: You should have the header files.
 
-Note: at this time it is only possible to compile it in a unix envireonment.
+Note: at this time it is only possible to compile it in a unix environment.
 
 Compiling and installation
 ==========================
 
-After unpacking or checking out from SVN copy the unpacked php_qt directory into the 
-php-5.1xxx/ext/ directory.
+You have a php-5.1.xxx build directory where you have compiled php. You also 
+have a copy of php_qt. After downloading or checking out from SVN copy the 
+unpacked php_qt directory into the php-5.1xxx/ext/ directory.
 
-We prefer to build PHP-Qt as module! In this example php is installed in /usr/local/
+We prefer to build PHP-Qt as module! In this example php is 
+installed in /usr/local/php511
 
 At first it is neccessary to check your environment for compiling. 
-To do that change into this directory and run phpize and configure:
+To do that change into the php-5.1xxx/ext/php_qt directory and run phpize 
+and configure:
 
-/usr/local/bin/phpize
+/usr/local/php511/bin/phpize
 
 ./configure --with-php_qt[=/usr/lib/qt4/include] 		\
   --with-qtlib=/usr/lib/qt4 							\
@@ -45,7 +48,8 @@ to build the extension. If the compilation is successful run
 
 make install
 
-to copy 'php_qt.so' into php's extension directory.
+to copy 'php_qt.so' into php's extension directory. If it fails please check 
+all related pathes on your system at first.
 
 To test it, simply run one of the test scripts in the php_qt/test/ subdirectory.
 
