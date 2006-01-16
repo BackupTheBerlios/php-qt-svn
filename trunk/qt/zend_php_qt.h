@@ -80,6 +80,7 @@ ZEND_METHOD(QObject,thread);
 
 /* QString */
 ZEND_METHOD(QString,__construct);
+ZEND_METHOD(QString,__toString);
 ZEND_METHOD(QString,append);
 ZEND_METHOD(QString,arg);
 ZEND_METHOD(QString,at);

@@ -50,6 +50,16 @@ ZEND_METHOD(QString,__construct){
 
 }
 
+ZEND_METHOD(QString,__toString){
+
+  QString *QString_ptr = (QString *) PHP_QT_FETCH();
+
+  int l = QString_ptr->size();
+  char* c = (char*) (QString_ptr->toAscii()).constData();
+  RETURN_STRING(c,l);
+
+}
+
 ZEND_METHOD(QString,append){
 
     const char *string; int *string_len;

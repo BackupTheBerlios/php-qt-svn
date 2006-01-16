@@ -1193,6 +1193,7 @@ void* php_qt_fetch(zval* this_ptr){
 
 static zend_function_entry QString_methods[] = { 
     ZEND_ME(QString,__construct,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(QString,__toString,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QString,append,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QString,arg,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(QString,at,NULL,ZEND_ACC_PUBLIC)

@@ -2,4 +2,4 @@
 - handling of optional method arguments
 - custom SLOTS/SIGNALS
 - virtual methods
-- UTF-8/UTF-16 support
+
