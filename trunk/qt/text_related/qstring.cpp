@@ -1250,7 +1250,9 @@ ZEND_METHOD(QString, toUtf8){
 	if (ZEND_NUM_ARGS() == 0){
 			QString *obj = (QString*) PHP_QT_FETCH();
 		// bytearray, skipped
-		RETURN_NULL();
+		int l = obj->size();
+		char* c = (char*) (obj->toAscii()).constData();
+		RETURN_STRING(c,l);
 	}
 }
 
@@ -2377,8 +2379,8 @@ ZEND_METHOD(QString, fromUtf8){
 
 		/* const char* , int size,  */
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"sl|", &var_sl_0, len_sl_0, &var_sl_1) == SUCCESS) {
-			QString *obj = (QString*) PHP_QT_FETCH();
 
+			QString *obj = (QString*) PHP_QT_FETCH();
 			
 			QString return_object = (QString) obj->fromUtf8( (const char*) var_sl_0 ,(int) var_sl_1);
 				zend_class_entry *ce;                                   
