@@ -30,6 +30,13 @@ using namespace std;
 #include <QChar>
 #include "../php_qt.h"
 
+ZEND_METHOD(QChar,__toString){
+
+  QChar *QChar_ptr = (QChar *) PHP_QT_FETCH();
+
+  long c = (const char) QChar_ptr->toAscii();
+  RETURN_LONG(c);
+}
 
 
 /*		public enumSpecialCharacter:long {
