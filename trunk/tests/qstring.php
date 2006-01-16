@@ -4,9 +4,45 @@
         dl('php_qt.' . PHP_SHLIB_SUFFIX);
     }
 
-	$QString = new QString("I'm a test!");
+/* String as parameter */
+	$QString_1 = new QString("I'm a test!");
 
-	echo $QString;
+/* ASCII as parameter */
+	$QString_2 = new QString(40);
+	$QString_3 = new QString(41);
 
+/* this works: */
+	echo $QString_2;
+	echo $QString_1;
+	echo $QString_3;
+    echo "\n";
+
+/* this does not works */
+	echo $QString_2." ".$QString_1." ".$QString_3;
+    echo "\n";
+
+/* this does not works */
+	$tmp = $QString_2." ".$QString_1." ".$QString_3;
+	print($tmp);
+
+    echo "\n";
+
+/* this does not works */
+	$tmp2 = $QString_2;
+	$tmp2 = $QString_1;
+	$tmp2 = $QString_3;
+	echo $tmp;
+    echo "\n";
+
+/* this does not works */
+	echo "$QString_2 $QString_1 $QString_3";
+    echo "\n";
+
+/* this works: */
+	$var1 = $QString_1->__toString();
+	$var2 = $QString_2->__toString();
+	$var3 = $QString_3->__toString();
+	print $var2." ".$var1." ".$var3;
+    echo "\n";
 
 ?>

@@ -1,6 +1,7 @@
 
 ZEND_METHOD(QActionEvent, action);
 ZEND_METHOD(QActionEvent, before);
+ZEND_METHOD(QChar, __toString);
 ZEND_METHOD(QChar, combiningClass);
 ZEND_METHOD(QChar, isUpper);
 ZEND_METHOD(QChar, joining);

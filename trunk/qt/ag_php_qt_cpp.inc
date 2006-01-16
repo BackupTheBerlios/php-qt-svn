@@ -14,6 +14,7 @@ void _register_QActionEvent(TSRMLS_D)
 
 }
 static zend_function_entry QChar_methods[] = {
+	ZEND_ME(QChar, __toString,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QChar,combiningClass,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QChar,isUpper,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QChar,joining,NULL,ZEND_ACC_PUBLIC)

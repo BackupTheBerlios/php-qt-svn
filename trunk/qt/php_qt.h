@@ -382,6 +382,11 @@ extern zend_class_entry *QFrame_ce_ptr;
 extern zend_class_entry *QLCDNumber_ce_ptr;
 extern zend_class_entry *QMimeSource_ce_ptr;
 
+extern zend_class_entry *QCharRef_ce_ptr;
+void    _register_QCharRef();
+extern zend_class_entry *QLatin1String_ce_ptr;
+void    _register_QLatin1String();
+
 #include "ag_extern_zend_class_entry.inc"
 
 
