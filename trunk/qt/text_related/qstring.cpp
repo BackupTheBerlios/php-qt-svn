@@ -2036,9 +2036,9 @@ ZEND_METHOD(QString, setUnicode){
 			QString *obj = (QString*) PHP_QT_FETCH();
 			QObject* var_ol_0 = (QObject*) php_qt_fetch(z_var_ol_0);
 
-			QString tmp_ol_0(var_ol_0->metaObject()->className());
+//			QString tmp_ol_0(var_ol_0->metaObject()->className());
 			
-			if(tmp_ol_0 == "const QChar") {
+//			if(tmp_ol_0 == "QChar") {
 				QString & return_object = (QString &) obj->setUnicode((const QChar*) var_ol_0, (int) var_ol_1);
 				zend_class_entry *ce;                                   
 				object_init_ex(return_value, QString_ce_ptr);     
@@ -2046,7 +2046,7 @@ ZEND_METHOD(QString, setUnicode){
 				le.ptr = (void*) &return_object;                                       
 				php_qt_register(return_value,le);                   
 				return;                                             
-			}
+//			}
 		}
 	}
 }
