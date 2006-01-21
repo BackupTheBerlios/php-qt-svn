@@ -35,6 +35,10 @@
 
 //QOUT();
 
+#include <iostream>
+using namespace std;
+
+
 //static int objects_handle;
 
 /* If you declare any globals in php_php_qt.h uncomment this:
@@ -43,6 +47,9 @@ ZEND_DECLARE_MODULE_GLOBALS(php_qt)
 
 /* True global resources - no need for thread safety here */
 static int le_php_qt;
+
+int le_php_qt_hashtype;
+HashTable php_qt_objptr_hash;
 
 zend_class_entry *QWidget_ce_ptr; //Gyger Jean-Luc change to non static
 zend_class_entry *QString_ce_ptr;
@@ -1052,9 +1059,12 @@ PHP_MINIT_FUNCTION(php_qt)
 	  REGISTER_LONG_CONSTANT("QT_WINDOWMODALITY_APPLICATIONMODAL", Qt::ApplicationModal, CONST_CS | CONST_PERSISTENT);
 */
 
-//    objects_handle = zend_register_list_destructors_ex(NULL,NULL,"Qt Wrapper",module_number);
-
 #include "ag_qt_minit.inc"
+
+	le_php_qt_hashtype = zend_register_list_destructors_ex(destroy_php_qt_hashtable, NULL, "PHP-Qt object list", module_number);
+
+	zend_hash_init_ex(&php_qt_objptr_hash, 50, NULL, NULL, 1, 0);
+
 
 	return SUCCESS;
 }
@@ -1076,6 +1086,8 @@ PHP_MSHUTDOWN_FUNCTION(php_qt)
  */
 PHP_RINIT_FUNCTION(php_qt)
 {
+
+
 	return SUCCESS;
 }
 /* }}} */
@@ -1085,6 +1097,7 @@ PHP_RINIT_FUNCTION(php_qt)
  */
 PHP_RSHUTDOWN_FUNCTION(php_qt)
 {
+	zend_hash_destroy(&php_qt_objptr_hash);
 	return SUCCESS;
 }
 /* }}} */
@@ -1173,30 +1186,56 @@ PHP_FUNCTION(SLOT)
 /* {{{ */
 
 void php_qt_register(zval* this_ptr, zend_rsrc_list_entry le){
+	php_qt_setObject(this_ptr, le.ptr);
+}
 
-    if(PHP_QT_REGISTER_OBJECT(le) == FAILURE){
-        php_error(E_ERROR,"PHP_QT: %s(): could not register qobject in hashtable.",get_active_function_name(TSRMLS_C));
-        return;
-    }
+void php_qt_setObject(zval* this_ptr, void* obj){
+
+	zval *listhandle;
+	MAKE_STD_ZVAL(listhandle);
+	Z_TYPE_P(listhandle) = IS_LONG;
+	Z_LVAL_P(listhandle) = zend_list_insert(obj, le_php_qt_hashtype);
+
+	if(zend_hash_index_update(Z_OBJPROP_P(this_ptr), 0, &listhandle, sizeof(zval*), NULL) == FAILURE){
+		php_error(E_ERROR,"could not bind resource to object.");
+	}
+	zval_add_ref(&this_ptr);
+
+	if(zend_hash_index_update(&php_qt_objptr_hash, (long) obj, (void*) &this_ptr, sizeof(zval *), NULL) == FAILURE){
+		php_error(E_ERROR,"could not register Qt object in resource table.");
+	}
 
 }
 
 void* php_qt_fetch(zval* this_ptr){
 
-    zend_rsrc_list_entry* le;  
+	void *ptr;
+	zval **listhandle;
+	int type;
+	TSRMLS_FETCH();
 
-    if(!zend_hash_exists(HASH_OF(this_ptr),PHP_QT_HASH_QOBJECT,strlen(PHP_QT_HASH_QOBJECT))){
-        php_error(E_ERROR,"PHP_QT: %s(): hash not found.",get_active_function_name(TSRMLS_C));
-    }
+	if(zend_hash_index_find(Z_OBJPROP_P(this_ptr), 0, (void**) &listhandle) == FAILURE){
+	  php_error(E_WARNING,"reference to Qt object missing.");
+	}
+	ptr = zend_list_find(Z_LVAL_PP(listhandle), &type);
+	if(!ptr){
+		php_error(E_ERROR,"reference to Qt object missing.");
+	} 
+	if(type != le_php_qt_hashtype){
+		php_error(E_ERROR,"wrong type.");
+	}
 
-    if(PHP_QT_FETCH_OBJECT(le) == FAILURE){
-        php_error(E_ERROR,"PHP_QT: %s(): could not fetch qobject from hashtable.",get_active_function_name(TSRMLS_C));
-        return NULL;
-    }
-
-    return le->ptr;
+	return ptr;
 
 }
+
+static void destroy_php_qt_hashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
+{
+#ifdef DEBUG
+	php_error(E_ERROR,"Hashtable destroyed. Shutdown PHP-Qt now.");
+#endif
+}
+
 
 ///
 

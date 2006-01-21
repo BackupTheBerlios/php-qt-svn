@@ -22,8 +22,6 @@
 
 /* define macros */
 #define debug
-#define object_hash_list
-
 
 #include <QTextStream>
 #define QOUT()                                              \
@@ -33,22 +31,9 @@
 #define NOT_YET_IMPLEMENTED { php_printf("%s(): functionality not yet implemented\n",get_active_function_name(TSRMLS_C));} 
 #endif
 
-//#define PHP_QT_REGISTER_OBJECT(list_entry)  zend_hash_update(HASH_OF(this_ptr),(char*)getThis(),strlen((char*)getThis()),(void*)&list_entry,sizeof(list_entry.ptr),NULL)
-//#define PHP_QT_FETCH_OBJECT(list_entry)     zend_hash_find(HASH_OF(this_ptr),h_name,strlen(h_name),(void**)&list_entry)
-
-#ifdef object_hash_list
 #define PHP_QT_HASH_QOBJECT  "qobject_list"
 #define PHP_QT_REGISTER_OBJECT(list_entry)  zend_hash_update(HASH_OF(this_ptr),PHP_QT_HASH_QOBJECT,strlen(PHP_QT_HASH_QOBJECT),(void*)&list_entry,sizeof(QObject),NULL)
 #define PHP_QT_FETCH_OBJECT(list_entry)     zend_hash_find(HASH_OF(this_ptr),PHP_QT_HASH_QOBJECT,strlen(PHP_QT_HASH_QOBJECT),(void**)&list_entry)
-#endif
-
-#ifndef object_hash_list
-#define PHP_QT_HASH_QOBJECT  "qobject_list"
-//		zend_hash_apply_with_argument(&EG(regular_list), (apply_func_arg_t) clean_module_resource, (void *) &(ld->resource_id) TSRMLS_CC);
-//#define PHP_QT_REGISTER_OBJECT(list_entry)  zend_hash_update(&EG(persistent_list),PHP_QT_HASH_QOBJECT,strlen(PHP_QT_HASH_QOBJECT),(void*)&list_entry,sizeof(QObject),NULL)
-#define PHP_QT_REGISTER_OBJECT(list_entry)  zend_hash_add(&EG(persistent_list),PHP_QT_HASH_QOBJECT,strlen(PHP_QT_HASH_QOBJECT),(void*)&list_entry,sizeof(QObject),NULL)
-#define PHP_QT_FETCH_OBJECT(list_entry)     zend_hash_find(&EG(persistent_list),PHP_QT_HASH_QOBJECT,strlen(PHP_QT_HASH_QOBJECT),(void**)&list_entry)
-#endif
 
 #define PHP_QT_DECLARE_PROPERTY(property)           \
     zend_declare_property_null(QObject_ce_ptr,property,strlen(property),ZEND_ACC_PROTECTED TSRMLS_CC);
@@ -339,6 +324,11 @@ ZEND_METHOD(classname,function){                                                
 
 void* php_qt_fetch(zval* this_ptr);
 void php_qt_register(zval* this_ptr, zend_rsrc_list_entry le);
+void php_qt_setObject(zval* this_ptr, void* obj);
+static void destroy_php_qt_hashtable(zend_rsrc_list_entry *rsrc);
+
+extern int le_php_qt_hashtype;
+extern HashTable php_qt_objptr_hash;
 
 void _register_QString();
 void _register_QLatin1String();
