@@ -75,7 +75,7 @@ if test "$PHP_PHP_QT" != "no"; then
   PHP_ADD_INCLUDE($PHP_QT_DIR/include)
 
   dnl from qmake
-  LDFLAGS="$LDFLAGS -lQtGui -laudio -lXt -lpng -lSM -lICE -lXi -lXrender -lXrandr -lXcursor -lXinerama -lfreetype -lXext -lX11 -lm -lQtCore -lfontconfig -lz -ldl -lpthread"
+  LDFLAGS="$LDFLAGS -lQtGui -lXt -lpng -lSM -lICE -lXi -lXrender -lXrandr -lXcursor -lXinerama -lfreetype -lXext -lX11 -lm -lQtCore -lfontconfig -lz -ldl -lpthread"
 
   PHP_REQUIRE_CXX
 
