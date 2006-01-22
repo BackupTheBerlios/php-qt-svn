@@ -289,6 +289,10 @@ ZEND_METHOD(QPushButton, __construct){
 				PHP_QT_REGISTER(QPushButton_ptr);
 				RETURN_NULL();
 			}
+			} else if(Z_TYPE_P(z_0) == IS_STRING) {
+				QPushButton *QPushButton_ptr = new QPushButton((const char*) Z_STRVAL_P(z_0));
+				PHP_QT_REGISTER(QPushButton_ptr);
+				RETURN_NULL();
 			}
 		}
 	}
@@ -304,12 +308,20 @@ ZEND_METHOD(QPushButton, __construct){
 			QObject* obj_z_0 = (QObject*) php_qt_fetch(z_0);
 			QObject* obj_z_1 = (QObject*) php_qt_fetch(z_1);
 
-
-			if(Z_OBJCE_P(z_0)->name == "QString" && obj_z_1->inherits("QWidget")) {
+			if(!(strcmp(Z_OBJCE_P(z_0)->name,"QString")) && obj_z_1->inherits("QWidget")) {
 				QPushButton *QPushButton_ptr = new QPushButton((const QString&) obj_z_0, (QWidget*) obj_z_1);
 				PHP_QT_REGISTER(QPushButton_ptr);
 				RETURN_NULL();
-			}
+			} 
+			} else if(Z_TYPE_P(z_0) == IS_STRING && Z_TYPE_P(z_1) == IS_OBJECT){
+
+			  QObject* obj_z_1 = (QObject*) php_qt_fetch(z_1);
+
+			if(obj_z_1->inherits("QWidget")) {
+				QPushButton *QPushButton_ptr = new QPushButton((const char*) Z_STRVAL_P(z_0), (QWidget*) obj_z_1);
+				PHP_QT_REGISTER(QPushButton_ptr);
+				RETURN_NULL();
+			} 
 			}
 		}
 	}
