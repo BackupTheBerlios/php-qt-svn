@@ -86,14 +86,11 @@ if test "$PHP_PHP_QT" != "no"; then
   PHP_NEW_EXTENSION(php_qt, \
   qt/main_window/qapplication.cpp \
   qt/main_window/qcoreapplication.cpp \
-  qt/abstract_widgets/qabstractbutton.cpp \
   qt/abstract_widgets/qwidget.cpp \
   qt/abstract_widgets/qabstractslider.cpp \
   qt/abstract_widgets/QFrame.cpp \
   qt/basic_widgets/qlineedit.cpp \
-  qt/basic_widgets/qpushbutton.cpp \
   qt/basic_widgets/qslider.cpp \
-  qt/basic_widgets/QLCDNumber.cpp \
   qt/layout_management/qlayoutitem.cpp \
   qt/layout_management/qlayout.cpp \
   qt/layout_management/qboxlayout.cpp \
@@ -105,6 +102,7 @@ if test "$PHP_PHP_QT" != "no"; then
   qt/classes/qchar.cpp \
   qt/event/qevent.cpp \
 	qt/classes/qactionevent.cpp \
+	qt/classes/qabstractbutton.cpp \
 	qt/classes/qcharref.cpp \
 	qt/classes/qclipboardevent.cpp \
 	qt/classes/qcloseevent.cpp \
@@ -129,12 +127,14 @@ if test "$PHP_PHP_QT" != "no"; then
 	qt/classes/qkeyevent.cpp \
 	qt/classes/qlabel.cpp \
 	qt/classes/qlatin1char.cpp \
+	qt/classes/qlcdnumber.cpp \
 	qt/classes/qmouseevent.cpp \
 	qt/classes/qmoveevent.cpp \
 	qt/classes/qobjectdata.cpp \
 	qt/classes/qobjectuserdata.cpp \
 	qt/classes/qpaintevent.cpp \
-	qt/classes/qpainter.cpp \ 
+	qt/classes/qpainter.cpp \
+	qt/classes/qpushbutton.cpp \
 	qt/classes/qresizeevent.cpp \
 	qt/classes/qshortcutevent.cpp \
 	qt/classes/qshowevent.cpp \
