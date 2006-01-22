@@ -316,30 +316,6 @@ ZEND_METHOD(QApplication,type);
 ZEND_METHOD(QApplication,widgetAt); //WARNING 2 imlementation,
 ZEND_METHOD(QApplication,windowIcon); 
 
-/* QAbstractButton */
-ZEND_METHOD(QAbstractButton,__construct);
-ZEND_METHOD(QAbstractButton,autoExclusive);
-ZEND_METHOD(QAbstractButton,autoRepeat);
-ZEND_METHOD(QAbstractButton,isCheckable);
-ZEND_METHOD(QAbstractButton,isChecked);
-ZEND_METHOD(QAbstractButton,isDown);
-ZEND_METHOD(QAbstractButton,setAutoExclusive);
-ZEND_METHOD(QAbstractButton,setAutoRepeat);
-ZEND_METHOD(QAbstractButton,setCheckable);
-ZEND_METHOD(QAbstractButton,paintEvent);
-
-/* QPushButton */
-ZEND_METHOD(QPushButton,__construct);
-ZEND_METHOD(QPushButton,autoDefault);
-ZEND_METHOD(QPushButton,isDefault);
-ZEND_METHOD(QPushButton,isFlat);
-ZEND_METHOD(QPushButton,menu);
-ZEND_METHOD(QPushButton,setAutoDefault);
-ZEND_METHOD(QPushButton,setDefault);
-ZEND_METHOD(QPushButton,setFlat);
-ZEND_METHOD(QPushButton,setMenu);
-ZEND_METHOD(QPushButton,paintEvent);
-
 /* QWidget */
 ZEND_METHOD(QWidget,__construct);
 ZEND_METHOD(QWidget,show);

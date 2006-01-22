@@ -36,7 +36,9 @@ ZEND_METHOD(QString,__toString){
   QString *QString_ptr = (QString *) PHP_QT_FETCH();
 
   int l = QString_ptr->size();
-  char* c = (char*) (QString_ptr->toAscii()).constData();
+
+  char* c = (char*) (QString_ptr->toUtf8()).constData();
+
   RETURN_STRING(c,l);
 }
 
@@ -2013,10 +2015,15 @@ ZEND_METHOD(QString, fromUtf8){
 		zval *z_1; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_STRING && Z_TYPE_P(z_1) == IS_LONG){
-			QString *obj = (QString*) PHP_QT_FETCH();
 
-
-				QString return_object = (QString) obj->fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
+	QString return_object;			
+    if(getThis() != NULL){
+        QString *obj = (QString*) PHP_QT_FETCH();
+        return_object = (QString) obj->fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
+    }else {
+        return_object = (QString) QString::fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
+    }
+				
 				zend_class_entry *ce;                                   
 				object_init_ex(return_value, QString_ce_ptr);     
 				zend_rsrc_list_entry le;                            

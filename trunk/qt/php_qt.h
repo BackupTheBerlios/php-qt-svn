@@ -330,14 +330,10 @@ static void destroy_php_qt_hashtable(zend_rsrc_list_entry *rsrc);
 extern int le_php_qt_hashtype;
 extern HashTable php_qt_objptr_hash;
 
-void _register_QString();
-void _register_QLatin1String();
 void _register_QObject();
 void _register_QApplication();
 void _register_QCoreApplication();
 void _register_QWidget();
-void _register_QAbstractButton();
-void _register_QPushButton();
 void _register_QEvent();
 void _register_QLayoutItem();
 void _register_QLayout();
@@ -348,13 +344,8 @@ void _register_QAbstractSlider();
 void _register_QSlider();
 void _register_QLineEdit();
 void _register_QFrame();
-void _register_QLCDNumber();
 
-extern zend_class_entry *QString_ce_ptr;
 extern zend_class_entry *QObject_ce_ptr;
-extern zend_class_entry *QLatin1String_ce_ptr;
-extern zend_class_entry *QPushButton_ce_ptr;
-extern zend_class_entry *QAbstractButton_ce_ptr;
 extern zend_class_entry *QApplication_ce_ptr;
 extern zend_class_entry *QWidget_ce_ptr;
 extern zend_class_entry *QCoreApplication_ce_ptr;
@@ -369,7 +360,6 @@ extern zend_class_entry *QAbstractSlider_ce_ptr;
 extern zend_class_entry *QSlider_ce_ptr;
 extern zend_class_entry *QLineEdit_ce_ptr;
 extern zend_class_entry *QFrame_ce_ptr;
-extern zend_class_entry *QLCDNumber_ce_ptr;
 extern zend_class_entry *QMimeSource_ce_ptr;
 
 extern zend_class_entry *QCharRef_ce_ptr;

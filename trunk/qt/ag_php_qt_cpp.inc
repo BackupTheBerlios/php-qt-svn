@@ -1,3 +1,48 @@
+static zend_function_entry QAbstractButton_methods[] = {
+	ZEND_ME(QAbstractButton,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QAbstractButton,setAutoRepeat,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,isDown,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,qt_invoke,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,setAutoExclusive,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,setIconSize,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,qt_cast,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,metaObject,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,setIcon,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,qt_emit,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,autoExclusive,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,className,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,toggle,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,setCheckable,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,setDown,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,shortcut,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,icon,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,setChecked,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,setShortcut,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,animateClick,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,staticMetaObject,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QAbstractButton,autoRepeat,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,qObject,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,group,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,setText,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,text,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,isChecked,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,iconSize,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,isCheckable,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,click,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,qt_property,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QAbstractButton,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QAbstractButton(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QAbstractButton",QAbstractButton_methods);
+    QAbstractButton_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QWidget_ce_ptr,NULL TSRMLS_CC);
+
+
+}
 static zend_function_entry QActionEvent_methods[] = {
 	ZEND_ME(QActionEvent,action,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QActionEvent,before,NULL,ZEND_ACC_PUBLIC)
@@ -14,7 +59,6 @@ void _register_QActionEvent(TSRMLS_D)
 
 }
 static zend_function_entry QChar_methods[] = {
-	ZEND_ME(QChar, __toString,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QChar,combiningClass,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QChar,isUpper,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QChar,joining,NULL,ZEND_ACC_PUBLIC)
@@ -567,6 +611,47 @@ void _register_QKeyEvent(TSRMLS_D)
 
 
 }
+static zend_function_entry QLCDNumber_methods[] = {
+	ZEND_ME(QLCDNumber,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QLCDNumber,segmentStyle,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,mode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,checkOverflow,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,qt_invoke,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,staticMetaObject,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QLCDNumber,setOctMode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,display,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,setSegmentStyle,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,setHexMode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,qObject,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,setSmallDecimalPoint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,sizeHint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,qt_cast,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,metaObject,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,value,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,setDecMode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,qt_emit,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,className,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,intValue,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber, __construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,setNumDigits,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,numDigits,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,setMode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QLCDNumber,qt_property,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,smallDecimalPoint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLCDNumber,setBinMode,NULL,ZEND_ACC_PUBLIC)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QLCDNumber(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QLCDNumber",QLCDNumber_methods);
+    QLCDNumber_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QFrame_ce_ptr,NULL TSRMLS_CC);
+
+
+}
 static zend_function_entry QLabel_methods[] = {
 	ZEND_ME(QLabel,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QLabel,setMargin,NULL,ZEND_ACC_PUBLIC)
@@ -632,6 +717,20 @@ void _register_QLatin1Char(TSRMLS_D)
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce,"QLatin1Char",QLatin1Char_methods);
     QLatin1Char_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
+
+}
+static zend_function_entry QLatin1String_methods[] = {
+	ZEND_ME(QLatin1String, __construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QLatin1String,latin1,NULL,ZEND_ACC_PUBLIC)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QLatin1String(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QLatin1String",QLatin1String_methods);
+    QLatin1String_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
 
 }
 static zend_function_entry QMouseEvent_methods[] = {
@@ -802,6 +901,40 @@ void _register_QPainter(TSRMLS_D)
     QPainter_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
 
 }
+static zend_function_entry QPushButton_methods[] = {
+	ZEND_ME(QPushButton,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QPushButton,showMenu,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,setFlat,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,qt_invoke,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,staticMetaObject,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QPushButton,qObject,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,isDefault,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,setAutoDefault,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,sizeHint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,qt_cast,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,metaObject,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,menu,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,setDefault,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,qt_emit,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton, __construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,className,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,autoDefault,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QPushButton,isFlat,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,qt_property,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QPushButton,setMenu,NULL,ZEND_ACC_PUBLIC)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QPushButton(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QPushButton",QPushButton_methods);
+    QPushButton_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QAbstractButton_ce_ptr,NULL TSRMLS_CC);
+
+
+}
 static zend_function_entry QResizeEvent_methods[] = {
 	ZEND_ME(QResizeEvent,oldSize,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QResizeEvent,size,NULL,ZEND_ACC_PUBLIC)
@@ -858,6 +991,97 @@ void _register_QStatusTipEvent(TSRMLS_D)
     INIT_CLASS_ENTRY(ce,"QStatusTipEvent",QStatusTipEvent_methods);
     QStatusTipEvent_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QEvent_ce_ptr,NULL TSRMLS_CC);
 
+
+}
+static zend_function_entry QString_methods[] = {
+	ZEND_ME(QString,compare,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,utf16,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,constData,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,insert,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,clear,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,setUtf16,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,prepend,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,trimmed,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,chop,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,leftJustified,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,squeeze,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,count,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromAscii,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,toLongLong,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toUpper,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString, __construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,normalized,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromUtf16,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,isRightToLeft,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,setNum,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,endsWith,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,number,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,localeAwareCompare,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,section,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,isSimpleText,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,size,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,simplified,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toUInt,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toUShort,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,truncate,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toAscii,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,length,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,right,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,push_front,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toUtf8,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toULongLong,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,indexOf,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromRawData,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,constEnd,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,left,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromLocal8Bit,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,startsWith,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,remove,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,isEmpty,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,arg,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,vsprintf,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toFloat,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,isDetached,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,reserve,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toULong,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toShort,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,split,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,setUnicode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromLatin1,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,data,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toLatin1,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,end,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,contains,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,resize,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,replace,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,toLong,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,detach,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,append,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,mid,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toDouble,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fill,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,rightJustified,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toLower,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,lastIndexOf,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,unicode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,at,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,begin,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,push_back,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,capacity,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,constBegin,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toLocal8Bit,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toInt,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,isNull,NULL,ZEND_ACC_PUBLIC)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QString(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QString",QString_methods);
+    QString_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
 
 }
 static zend_function_entry QTabletEvent_methods[] = {
