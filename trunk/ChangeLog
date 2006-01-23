@@ -5,7 +5,7 @@
 		* multiple inheritance added
 		* method overloading added
 		* tutorials (1-6) added
-		* UTF-8/UTF-16 support
+		* UTF-8/UTF-16 support prepared
 		* objects are stored in a way that ensures safety
 
 2005-11-06  Thomas Moenicke  <tm@ippfp.org> (v.0.0.1)
