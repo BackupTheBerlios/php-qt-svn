@@ -483,6 +483,7 @@ ZEND_METHOD(QShortcutEvent, shortcutId);
 ZEND_METHOD(QShortcutEvent, isAmbiguous);
 ZEND_METHOD(QShortcutEvent, key);
 ZEND_METHOD(QStatusTipEvent, tip);
+ZEND_METHOD(QString, __toString);
 ZEND_METHOD(QString, compare);
 ZEND_METHOD(QString, utf16);
 ZEND_METHOD(QString, constData);

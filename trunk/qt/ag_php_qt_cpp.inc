@@ -994,6 +994,7 @@ void _register_QStatusTipEvent(TSRMLS_D)
 
 }
 static zend_function_entry QString_methods[] = {
+	ZEND_ME(QString,__toString,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QString,compare,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QString,utf16,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QString,constData,NULL,ZEND_ACC_PUBLIC)
