@@ -1,19 +1,48 @@
 <?php
 
+	/* unicode test from Ferenc Verec */
+
     if(!extension_loaded('php_qt')) {
         dl('php_qt.' . PHP_SHLIB_SUFFIX);
     }
 
-	$QString = new QString("hello");
+	class TestButtons extends QWidget
+	{
+		public $layout;
+		public $buttons;
 
-	echo $QString->toUTF8();
+		public function __construct() 
+		{
+			parent::__construct();
+			
+			$this->layout = new QVBoxLayout($this);
 
-	echo $QString;
+			// Load the test xml
+			$unicodeXml = new DOMDocument();
+			$unicodeXml->load("unicode.xml");
+			$xpath = new DOMXPath($unicodeXml);
+			$dataNodes = $xpath->query("/test/data");
 
-	$QString->setUnicode(new QChar(65), 1);
+			// Loop on all data node and create buttons
+			foreach($dataNodes as $data)
+			{
+				$this->buttons[] = new QLineEdit(QString::fromUtf8($data->nodeValue, -1),$this);
+				$this->layout->addWidget($this->buttons[count($this->buttons)-1]);
+			}
 
-	echo $QString;
+			$this->buttons[] = new QLineEdit("Test",$this);
+			$this->layout->addWidget($this->buttons[count($this->buttons)-1]);
 
-	echo "\n";
+			$this->buttons[] = new QLineEdit(("second Test"),$this);
+			$this->layout->addWidget($this->buttons[count($this->buttons)-1]);
+
+		}
+
+	}
+
+    $app = new QApplication();
+	$widget = new TestButtons();
+	$widget->show();
+	$app->exec();
 
 ?>

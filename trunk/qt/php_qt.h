@@ -24,6 +24,7 @@
 #define debug
 
 #include <QTextStream>
+#include <QVariant>
 #define QOUT()                                              \
     extern QTextStream qout(stdout, QIODevice::WriteOnly);  \
 

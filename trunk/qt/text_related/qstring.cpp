@@ -553,8 +553,8 @@ ZEND_METHOD(QString, __construct){
 			}
 			if(Z_TYPE_P(z_0) == IS_STRING){
 
-
 			QString *QString_ptr = new QString( (const char*) Z_STRVAL_P(z_0));
+
 				PHP_QT_REGISTER(QString_ptr);
 				RETURN_NULL();
 			}
@@ -2016,20 +2016,23 @@ ZEND_METHOD(QString, fromUtf8){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_STRING && Z_TYPE_P(z_1) == IS_LONG){
 
-	QString return_object;			
-    if(getThis() != NULL){
-        QString *obj = (QString*) PHP_QT_FETCH();
-        return_object = (QString) obj->fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
-    }else {
-        return_object = (QString) QString::fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
-    }
-				
-				zend_class_entry *ce;                                   
-				object_init_ex(return_value, QString_ce_ptr);     
-				zend_rsrc_list_entry le;                            
-				le.ptr = (void*) &return_object;                                       
-				php_qt_register(return_value,le);                   
-				return;                                             
+// wichtig: Speicher auf dem Heap alloziieren
+			  QString *return_object = new QString;
+  			  if(getThis() != NULL){
+		        QString *obj = (QString*) PHP_QT_FETCH();
+// hier einfach überschreiben
+      			*return_object = (QString) obj->fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
+// static
+		      } else {
+		        *return_object = (QString) QString::fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
+
+		      }		
+			  zend_class_entry *ce;                                   
+			  object_init_ex(return_value, QString_ce_ptr);
+			  zend_rsrc_list_entry le;                            
+			  le.ptr = return_object;
+			  php_qt_register(return_value,le);
+			  return;
 			}
 		}
 	}
