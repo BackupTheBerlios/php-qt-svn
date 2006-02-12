@@ -149,7 +149,7 @@ if test "$PHP_PHP_QT" != "no"; then
 	qt/classes/qwidgetdata.cpp \
 	qt/classes/qwidgetitem.cpp \
 	qt/classes/qwindowstatechangeevent.cpp \
-  qt/php_qt.cpp,$ext_shared)
+  qt/php_qt.cpp,$ext_shared,cli)
   PHP_ADD_BUILD_DIR($ext_builddir/qt)
 
 fi
