@@ -1196,7 +1196,7 @@ void* php_qt_fetch(zval* this_ptr){
 	TSRMLS_FETCH();
 
 	if(zend_hash_index_find(Z_OBJPROP_P(this_ptr), 0, (void**) &listhandle) == FAILURE){
-	  php_error(E_WARNING,"reference to Qt object missing.");
+	  php_error(E_ERROR,"Object not found in list.");
 	}
 	ptr = zend_list_find(Z_LVAL_PP(listhandle), &type);
 
