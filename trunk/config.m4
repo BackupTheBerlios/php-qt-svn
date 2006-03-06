@@ -84,26 +84,27 @@ if test "$PHP_PHP_QT" != "no"; then
   PHP_ADD_INCLUDE($PHP_QT_DIR)
 
   PHP_NEW_EXTENSION(php_qt, \
-  qt/main_window/qapplication.cpp \
-  qt/main_window/qcoreapplication.cpp \
-  qt/abstract_widgets/qwidget.cpp \
-  qt/abstract_widgets/qabstractslider.cpp \
-  qt/abstract_widgets/QFrame.cpp \
-  qt/basic_widgets/qlineedit.cpp \
-  qt/basic_widgets/qslider.cpp \
-  qt/layout_management/qlayoutitem.cpp \
-  qt/layout_management/qlayout.cpp \
-  qt/layout_management/qboxlayout.cpp \
-  qt/layout_management/qhboxlayout.cpp \
-  qt/layout_management/qvboxlayout.cpp \
+  qt/classes/qapplication.cpp \
+  qt/classes/qcoreapplication.cpp \
+  qt/classes/qwidget.cpp \
+  qt/classes/qabstractslider.cpp \
+  qt/classes/qframe.cpp \
+  qt/classes/qlineedit.cpp \
+  qt/classes/qslider.cpp \
+  qt/classes/qlayoutitem.cpp \
+  qt/classes/qlayout.cpp \
+  qt/classes/qboxlayout.cpp \
+  qt/classes/qhboxlayout.cpp \
+  qt/classes/qvboxlayout.cpp \
   qt/object_model/qobject.cpp \
   qt/text_related/qstring.cpp \
-  qt/text_related/qlatin1string.cpp \
+  qt/classes/qlatin1string.cpp \
   qt/classes/qchar.cpp \
   qt/event/qevent.cpp \
 	qt/classes/qactionevent.cpp \
 	qt/classes/qabstractbutton.cpp \
 	qt/classes/qcharref.cpp \
+	qt/classes/qchildevent.cpp \
 	qt/classes/qclipboardevent.cpp \
 	qt/classes/qcloseevent.cpp \
 	qt/classes/qcontextmenuevent.cpp \
@@ -132,6 +133,7 @@ if test "$PHP_PHP_QT" != "no"; then
 	qt/classes/qmoveevent.cpp \
 	qt/classes/qobjectdata.cpp \
 	qt/classes/qobjectuserdata.cpp \
+	qt/classes/qpaintdevice.cpp \
 	qt/classes/qpaintevent.cpp \
 	qt/classes/qpainter.cpp \
 	qt/classes/qpushbutton.cpp \
@@ -143,6 +145,7 @@ if test "$PHP_PHP_QT" != "no"; then
 	qt/classes/qtabletevent.cpp \
 	qt/classes/qtime.cpp \
 	qt/classes/qtimer.cpp \
+	qt/classes/qtimerevent.cpp \
 	qt/classes/qtoolbarchangeevent.cpp \
 	qt/classes/qwhatsthisclickedevent.cpp \
 	qt/classes/qwheelevent.cpp \
