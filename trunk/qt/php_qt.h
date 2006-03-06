@@ -44,7 +44,8 @@
     le.ptr = object;                \
     php_qt_register(getThis(),le);  \
 
-#define PHP_QT_FETCH() php_qt_fetch(getThis())
+#define PHP_QT_FETCH()  \
+	php_qt_fetch(getThis()) \
 
 #define PHP_QT_DESTRUCT(classname)              \
 ZEND_METHOD(classname,__desctruct){             \
@@ -332,36 +333,10 @@ extern int le_php_qt_hashtype;
 extern HashTable php_qt_objptr_hash;
 
 void _register_QObject();
-void _register_QApplication();
-void _register_QCoreApplication();
-void _register_QWidget();
 void _register_QEvent();
-void _register_QLayoutItem();
-void _register_QLayout();
-void _register_QBoxLayout();
-void _register_QVBoxLayout();
-void _register_QHBoxLayout();
-void _register_QAbstractSlider();
-void _register_QSlider();
-void _register_QLineEdit();
-void _register_QFrame();
 
 extern zend_class_entry *QObject_ce_ptr;
-extern zend_class_entry *QApplication_ce_ptr;
-extern zend_class_entry *QWidget_ce_ptr;
-extern zend_class_entry *QCoreApplication_ce_ptr;
 extern zend_class_entry *QEvent_ce_ptr;
-extern zend_class_entry *QLayoutItem_ce_ptr;
-extern zend_class_entry *QLayout_ce_ptr;
-extern zend_class_entry *QBoxLayout_ce_ptr;
-extern zend_class_entry *QVBoxLayout_ce_ptr;
-extern zend_class_entry *QHBoxLayout_ce_ptr;
-extern zend_class_entry *QSpacerItem_ce_ptr;
-extern zend_class_entry *QAbstractSlider_ce_ptr;
-extern zend_class_entry *QSlider_ce_ptr;
-extern zend_class_entry *QLineEdit_ce_ptr;
-extern zend_class_entry *QFrame_ce_ptr;
-extern zend_class_entry *QMimeSource_ce_ptr;
 
 extern zend_class_entry *QCharRef_ce_ptr;
 void    _register_QCharRef();

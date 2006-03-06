@@ -289,7 +289,7 @@ ZEND_METHOD(QPushButton, __construct){
 				PHP_QT_REGISTER(QPushButton_ptr);
 				RETURN_NULL();
 			}
-			} else if(Z_TYPE_P(z_0) == IS_STRING) {
+			} else if(Z_TYPE_P(z_0) == IS_STRING) { 
 				QPushButton *QPushButton_ptr = new QPushButton((const char*) Z_STRVAL_P(z_0));
 				PHP_QT_REGISTER(QPushButton_ptr);
 				RETURN_NULL();
