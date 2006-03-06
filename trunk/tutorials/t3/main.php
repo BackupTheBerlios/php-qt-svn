@@ -13,7 +13,7 @@
 	}
 
 
-    $app = new QApplication();
+    $app = new QApplication($argc,0);
 
     $window = new QWidget();
     $window->resize(200,120);

@@ -13,7 +13,7 @@
 	}
 
 
-    $app = new QApplication();
+    $app = new QApplication($argc,0);
 
     $quit = new QPushButton("Quit");
     $quit->resize(75,30);
