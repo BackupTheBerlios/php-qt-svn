@@ -94,6 +94,53 @@ void _register_QActionEvent(TSRMLS_D)
 
 
 }
+static zend_function_entry QCoreApplication_methods[] = {
+	ZEND_ME(QCoreApplication,removeTranslator,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,installTranslator,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,startingUp,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,exit,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,addLibraryPath,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,setOrganizationDomain,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,argv,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,libraryPaths,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,exec,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,setLibraryPaths,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,removeLibraryPath,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,organizationName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,setOrganizationName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,instance,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,organizationDomain,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,hasPendingEvents,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,sendPostedEvents,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,applicationName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,flush,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,processEvents,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,translate,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,applicationDirPath,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,staticMetaObject,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,qObject,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QCoreApplication,argc,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,quit,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication, __construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QCoreApplication,watchUnixSignal,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,removePostedEvents,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,applicationFilePath,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,setApplicationName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QCoreApplication,closingDown,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QCoreApplication(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QCoreApplication",QCoreApplication_methods);
+    QCoreApplication_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QObject_ce_ptr,NULL TSRMLS_CC);
+
+
+}
 static zend_function_entry QApplication_methods[] = {
 	ZEND_ME(QApplication,sessionKey,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QApplication,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -369,53 +416,7 @@ void _register_QContextMenuEvent(TSRMLS_D)
 
 
 }
-static zend_function_entry QCoreApplication_methods[] = {
-	ZEND_ME(QCoreApplication,removeTranslator,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,installTranslator,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,startingUp,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,exit,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,addLibraryPath,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,setOrganizationDomain,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,argv,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,libraryPaths,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,exec,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,setLibraryPaths,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,removeLibraryPath,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,organizationName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,setOrganizationName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,instance,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,organizationDomain,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,hasPendingEvents,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,sendPostedEvents,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,applicationName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,flush,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,processEvents,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,translate,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,applicationDirPath,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,staticMetaObject,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,qObject,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QCoreApplication,argc,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,quit,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication, __construct,NULL,ZEND_ACC_PUBLIC)
-	ZEND_ME(QCoreApplication,watchUnixSignal,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,removePostedEvents,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,applicationFilePath,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,setApplicationName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(QCoreApplication,closingDown,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 
-    {NULL,NULL,NULL}
-};
-
-void _register_QCoreApplication(TSRMLS_D)
-{
-    zend_class_entry ce;
-    INIT_CLASS_ENTRY(ce,"QCoreApplication",QCoreApplication_methods);
-    QCoreApplication_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QObject_ce_ptr,NULL TSRMLS_CC);
-
-
-}
 static zend_function_entry QDate_methods[] = {
 	ZEND_ME(QDate,longDayName,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(QDate,dayOfWeek,NULL,ZEND_ACC_PUBLIC)
