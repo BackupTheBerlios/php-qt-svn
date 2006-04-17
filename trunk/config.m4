@@ -13,7 +13,7 @@ if test "$PHP_QTLIB" != "yes"; then
     if test -r "$PHP_QTLIB"; then
         AC_MSG_RESULT(found in $PHP_QTLIB)
     else 
-        AC_MSG_ERROR([Please reinstall the Qt distribution] $PHP_QTLIB)
+        AC_MSG_ERROR([Please check the Qt distribution] $PHP_QTLIB)
     fi
 
   PHP_ADD_LIBPATH($PHP_QTLIB/lib/qt4 )
@@ -60,6 +60,7 @@ if test "$PHP_PHP_QT" != "no"; then
       if test -r $i$j/$SEARCH_OBJ; then
         PHP_QT_DIR=$i$j
         AC_MSG_RESULT(found)
+        break 2
       else
         AC_MSG_RESULT(not found)
       fi
