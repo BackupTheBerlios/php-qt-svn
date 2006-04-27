@@ -96,23 +96,23 @@ ZEND_METHOD(QObject,connect){
         if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ozoz", &sender, &signal, &receiver, &slot) == FAILURE) {
             RETURN_NULL(); 
         }
-        receiver_ptr = (QObject*) php_qt_fetch(receiver);    
+        receiver_ptr = static_cast<QObject*>(php_qt_fetch(receiver));    
     } else {
         if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ozz", &sender, &signal, &slot) == FAILURE) {
             RETURN_NULL(); 
         }
-        receiver_ptr = (QObject*) PHP_QT_FETCH();
+        receiver_ptr = static_cast<QObject*>(PHP_QT_FETCH());
     }
 
-    QObject *sender_ptr = (QObject*) php_qt_fetch(sender);
+    QObject *sender_ptr = static_cast<QObject*>(php_qt_fetch(sender));
 
     const char* __signal = Z_STRVAL_P(signal);
     const char* __slot = Z_STRVAL_P(slot);
 
     if(num_args==4){
-        RETURN_BOOL(QObject::connect((const QObject*) sender_ptr, __signal, (const QObject*) receiver_ptr, __slot));
+        RETURN_BOOL(QObject::connect(static_cast<const QObject*>(sender_ptr), __signal, static_cast<const QObject*>(receiver_ptr), __slot));
     } else if(num_args==3){
-        RETURN_BOOL(receiver_ptr->connect((const QObject*) sender_ptr, __signal, __slot));
+        RETURN_BOOL(receiver_ptr->connect(static_cast<const QObject*>(sender_ptr), __signal, __slot));
     }
 
 }
