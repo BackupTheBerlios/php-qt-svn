@@ -4968,7 +4968,13 @@ ZEND_METHOD(QWidget, setLayout)
         php_error(E_ERROR, "argument not allowed");
       }                         /// END check of argument types
     }                           /// END zend_parse_parameters
+    else {
+        php_error(E_ERROR, "arg parse error.");
+    }
   }                             /// END ZEND_NUM_ARGS
+  else {
+    php_error(E_ERROR, "wrong arg count.");
+  }
 }
 
 /*!

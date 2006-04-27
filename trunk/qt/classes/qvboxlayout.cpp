@@ -145,6 +145,16 @@ ZEND_METHOD(QVBoxLayout, __construct){
 				PHP_QT_REGISTER(QVBoxLayout_ptr);
 				RETURN_NULL();
 	}
+/// handmade
+    if (ZEND_NUM_ARGS() == 1){
+    	zval *z_0; // define ZVAL
+		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
+            QWidget *qw = static_cast<QWidget*>(php_qt_fetch(z_0));
+			QVBoxLayout *QVBoxLayout_ptr = new QVBoxLayout(qw);
+			PHP_QT_REGISTER(QVBoxLayout_ptr);
+			RETURN_NULL();
+        }
+	}
 }
 
 

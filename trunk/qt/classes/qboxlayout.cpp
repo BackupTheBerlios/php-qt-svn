@@ -322,6 +322,21 @@ ZEND_METHOD(QBoxLayout, addWidget){
 			} else { php_error(E_ERROR,"argument not allowed"); }
 		}
 	}
+    if (ZEND_NUM_ARGS() == 1){
+		zval *z_0; // define ZVAL
+		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
+			if(Z_TYPE_P(z_0) == IS_OBJECT){
+
+			    QBoxLayout *obj = static_cast<QBoxLayout*>(PHP_QT_FETCH());
+			    QWidget* obj_z_0 = static_cast<QWidget*>(php_qt_fetch(z_0));
+
+//			if(obj_z_0->inherits("QWidget")) {
+				obj->addWidget(obj_z_0);
+			    RETURN_NULL();
+//			}
+			} else { php_error(E_ERROR,"argument not allowed"); }
+		}
+	}
 }
 
 /*********************************

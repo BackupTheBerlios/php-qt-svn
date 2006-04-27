@@ -406,20 +406,22 @@ ZEND_METHOD(QCoreApplication, event){
  */
 ZEND_METHOD(QCoreApplication, instance){
 	if (ZEND_NUM_ARGS() == 0){
-			QCoreApplication *obj = (QCoreApplication*) PHP_QT_FETCH();
+
 			QCoreApplication ** return_object;
 			// check whether method call is static.
 			if(getThis() != NULL){
-				*return_object = (QCoreApplication *) obj->instance();
+			    QCoreApplication *obj = (QCoreApplication*) PHP_QT_FETCH();
+				*return_object = static_cast<QCoreApplication*>(obj->instance());
 			} else {
-				*return_object = (QCoreApplication *) QCoreApplication::instance();
+                return_object = (QCoreApplication **) malloc(sizeof(QCoreApplication::instance()));
+				*return_object = static_cast<QCoreApplication *>(QCoreApplication::instance());
 			}
-				zend_class_entry *ce;                                   
-				object_init_ex(return_value, QCoreApplication_ce_ptr);     
-				zend_rsrc_list_entry le;                            
-				le.ptr = return_object;                                       
-				php_qt_register(return_value,le);                   
-				return;                                             
+			zend_class_entry *ce;                                   
+			object_init_ex(return_value, QCoreApplication_ce_ptr);     
+			zend_rsrc_list_entry le;                            
+			le.ptr = return_object[0];
+			php_qt_register(return_value,le);                   
+			return;                                             
 	}
 }
 
