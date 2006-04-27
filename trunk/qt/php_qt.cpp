@@ -1106,7 +1106,7 @@ void php_qt_setObject(zval* this_ptr, void* obj){
 void* php_qt_fetch(zval* this_ptr){
 
 	if(this_ptr == NULL){
-	  php_error(E_ERROR,"fatal: object 'this' does not exists");
+	  php_error(E_ERROR,"fatal: object does not exists and could not be fetched, %s",Z_OBJCE_P(this_ptr)->name);
 	}
 
 	void *ptr;
@@ -1115,15 +1115,15 @@ void* php_qt_fetch(zval* this_ptr){
 	TSRMLS_FETCH();
 
 	if(zend_hash_index_find(Z_OBJPROP_P(this_ptr), 0, (void**) &listhandle) == FAILURE){
-	  php_error(E_ERROR,"Object not found in list.");
+	  php_error(E_ERROR,"Object not found in list, %s",Z_OBJCE_P(this_ptr)->name);
 	}
 	ptr = zend_list_find(Z_LVAL_PP(listhandle), &type);
 
 	if(!ptr){
-		php_error(E_ERROR,"reference to Qt object missing.");
+		php_error(E_ERROR,"reference to Qt object missing, %s",Z_OBJCE_P(this_ptr)->name);
 	} 
 	if(type != le_php_qt_hashtype){
-		php_error(E_ERROR,"wrong type.");
+		php_error(E_ERROR,"wrong type, %s",Z_OBJCE_P(this_ptr)->name);
 	}
 
 	return ptr;
