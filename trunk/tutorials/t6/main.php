@@ -42,7 +42,6 @@
         var $quit;
         var $grid;
         var $layout;
-        var $LCDRange_array = array();
 
         function __construct(){
 
@@ -51,17 +50,17 @@
             $this->quit = new QPushButton("Quit");
     //        $this->quit->setFont(QFont("Times", 18, QFont::Bold));
             $this->connect($this->quit, SIGNAL("clicked()"), QApplication::instance(), SLOT("quit()"));
-    
+
             $this->grid = new QGridLayout();
             for ($row = 0; $row < 4; ++$row) {
                 for ($column = 0; $column < 4; ++$column) {
-                    $this->grid->addWidget(new LCDRange(), $row, $column, 0);
+                    $this->grid->addWidget(new LCDRange(), $row, $column);
                 }
             }
 
             $this->layout = new QVBoxLayout($this);
             $this->layout->addWidget($this->quit);
-            $this->layout->addLayout($this->grid);
+            $this->layout->addLayout($this->grid,0);
             $this->setLayout($this->layout);
         }
     }
