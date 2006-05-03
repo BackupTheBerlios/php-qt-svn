@@ -1155,6 +1155,63 @@ void php_qt_callmethod(zval* this_ptr, char* methodname)
 
 }
 
+// creates stringdata
+// example: char* stringdata = "QWidget\0\0value\0test(int)\0";
+
+char* php_qt_getStringdata(zval* this_ptr, char* classname){
+
+    char * r;
+    r = (char*) malloc(2 + strlen(classname));
+    strcpy(r, classname);  
+    strncat(r,"++",2);
+
+    char * value;
+    value = (char*) malloc(1 + strlen("value"));
+    strcpy(value, "value");
+
+    strcat(r,value);
+    strncat(r,"+",1);    
+
+    zval *s1 = zend_read_property(QWidget_ce_ptr,this_ptr,"slots",5,0);
+    zval **data;
+
+// TODO: is it really an array?
+    HashTable* hash = HASH_OF(s1);
+    char* assocKey;
+    ulong numKey;
+
+    zend_hash_internal_pointer_reset(hash);
+
+    while(zend_hash_has_more_elements(hash) == SUCCESS){
+        zend_hash_get_current_key(hash,&assocKey,&numKey,0);
+        zend_hash_get_current_data(hash,(void**)&data);
+        
+        convert_to_string(*data);
+
+        char *buf;
+        buf = (char*) malloc(1+strlen(Z_STRVAL_PP(data)));
+        strcpy(buf, Z_STRVAL_PP(data));
+
+        strncat(r,buf,strlen(Z_STRVAL_PP(data)));
+        strncat(r,"+",1);
+
+        zend_hash_move_forward(hash);
+    }
+
+    // transform '+' into \0
+    for(int i=0;i<44;i++){
+#ifdef DEBUG
+        cout << r[i] << "";
+#endif
+        if((int) r[i] == 43){
+            r[i] = NULL;
+        }
+    }
+
+    return r;
+
+}
+
 ///
 static zend_function_entry QObject_methods[] = { 
     ZEND_ME(QObject,__construct,NULL,ZEND_ACC_PUBLIC)

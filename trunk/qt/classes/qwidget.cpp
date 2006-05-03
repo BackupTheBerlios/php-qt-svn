@@ -34,12 +34,23 @@ using namespace std;
 #include <QIcon>
 #include <QMetaMethod>
 
-const QMetaObject *QWidget::metaObject() const
+
+
+class QWidget_moc : public QWidget
+{
+    public:
+        zval* zend_ptr;
+        const QMetaObject* metaObject() const;
+        int qt_metacall(QMetaObject::Call _c, int _id, void **_a);
+        
+};
+
+const QMetaObject *QWidget_moc::metaObject() const
 {
 
     QMetaObject *superdata = (QMetaObject*) &staticMetaObject;
 
-    static const char stringdata[] = {"QWidget\0\0value\0test(int)\0"};
+//    static const char stringdata[] = {"QWidget\0\0value\0test(int)\0"};
     static const uint data[] = {
 
        1,       // revision
@@ -50,8 +61,11 @@ const QMetaObject *QWidget::metaObject() const
        0,    0, // enums/sets
 
        15,   10,    9,    9, 0x0a,
+       15,   10,    9,    9, 0x0a,
 
     };
+
+    static const char* stringdata = php_qt_getStringdata(this->zend_ptr,"QWidget");
 
     QMetaObject ob = {
         {superdata,stringdata,data,0}
@@ -63,15 +77,6 @@ const QMetaObject *QWidget::metaObject() const
     return meta;
 
 }
-
-class QWidget_moc : public QWidget
-{
-    public:
-        zval* zend_ptr;
-        int qt_metacall(QMetaObject::Call _c, int _id, void **_a);
-        
-};
-
 
 int QWidget_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
