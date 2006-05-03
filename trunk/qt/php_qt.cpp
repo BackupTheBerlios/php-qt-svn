@@ -32,6 +32,7 @@
 */
 /* $Id: header,v 1.15 2004/01/08 16:46:52 sniper Exp $ */
 
+#include <zend_interfaces.h>
 #include "php_qt.h"
 #include <QObject>
 #include <QApplication>
@@ -41,7 +42,6 @@
 #include <QSlider>
 #include <QLCDNumber>
 #include <QStringList>
-
 
 //QOUT();
 
@@ -1137,6 +1137,23 @@ static void destroy_php_qt_hashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 #endif
 }
 
+void php_qt_callmethod(zval* this_ptr, char* methodname)
+{
+
+	if(this_ptr == NULL){
+	  php_error(E_ERROR,"fatal: object does not exists and could not be fetched, %s",Z_OBJCE_P(this_ptr)->name);
+	}    
+
+    zval *function_name;
+    MAKE_STD_ZVAL(function_name);
+    ZVAL_STRING(function_name,methodname,1);
+    
+    zval* retval;
+    MAKE_STD_ZVAL(retval);
+
+    call_user_function_ex(CG(function_table),&this_ptr,function_name,&retval,0,NULL,0,NULL);
+
+}
 
 ///
 static zend_function_entry QObject_methods[] = { 

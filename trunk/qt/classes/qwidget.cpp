@@ -32,6 +32,59 @@ using namespace std;
 
 #include <QWidget>
 #include <QIcon>
+#include <QMetaMethod>
+
+const QMetaObject *QWidget::metaObject() const
+{
+
+    QMetaObject *superdata = (QMetaObject*) &staticMetaObject;
+
+    static const char stringdata[] = {"QWidget\0\0value\0test(int)\0"};
+    static const uint data[] = {
+
+       1,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       1,    10, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+
+       15,   10,    9,    9, 0x0a,
+
+    };
+
+    QMetaObject ob = {
+        {superdata,stringdata,data,0}
+    };
+
+    QMetaObject *meta = new QMetaObject;
+    *meta = ob;
+
+    return meta;
+
+}
+
+class QWidget_moc : public QWidget
+{
+    public:
+        zval* zend_ptr;
+        int qt_metacall(QMetaObject::Call _c, int _id, void **_a);
+        
+};
+
+
+int QWidget_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+
+    _id = QWidget::qt_metacall(_c, _id, _a);
+    if(_id == 0) 
+    {
+        php_qt_callmethod(this->zend_ptr,"test");
+    }
+    return _id;
+
+}
+
 
 /*!
  *    @class     QWidget
@@ -2779,7 +2832,8 @@ ZEND_METHOD(QWidget, __construct)
 {
 ///QWidget*
   if (ZEND_NUM_ARGS() == 0) {
-          QWidget *QWidget_ptr = new QWidget();
+          QWidget_moc *QWidget_ptr = new QWidget_moc();
+          QWidget_ptr->zend_ptr = this_ptr;
 
           PHP_QT_REGISTER(QWidget_ptr);
           RETURN_NULL();
