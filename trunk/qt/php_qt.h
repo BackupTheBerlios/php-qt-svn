@@ -324,12 +324,17 @@ ZEND_METHOD(classname,function){                                                
 #include "ext/standard/info.h"
 #include "zend_php_qt.h"
 
+struct moc {
+    char* stringdata; 
+    uint* signature;
+};
+
 void* php_qt_fetch(zval* this_ptr);
 void php_qt_register(zval* this_ptr, zend_rsrc_list_entry le);
 void php_qt_setObject(zval* this_ptr, void* obj);
 static void destroy_php_qt_hashtable(zend_rsrc_list_entry *rsrc);
 void php_qt_callmethod(zval* zend_ptr, char* methodname);
-char* php_qt_getStringdata(zval* this_ptr, char* classname);
+moc* php_qt_getData(zval* this_ptr, char* classname);
 
 extern int le_php_qt_hashtype;
 extern HashTable php_qt_objptr_hash;

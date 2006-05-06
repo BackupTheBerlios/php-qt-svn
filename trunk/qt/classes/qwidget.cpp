@@ -50,25 +50,10 @@ const QMetaObject *QWidget_moc::metaObject() const
 
     QMetaObject *superdata = (QMetaObject*) &staticMetaObject;
 
-//    static const char stringdata[] = {"QWidget\0\0value\0test(int)\0"};
-    static const uint data[] = {
-
-       1,       // revision
-       0,       // classname
-       0,    0, // classinfo
-       1,    10, // methods
-       0,    0, // properties
-       0,    0, // enums/sets
-
-       15,   10,    9,    9, 0x0a,
-       15,   10,    9,    9, 0x0a,
-
-    };
-
-    static const char* stringdata = php_qt_getStringdata(this->zend_ptr,"QWidget");
+    static const moc* m = php_qt_getData(this->zend_ptr,"QWidget");
 
     QMetaObject ob = {
-        {superdata,stringdata,data,0}
+        {superdata,m->stringdata,m->signature,0}
     };
 
     QMetaObject *meta = new QMetaObject;
@@ -86,6 +71,11 @@ int QWidget_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     {
         php_qt_callmethod(this->zend_ptr,"test");
     }
+    if(_id == 1) 
+    {
+        php_qt_callmethod(this->zend_ptr,"meinSlot");
+    }
+
     return _id;
 
 }

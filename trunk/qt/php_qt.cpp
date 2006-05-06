@@ -32,6 +32,8 @@
 */
 /* $Id: header,v 1.15 2004/01/08 16:46:52 sniper Exp $ */
 
+//#define DEBUG=0
+
 #include <zend_interfaces.h>
 #include "php_qt.h"
 #include <QObject>
@@ -1155,24 +1157,15 @@ void php_qt_callmethod(zval* this_ptr, char* methodname)
 
 }
 
-// creates stringdata
-// example: char* stringdata = "QWidget\0\0value\0test(int)\0";
+/*! creates moc data
+ *  example: "QWidget\0\0value\0test(int)\0"
+ */
 
-char* php_qt_getStringdata(zval* this_ptr, char* classname){
+moc* php_qt_getData(zval* this_ptr, char* classname){
 
-    char * r;
-    r = (char*) malloc(2 + strlen(classname));
-    strcpy(r, classname);  
-    strncat(r,"++",2);
-
-    char * value;
-    value = (char*) malloc(1 + strlen("value"));
-    strcpy(value, "value");
-
-    strcat(r,value);
-    strncat(r,"+",1);    
-
-    zval *s1 = zend_read_property(QWidget_ce_ptr,this_ptr,"slots",5,0);
+    /*! readout the slots table */
+    zval *s1;
+    s1 = zend_read_property(QWidget_ce_ptr,this_ptr,"slots",5,0);
     zval **data;
 
 // TODO: is it really an array?
@@ -1180,9 +1173,37 @@ char* php_qt_getStringdata(zval* this_ptr, char* classname){
     char* assocKey;
     ulong numKey;
 
+    int signaturecount;
+    signaturecount = 2 + strlen(classname);
+
+    char* stringdata;
+    stringdata = (char*) malloc(2 + strlen(classname)+(zend_hash_num_elements(hash)*20));
+
+    uint* signature = (uint*) malloc(sizeof(uint)*zend_hash_num_elements(hash)*5+10);
+
+    /*! write class signature */
+    signature[0] = 1;
+    signature[1] = 0;
+    signature[2] = 0;
+    signature[3] = 0;
+    signature[4] = zend_hash_num_elements(hash);
+    signature[5] = 10;
+    signature[6] = 0;
+    signature[7] = 0;
+    signature[8] = 0;
+    signature[9] = 0;
+
+    /*! write classname */
+    strcpy(stringdata, classname);  
+    strncat(stringdata,"++",2);
+    int i;
+    i = 10;
+
     zend_hash_internal_pointer_reset(hash);
 
     while(zend_hash_has_more_elements(hash) == SUCCESS){
+
+        /* read slot from hashtable */
         zend_hash_get_current_key(hash,&assocKey,&numKey,0);
         zend_hash_get_current_data(hash,(void**)&data);
         
@@ -1192,23 +1213,34 @@ char* php_qt_getStringdata(zval* this_ptr, char* classname){
         buf = (char*) malloc(1+strlen(Z_STRVAL_PP(data)));
         strcpy(buf, Z_STRVAL_PP(data));
 
-        strncat(r,buf,strlen(Z_STRVAL_PP(data)));
-        strncat(r,"+",1);
+        strncat(stringdata,buf,strlen(Z_STRVAL_PP(data)));
+        strncat(stringdata,"+",1);
 
         zend_hash_move_forward(hash);
+
+        /*! write slot signature */
+        signature[i++] = signaturecount;
+        signature[i++] = 8;        
+        signature[i++] = 8;
+        signature[i++] = 8;
+        signature[i++] = 0x0a;
+
+        signaturecount += strlen(Z_STRVAL_PP(data)) + 1;
+
     }
 
-    // transform '+' into \0
-    for(int i=0;i<44;i++){
-#ifdef DEBUG
-        cout << r[i] << "";
-#endif
-        if((int) r[i] == 43){
-            r[i] = NULL;
+    /// transform '+' into \0
+    for(int i=0;i<=signaturecount;i++){
+        if((int) stringdata[i] == 43){
+            stringdata[i] = NULL;
         }
     }
 
-    return r;
+    moc *m = new moc;
+    m->stringdata = stringdata;
+    m->signature = signature;
+
+    return m;
 
 }
 
