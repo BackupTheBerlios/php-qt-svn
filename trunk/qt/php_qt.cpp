@@ -44,6 +44,7 @@
 #include <QSlider>
 #include <QLCDNumber>
 #include <QStringList>
+#include <QList>
 
 //QOUT();
 
@@ -1139,7 +1140,7 @@ static void destroy_php_qt_hashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 #endif
 }
 
-void php_qt_callmethod(zval* this_ptr, char* methodname)
+void php_qt_callmethod(zval* this_ptr, char* methodname, zend_uint param_count, zval** args[])
 {
 
 	if(this_ptr == NULL){
@@ -1153,7 +1154,7 @@ void php_qt_callmethod(zval* this_ptr, char* methodname)
     zval* retval;
     MAKE_STD_ZVAL(retval);
 
-    call_user_function_ex(CG(function_table),&this_ptr,function_name,&retval,0,NULL,0,NULL);
+    call_user_function_ex(CG(function_table),&this_ptr,function_name,&retval,param_count,args,0,NULL);
 
 }
 
@@ -1161,15 +1162,15 @@ void php_qt_callmethod(zval* this_ptr, char* methodname)
  *  example: "QWidget\0\0value\0test(int)\0"
  */
 
-moc* php_qt_getData(zval* this_ptr, char* classname){
+moc* php_qt_getMocData(zval* this_ptr, char* classname){
 
     /*! readout the slots table */
-    zval *s1;
-    s1 = zend_read_property(QWidget_ce_ptr,this_ptr,"slots",5,0);
-    zval **data;
+    zval *zslot;
+    zslot = zend_read_property(QWidget_ce_ptr,this_ptr,"slots",5,0);
+    zval **slotdata;
 
 // TODO: is it really an array?
-    HashTable* hash = HASH_OF(s1);
+    HashTable* hash = HASH_OF(zslot);
     char* assocKey;
     ulong numKey;
 
@@ -1178,7 +1179,6 @@ moc* php_qt_getData(zval* this_ptr, char* classname){
 
     char* stringdata;
     stringdata = (char*) malloc(2 + strlen(classname)+(zend_hash_num_elements(hash)*20));
-
     uint* signature = (uint*) malloc(sizeof(uint)*zend_hash_num_elements(hash)*5+10);
 
     /*! write class signature */
@@ -1205,15 +1205,15 @@ moc* php_qt_getData(zval* this_ptr, char* classname){
 
         /* read slot from hashtable */
         zend_hash_get_current_key(hash,&assocKey,&numKey,0);
-        zend_hash_get_current_data(hash,(void**)&data);
+        zend_hash_get_current_data(hash,(void**)&slotdata);
         
-        convert_to_string(*data);
+        convert_to_string(*slotdata);
 
         char *buf;
-        buf = (char*) malloc(1+strlen(Z_STRVAL_PP(data)));
-        strcpy(buf, Z_STRVAL_PP(data));
+        buf = (char*) malloc(1+strlen(Z_STRVAL_PP(slotdata)));
+        strcpy(buf, Z_STRVAL_PP(slotdata));
 
-        strncat(stringdata,buf,strlen(Z_STRVAL_PP(data)));
+        strncat(stringdata,buf,strlen(Z_STRVAL_PP(slotdata)));
         strncat(stringdata,"+",1);
 
         zend_hash_move_forward(hash);
@@ -1225,7 +1225,7 @@ moc* php_qt_getData(zval* this_ptr, char* classname){
         signature[i++] = 8;
         signature[i++] = 0x0a;
 
-        signaturecount += strlen(Z_STRVAL_PP(data)) + 1;
+        signaturecount += strlen(Z_STRVAL_PP(slotdata)) + 1;
 
     }
 

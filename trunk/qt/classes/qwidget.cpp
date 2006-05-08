@@ -29,12 +29,9 @@ using namespace std;
 
 #include "../php_qt.h"
 
-
 #include <QWidget>
 #include <QIcon>
 #include <QMetaMethod>
-
-
 
 class QWidget_moc : public QWidget
 {
@@ -50,7 +47,7 @@ const QMetaObject *QWidget_moc::metaObject() const
 
     QMetaObject *superdata = (QMetaObject*) &staticMetaObject;
 
-    static const moc* m = php_qt_getData(this->zend_ptr,"QWidget");
+    static const moc* m = php_qt_getMocData(this->zend_ptr,"QWidget");
 
     QMetaObject ob = {
         {superdata,m->stringdata,m->signature,0}
@@ -66,15 +63,36 @@ const QMetaObject *QWidget_moc::metaObject() const
 int QWidget_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
 
-    _id = QWidget::qt_metacall(_c, _id, _a);
-    if(_id == 0) 
-    {
-        php_qt_callmethod(this->zend_ptr,"test");
+    QMetaObject* d = (QMetaObject*) this->metaObject();
+    char* method_name = new char[strlen((d->method(_id)).signature())];
+    strcpy(method_name,(char*) (d->method(_id)).signature());
+
+    int i;
+    for(i = 0; i < strlen(method_name); i++){
+        if(method_name[i] == 40){
+            method_name[i] = 0;
+            break;
+        }
     }
-    if(_id == 1) 
-    {
-        php_qt_callmethod(this->zend_ptr,"meinSlot");
+
+    int j = 0;
+    zval** args[1];
+    QList<QByteArray> qargs = d->method(_id).parameterTypes();
+    for(i = 0; i < qargs.count(); i++){
+
+        if(!strncmp("int",(const char*) qargs[i],3)){
+            zval *arg;
+            MAKE_STD_ZVAL(arg);
+            ZVAL_LONG(arg, *reinterpret_cast< int*>(_a[1]));
+            args[j++] = &arg;
+        }
+
     }
+
+    php_qt_callmethod(this->zend_ptr, method_name, j, args);
+
+    delete d;
+    delete method_name;
 
     return _id;
 
@@ -85,7 +103,7 @@ int QWidget_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
  *    @class     QWidget
  *    @function  nextInFocusChain
  *
- *    @flags    c
+ *    @flags     c
  *    @access    public
  *    @return    QWidget *
  *    @param    
