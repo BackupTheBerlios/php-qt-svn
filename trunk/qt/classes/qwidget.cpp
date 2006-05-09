@@ -36,7 +36,11 @@ using namespace std;
 class QWidget_moc : public QWidget
 {
     public:
+        QWidget_moc(zval* zend_ptr);
+
         zval* zend_ptr;
+        QMetaObject* dynamicMetaObject;
+
         const QMetaObject* metaObject() const;
         int qt_metacall(QMetaObject::Call _c, int _id, void **_a);
         
@@ -44,20 +48,14 @@ class QWidget_moc : public QWidget
 
 const QMetaObject *QWidget_moc::metaObject() const
 {
+    return php_qt_getMocData(this->zend_ptr,"QWidget",&staticMetaObject);;
+}
 
-    QMetaObject *superdata = (QMetaObject*) &staticMetaObject;
-
-    static const moc* m = php_qt_getMocData(this->zend_ptr,"QWidget");
-
-    QMetaObject ob = {
-        {superdata,m->stringdata,m->signature,0}
-    };
-
-    QMetaObject *meta = new QMetaObject;
-    *meta = ob;
-
-    return meta;
-
+QWidget_moc::QWidget_moc(zval* zend_ptr)
+{
+    this->zend_ptr = zend_ptr;
+    dynamicMetaObject = new QMetaObject;
+    dynamicMetaObject = php_qt_getMocData(this->zend_ptr,"QWidget",&staticMetaObject);
 }
 
 int QWidget_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
@@ -2845,12 +2843,13 @@ ZEND_METHOD(QWidget, __construct)
 {
 ///QWidget*
   if (ZEND_NUM_ARGS() == 0) {
-          QWidget_moc *QWidget_ptr = new QWidget_moc();
-          QWidget_ptr->zend_ptr = this_ptr;
+
+          QWidget_moc *QWidget_ptr = new QWidget_moc(this_ptr);
 
           PHP_QT_REGISTER(QWidget_ptr);
           RETURN_NULL();
-  }
+
+    }
 
 /*! ol public*/
 /*! QWidget* parent, int f,  */

@@ -1162,63 +1162,67 @@ void php_qt_callmethod(zval* this_ptr, char* methodname, zend_uint param_count, 
  *  example: "QWidget\0\0value\0test(int)\0"
  */
 
-moc* php_qt_getMocData(zval* this_ptr, char* classname){
+QMetaObject* php_qt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata){
 
-    /*! readout the slots table */
-    zval *zslot;
-    zslot = zend_read_property(QWidget_ce_ptr,this_ptr,"slots",5,0);
+    /// readout the slots table
     zval **slotdata;
 
-// TODO: is it really an array?
-    HashTable* hash = HASH_OF(zslot);
-    char* assocKey;
-    ulong numKey;
+    zval *zslot;
+    zslot = zend_read_property(QWidget_ce_ptr,this_ptr,"slots",5,0);
 
-    int signaturecount;
-    signaturecount = 2 + strlen(classname);
+    zval *zsignal;
+    zsignal = zend_read_property(QWidget_ce_ptr,this_ptr,"signals",7,0);
 
-    char* stringdata;
-    stringdata = (char*) malloc(2 + strlen(classname)+(zend_hash_num_elements(hash)*20));
-    uint* signature = (uint*) malloc(sizeof(uint)*zend_hash_num_elements(hash)*5+10);
 
-    /*! write class signature */
+    if((zslot)->type==IS_ARRAY && (zsignal)->type==IS_ARRAY ) {
+
+        HashTable* slots_hash = HASH_OF(zslot);
+        HashTable* signals_hash = HASH_OF(zsignal);
+
+        char* assocKey;
+        ulong numKey;
+
+        int signaturecount;
+        signaturecount = 2 + strlen(classname);
+
+        uint* signature = (uint*) new uint[sizeof(uint)*zend_hash_num_elements(slots_hash)*zend_hash_num_elements(signals_hash)*5+10];
+        QString *q = new QString();
+
+
+    /// write class signature
     signature[0] = 1;
     signature[1] = 0;
     signature[2] = 0;
     signature[3] = 0;
-    signature[4] = zend_hash_num_elements(hash);
+    signature[4] = zend_hash_num_elements(slots_hash)+zend_hash_num_elements(signals_hash);
     signature[5] = 10;
     signature[6] = 0;
     signature[7] = 0;
     signature[8] = 0;
     signature[9] = 0;
 
-    /*! write classname */
-    strcpy(stringdata, classname);  
-    strncat(stringdata,"++",2);
+    /// write classname
+    q->append(classname);
+    q->append(QChar::Null);
+    q->append(QChar::Null);
+
     int i;
     i = 10;
 
-    zend_hash_internal_pointer_reset(hash);
+    zend_hash_internal_pointer_reset(signals_hash);
 
-    while(zend_hash_has_more_elements(hash) == SUCCESS){
+    while(zend_hash_has_more_elements(signals_hash) == SUCCESS){
 
-        /* read slot from hashtable */
-        zend_hash_get_current_key(hash,&assocKey,&numKey,0);
-        zend_hash_get_current_data(hash,(void**)&slotdata);
-        
-        convert_to_string(*slotdata);
+        /// read slot from hashtable
+        zend_hash_get_current_key(signals_hash,&assocKey,&numKey,0);
+        zend_hash_get_current_data(signals_hash,(void**)&slotdata);
 
-        char *buf;
-        buf = (char*) malloc(1+strlen(Z_STRVAL_PP(slotdata)));
-        strcpy(buf, Z_STRVAL_PP(slotdata));
+        q->append(Z_STRVAL_PP(slotdata));
+        q->append(QChar::Null);
 
-        strncat(stringdata,buf,strlen(Z_STRVAL_PP(slotdata)));
-        strncat(stringdata,"+",1);
+        zend_hash_move_forward(signals_hash);
 
-        zend_hash_move_forward(hash);
-
-        /*! write slot signature */
+        /// write slot signature
         signature[i++] = signaturecount;
         signature[i++] = 8;        
         signature[i++] = 8;
@@ -1229,18 +1233,46 @@ moc* php_qt_getMocData(zval* this_ptr, char* classname){
 
     }
 
-    /// transform '+' into \0
-    for(int i=0;i<=signaturecount;i++){
-        if((int) stringdata[i] == 43){
-            stringdata[i] = NULL;
-        }
+    zend_hash_internal_pointer_reset(slots_hash);
+
+    while(zend_hash_has_more_elements(slots_hash) == SUCCESS){
+
+        /// read slot from hashtable
+        zend_hash_get_current_key(slots_hash,&assocKey,&numKey,0);
+        zend_hash_get_current_data(slots_hash,(void**)&slotdata);
+
+        q->append(Z_STRVAL_PP(slotdata));
+        q->append(QChar::Null);
+
+        zend_hash_move_forward(slots_hash);
+
+        /// write slot signature
+        signature[i++] = signaturecount;
+        signature[i++] = 8;        
+        signature[i++] = 8;
+        signature[i++] = 8;
+        signature[i++] = 0x0a;
+
+        signaturecount += strlen(Z_STRVAL_PP(slotdata)) + 1;
+
     }
 
-    moc *m = new moc;
-    m->stringdata = stringdata;
-    m->signature = signature;
 
-    return m;
+    QMetaObject ob = {
+        {superdata,(q->toAscii()).data(),signature,0}
+    };
+
+
+    QMetaObject *meta = new QMetaObject;
+    *meta = ob;
+
+    return meta;
+
+  } else {
+
+    return (QMetaObject*) superdata;
+
+  }
 
 }
 
