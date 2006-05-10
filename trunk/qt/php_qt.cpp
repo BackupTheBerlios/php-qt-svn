@@ -1227,7 +1227,7 @@ QMetaObject* php_qt_getMocData(zval* this_ptr, char* classname, const QMetaObjec
         signature[i++] = 8;        
         signature[i++] = 8;
         signature[i++] = 8;
-        signature[i++] = 0x0a;
+        signature[i++] = 0x05;
 
         signaturecount += strlen(Z_STRVAL_PP(slotdata)) + 1;
 

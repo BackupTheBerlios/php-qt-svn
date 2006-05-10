@@ -56,6 +56,7 @@ QWidget_moc::QWidget_moc(zval* zend_ptr)
     this->zend_ptr = zend_ptr;
     dynamicMetaObject = new QMetaObject;
     dynamicMetaObject = php_qt_getMocData(this->zend_ptr,"QWidget",&staticMetaObject);
+//    cout << dynamicMetaObject->indexOfSignal("valueChanged(int)")<<"\n";
 }
 
 int QWidget_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
@@ -65,6 +66,7 @@ int QWidget_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     char* method_name = new char[strlen((d->method(_id)).signature())];
     strcpy(method_name,(char*) (d->method(_id)).signature());
 
+    // breaks the string at the first bracket
     int i;
     for(i = 0; i < strlen(method_name); i++){
         if(method_name[i] == 40){
@@ -73,21 +75,29 @@ int QWidget_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         }
     }
 
-    int j = 0;
-    zval** args[1];
-    QList<QByteArray> qargs = d->method(_id).parameterTypes();
-    for(i = 0; i < qargs.count(); i++){
+    // is a Slot
+    if(d->method(_id).methodType() == QMetaMethod::Slot){
+        int j = 0;
+        zval** args[1];
+        QList<QByteArray> qargs = d->method(_id).parameterTypes();
+        for(i = 0; i < qargs.count(); i++){
 
-        if(!strncmp("int",(const char*) qargs[i],3)){
-            zval *arg;
-            MAKE_STD_ZVAL(arg);
-            ZVAL_LONG(arg, *reinterpret_cast< int*>(_a[1]));
-            args[j++] = &arg;
+            if(!strncmp("int",(const char*) qargs[i],3)){
+                zval *arg;
+                MAKE_STD_ZVAL(arg);
+                ZVAL_LONG(arg, *reinterpret_cast< int*>(_a[1]));
+                args[j++] = &arg;
+            }
+
         }
 
-    }
+        php_qt_callmethod(this->zend_ptr, method_name, j, args);
 
-    php_qt_callmethod(this->zend_ptr, method_name, j, args);
+    // is a signal
+    } else {
+        void *_b[] = { 0, _a[1] };
+        QMetaObject::activate(this, d, 0, _b);
+    }
 
     delete d;
     delete method_name;

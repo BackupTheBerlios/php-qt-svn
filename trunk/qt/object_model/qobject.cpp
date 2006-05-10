@@ -85,20 +85,22 @@ ZEND_METHOD(QObject,connect){
     zval *sender;
     zval *signal;
     zval *slot;
- 
+
     int num_args = 0;
     num_args = ZEND_NUM_ARGS();
-    
+
     QObject *receiver_ptr;
 
     if(num_args == 4){
         zval *receiver;
         if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ozoz", &sender, &signal, &receiver, &slot) == FAILURE) {
+            php_error(E_ERROR,"connect failed\n");
             RETURN_NULL(); 
         }
         receiver_ptr = static_cast<QObject*>(php_qt_fetch(receiver));    
     } else {
         if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ozz", &sender, &signal, &slot) == FAILURE) {
+            php_error(E_ERROR,"connect failed\n");
             RETURN_NULL(); 
         }
         receiver_ptr = static_cast<QObject*>(PHP_QT_FETCH());
