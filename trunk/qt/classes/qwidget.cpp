@@ -82,12 +82,29 @@ int QWidget_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         QList<QByteArray> qargs = d->method(_id).parameterTypes();
         for(i = 0; i < qargs.count(); i++){
 
+            zval *arg;
+            MAKE_STD_ZVAL(arg);
+
+            // invoke to zend types
             if(!strncmp("int",(const char*) qargs[i],3)){
-                zval *arg;
-                MAKE_STD_ZVAL(arg);
-                ZVAL_LONG(arg, *reinterpret_cast< int*>(_a[1]));
-                args[j++] = &arg;
+                ZVAL_LONG(arg, *reinterpret_cast< int*>(_a[i+1]));
+            } else if(!strncmp("char*",(const char*) qargs[i],5)){
+                ZVAL_STRING(arg, *reinterpret_cast< char**>(_a[i+1]), 1);
+            } else if(!strncmp("bool",(const char*) qargs[i],4)){
+                ZVAL_BOOL(arg, *reinterpret_cast< bool*>(_a[i+1]));
+            } else if(!strncmp("double",(const char*) qargs[i],4)){
+                ZVAL_DOUBLE(arg, *reinterpret_cast< double*>(_a[i+1]));
+            } else {
+                    // must be an object
+                    zend_class_entry *ce;
+                    object_init_ex(arg, QWidget_ce_ptr);
+                    zend_rsrc_list_entry le;
+                    le.ptr = *reinterpret_cast< QObject**>(_a[1]);
+                    php_qt_register(arg, le);
+                    
             }
+
+            args[j++] = &arg;
 
         }
 
