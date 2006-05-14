@@ -39,7 +39,7 @@ ZEND_METHOD(QString,__toString){
 
   char* c = (char*) (QString_ptr->toUtf8()).constData();
 
-  RETURN_STRING(c,l);
+  RETURN_STRINGL(c,l,1);
 }
 
 

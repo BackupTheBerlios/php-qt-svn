@@ -854,6 +854,7 @@ ZEND_METHOD(QString, constBegin);
 ZEND_METHOD(QString, toLocal8Bit);
 ZEND_METHOD(QString, toInt);
 ZEND_METHOD(QString, isNull);
+ZEND_METHOD(QString, __toString);
 ZEND_METHOD(QTabletEvent, hiResGlobalX);
 ZEND_METHOD(QTabletEvent, pressure);
 ZEND_METHOD(QTabletEvent, hiResGlobalPos);

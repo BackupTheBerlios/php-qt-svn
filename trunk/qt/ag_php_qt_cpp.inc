@@ -1546,6 +1546,7 @@ static zend_function_entry QString_methods[] = {
 	ZEND_ME(QString,toLocal8Bit,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QString,toInt,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QString,isNull,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,__toString,NULL,ZEND_ACC_PUBLIC)
 
     {NULL,NULL,NULL}
 };
