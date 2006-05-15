@@ -457,6 +457,7 @@ void _register_QDate(TSRMLS_D)
     QDate_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
 
 }
+
 static zend_function_entry QDateTime_methods[] = {
 	ZEND_ME(QDateTime,time,NULL,ZEND_ACC_PUBLIC)
 	ZEND_ME(QDateTime,date,NULL,ZEND_ACC_PUBLIC)
@@ -490,6 +491,42 @@ void _register_QDateTime(TSRMLS_D)
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce,"QDateTime",QDateTime_methods);
     QDateTime_ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
+
+}
+static zend_function_entry QDialog_methods[] = {
+	ZEND_ME(QDialog,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QDialog,setSizeGripEnabled,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,setModal,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,exec,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,showExtension,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,rejected,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,isSizeGripEnabled,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,event,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,setExtension,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,finished,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,result,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,orientation,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog, __construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,staticMetaObject,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QDialog,qObject,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,sizeHint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,minimumSizeHint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,extension,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,setOrientation,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,setVisible,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,setResult,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,accepted,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QDialog,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QDialog(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QDialog",QDialog_methods);
+    QDialog_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QWidget_ce_ptr,NULL TSRMLS_CC);
+
 
 }
 static zend_function_entry QDragEnterEvent_methods[] = {
@@ -1671,6 +1708,40 @@ void _register_QToolBarChangeEvent(TSRMLS_D)
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce,"QToolBarChangeEvent",QToolBarChangeEvent_methods);
     QToolBarChangeEvent_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QEvent_ce_ptr,NULL TSRMLS_CC);
+
+
+}
+static zend_function_entry QToolButton_methods[] = {
+	ZEND_ME(QToolButton,tr,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QToolButton,defaultAction,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,showMenu,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,autoRaise,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,staticMetaObject,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QToolButton,arrowType,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,setDefaultAction,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,popupMode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,qObject,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,minimumSizeHint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,sizeHint,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton, __construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,menu,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,triggered,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,toolButtonStyle,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,setPopupMode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,setToolButtonStyle,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,trUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QToolButton,setMenu,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,setAutoRaise,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QToolButton,setArrowType,NULL,ZEND_ACC_PUBLIC)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QToolButton(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QToolButton",QToolButton_methods);
+    QToolButton_ce_ptr = zend_register_internal_class_ex(&ce TSRMLS_CC, QAbstractButton_ce_ptr,NULL TSRMLS_CC);
 
 
 }

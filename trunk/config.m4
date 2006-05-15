@@ -111,6 +111,7 @@ if test "$PHP_PHP_QT" != "no"; then
 	qt/classes/qcontextmenuevent.cpp \
 	qt/classes/qdate.cpp \
 	qt/classes/qdatetime.cpp \
+	qt/classes/qdialog.cpp \ 
 	qt/classes/qdragenterevent.cpp \
 	qt/classes/qdragleaveevent.cpp \
 	qt/classes/qdragmoveevent.cpp \
@@ -148,6 +149,7 @@ if test "$PHP_PHP_QT" != "no"; then
 	qt/classes/qtimer.cpp \
 	qt/classes/qtimerevent.cpp \
 	qt/classes/qtoolbarchangeevent.cpp \
+	qt/classes/qtoolbutton.cpp \ 
 	qt/classes/qwhatsthisclickedevent.cpp \
 	qt/classes/qwheelevent.cpp \
 	qt/classes/qwidgetdata.cpp \
