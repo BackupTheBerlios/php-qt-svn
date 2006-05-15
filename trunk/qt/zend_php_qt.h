@@ -55,6 +55,7 @@ PHP_FUNCTION(confirm_php_qt_compiled);	/* For testing, remove later. */
 /* emulate SIGNAL(), SLOT() macros */
 PHP_FUNCTION(SIGNAL);
 PHP_FUNCTION(SLOT);
+PHP_FUNCTION(qobject_cast);
 
 /* QObject */
 ZEND_METHOD(QObject,__construct);
@@ -86,6 +87,8 @@ ZEND_METHOD(QObject,setProperty);
 ZEND_METHOD(QObject,signalsBlocked);
 ZEND_METHOD(QObject,startTimer);
 ZEND_METHOD(QObject,thread);
+ZEND_METHOD(QObject,tr);
+ZEND_METHOD(QObject,sender);
 
 /* QEvent */
 ZEND_METHOD(QEvent,__construct);
@@ -97,6 +100,8 @@ ZEND_METHOD(QEvent,spontaneous);
 ZEND_METHOD(QEvent,type);
 
 #include "ag_zend_php_qt.inc"
+
+
 
 /* 
   	Declare any global variables you may need between the BEGIN

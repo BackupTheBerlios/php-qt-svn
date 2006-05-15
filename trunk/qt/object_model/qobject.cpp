@@ -24,9 +24,108 @@ using namespace std;
 #include <QObject>
 #include "../php_qt.h"
 
+#include <QMetaMethod>
+
+class QObject_moc : public QObject
+{
+    public:
+        QObject_moc(zval* zend_ptr);
+
+        zval* zend_ptr;
+        QMetaObject* dynamicMetaObject;
+
+        const QMetaObject* metaObject() const;
+        int qt_metacall(QMetaObject::Call _c, int _id, void **_a);
+        QObject* protected_sender() const;
+        
+};
+
+QObject *QObject_moc::protected_sender() const
+{
+    return this->sender();
+}
+
+const QMetaObject *QObject_moc::metaObject() const
+{
+    return php_qt_getMocData(this->zend_ptr,"QObject",&staticMetaObject);;
+}
+
+QObject_moc::QObject_moc(zval* zend_ptr)
+{
+    this->zend_ptr = zend_ptr;
+    dynamicMetaObject = new QMetaObject;
+    dynamicMetaObject = php_qt_getMocData(this->zend_ptr,"QObject",&staticMetaObject);
+//    cout << dynamicMetaObject->indexOfSignal("valueChanged(int)")<<"\n";
+}
+
+int QObject_moc::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+
+    QMetaObject* d = (QMetaObject*) this->metaObject();
+    char* method_name = new char[strlen((d->method(_id)).signature())];
+    strcpy(method_name,(char*) (d->method(_id)).signature());
+
+    // breaks the string at the first bracket
+    int i;
+    for(i = 0; i < strlen(method_name); i++){
+        if(method_name[i] == 40){
+            method_name[i] = 0;
+            break;
+        }
+    }
+
+    // is a Slot
+    if(d->method(_id).methodType() == QMetaMethod::Slot){
+        int j = 0;
+        zval** args[1];
+        QList<QByteArray> qargs = d->method(_id).parameterTypes();
+        for(i = 0; i < qargs.count(); i++){
+
+            zval *arg;
+            MAKE_STD_ZVAL(arg);
+
+            // invoke to zend types
+            if(!strncmp("int",(const char*) qargs[i],3)){
+                ZVAL_LONG(arg, *reinterpret_cast< int*>(_a[i+1]));
+            } else if(!strncmp("char*",(const char*) qargs[i],5)){
+                ZVAL_STRING(arg, *reinterpret_cast< char**>(_a[i+1]), 1);
+            } else if(!strncmp("bool",(const char*) qargs[i],4)){
+                ZVAL_BOOL(arg, *reinterpret_cast< bool*>(_a[i+1]));
+            } else if(!strncmp("double",(const char*) qargs[i],4)){
+                ZVAL_DOUBLE(arg, *reinterpret_cast< double*>(_a[i+1]));
+            } else {
+                    // must be an object
+                    zend_class_entry *ce;
+                    object_init_ex(arg, QObject_ce_ptr);
+                    zend_rsrc_list_entry le;
+                    le.ptr = *reinterpret_cast< QObject**>(_a[1]);
+                    php_qt_register(arg, le);
+                    
+            }
+
+            args[j++] = &arg;
+
+        }
+
+        php_qt_callmethod(this->zend_ptr, method_name, j, args);
+
+    // is a signal
+    } else {
+        void *_b[] = { 0, _a[1] };
+        QMetaObject::activate(this, d, 0, _b);
+    }
+
+    delete d;
+    delete method_name;
+
+    return _id;
+
+}
+
+
 ZEND_METHOD(QObject,__construct){
 
-    QObject *QObject_ptr = new QObject();
+    QObject *QObject_ptr = new QObject_moc(getThis());
 
     if(ZEND_NUM_ARGS() > 0){
         zval *object;
@@ -102,6 +201,9 @@ ZEND_METHOD(QObject,connect){
         if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ozz", &sender, &signal, &slot) == FAILURE) {
             php_error(E_ERROR,"connect failed\n");
             RETURN_NULL(); 
+        }
+        if(getThis() == NULL){
+            php_error(E_ERROR,"zend object lost, cannot connect Signals/Slots. connect() should not be called statically without a this argument.\n");
         }
         receiver_ptr = static_cast<QObject*>(PHP_QT_FETCH());
     }
@@ -383,3 +485,56 @@ PHP_QT_SET_PROPERTY_OBJ_METHOD(QObject,setObjectName,objectName,QString);
 PHP_QT_RETURN_PROPERTY_OBJ_METHOD(QObject,parent);
 //PHP_QT_SET_PROPERTY_OBJ_METHOD(QObject,setParent,QObject);
 //PHP_QT_RETURN_OBJ_METHOD(QObject,property,QVariant);
+
+ZEND_METHOD(QObject,tr){
+
+  if (ZEND_NUM_ARGS() == 1) {
+
+    char *str;
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s", &str) == FAILURE) {
+        return; 
+    }
+    
+    QString *return_object;
+
+    if (getThis() != NULL) {
+      QObject *obj = (QObject *) PHP_QT_FETCH();
+      *return_object = static_cast < QString > (obj->tr(str));
+    } else {
+      php_error(E_ERROR, "Object not found");
+    }
+    zend_class_entry *ce;
+
+    object_init_ex(return_value, QString_ce_ptr);
+    zend_rsrc_list_entry le;
+
+    le.ptr = return_object;
+    php_qt_register(return_value, le);
+    return;
+
+  }
+
+}
+
+ZEND_METHOD(QObject,sender){
+
+    QObject *return_object;
+
+    if (getThis() != NULL) {
+      QObject_moc *obj = (QObject_moc *) PHP_QT_FETCH();
+      return_object = obj->protected_sender();
+    } else {
+      php_error(E_ERROR, "Object not found");
+    }
+    zend_class_entry *ce;
+
+    object_init_ex(return_value, QObject_ce_ptr);
+    zend_rsrc_list_entry le;
+
+    le.ptr = return_object;
+    php_qt_register(return_value, le);
+    return;
+
+
+}
+
