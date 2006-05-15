@@ -276,7 +276,7 @@ ZEND_METHOD(QLineEdit, setReadOnly){
 	if (ZEND_NUM_ARGS() == 1){
 		zval *z_0; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
-			if(Z_TYPE_P(z_0) == IS_LONG){
+			if(Z_TYPE_P(z_0) == IS_BOOL){
 			QLineEdit *obj = (QLineEdit*) PHP_QT_FETCH();
 
 
@@ -446,15 +446,34 @@ ZEND_METHOD(QLineEdit, __construct){
 		zval *z_0; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
-			QObject* obj_z_0 = (QObject*) php_qt_fetch(z_0);
+			    QObject* obj_z_0 = (QObject*) php_qt_fetch(z_0);
 
 
-			if(obj_z_0->inherits("QWidget")) {
-				QLineEdit *QLineEdit_ptr = new QLineEdit((QWidget*) obj_z_0);
+			    if(obj_z_0->inherits("QWidget")) {
+				    QLineEdit *QLineEdit_ptr = new QLineEdit((QWidget*) obj_z_0);
+				    PHP_QT_REGISTER(QLineEdit_ptr);
+
+				    RETURN_NULL();
+			    }
+			} else if(Z_TYPE_P(z_0) == IS_STRING){
+
+			    QString *str = new QString("");
+			    *str = QString(QString::fromUtf8(Z_STRVAL_P(z_0)));
+
+			    zend_class_entry *ce;                                   
+			    object_init_ex(z_0, QString_ce_ptr);
+			    zend_rsrc_list_entry le_;                            
+			    le_.ptr = str;
+			    php_qt_register(z_0,le_);                                 
+
+			    QObject* obj_z_0 = (QObject*) php_qt_fetch(z_0);
+
+				QLineEdit *QLineEdit_ptr = new QLineEdit((const QString&) *obj_z_0);
 				PHP_QT_REGISTER(QLineEdit_ptr);
 				RETURN_NULL();
+
 			}
-			}
+            
 		}
 	}
 		/* oo public*/
@@ -479,7 +498,6 @@ ZEND_METHOD(QLineEdit, __construct){
 			  php_qt_register(z_0,le);                                 
 
 			}
-
 
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_OBJECT){
 			QObject* obj_z_0 = (QObject*) php_qt_fetch(z_0);
@@ -567,9 +585,9 @@ ZEND_METHOD(QLineEdit, text){
 				php_error(E_ERROR,"Object not found");
 			}
 				zend_class_entry *ce;                                   
-				object_init_ex(return_value, QLineEdit_ce_ptr);     
+				object_init_ex(return_value, QString_ce_ptr);     
 				zend_rsrc_list_entry le;                            
-				le.ptr = return_object;                                       
+				le.ptr = return_object;
 				php_qt_register(return_value,le);                   
 				return;                                             
 	}
@@ -1153,10 +1171,20 @@ ZEND_METHOD(QLineEdit, setText){
 
 			if(!strcmp(Z_OBJCE_P(z_0)->name,"QString")) {
 				obj->setText((const QString&) *obj_z_0);
-			RETURN_NULL();
+			    RETURN_NULL();
 			}
 			}
+			if(Z_TYPE_P(z_0) == IS_STRING){
+
+			    QLineEdit *obj = (QLineEdit*) PHP_QT_FETCH();
+
+				obj->setText(Z_STRVAL_P(z_0));
+			    RETURN_NULL();
+			}
+			
+
 		}
+
 	}
 }
 

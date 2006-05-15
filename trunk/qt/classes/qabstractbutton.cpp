@@ -484,19 +484,17 @@ ZEND_METHOD(QAbstractButton, setText){
 		/* o public*/
 
 		/* const QString& text,  */
-
 	if (ZEND_NUM_ARGS() == 1){
 		zval *z_0; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
-			QAbstractButton *obj = (QAbstractButton*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) php_qt_fetch(z_0);
 
+			    QAbstractButton *obj = static_cast<QAbstractButton*>(PHP_QT_FETCH());
+			    QObject* obj_z_0 = static_cast<QObject*>(php_qt_fetch(z_0));
 
-			if(Z_OBJCE_P(z_0)->name == "QString") {
-				obj->setText((const QString&) obj_z_0);
-			RETURN_NULL();
-			}
+		        obj->setText((const QString&) *obj_z_0);
+			    RETURN_NULL();
+
 			}
 		}
 	}
@@ -511,11 +509,12 @@ ZEND_METHOD(QAbstractButton, setText){
 ZEND_METHOD(QAbstractButton, text){
 	if (ZEND_NUM_ARGS() == 0){
 			QAbstractButton *obj = (QAbstractButton*) PHP_QT_FETCH();
-				QString return_object = (QString) obj->text();
+            QString *return_object = new QString;
+				*return_object = (QString) obj->text();
 				zend_class_entry *ce;                                   
-				object_init_ex(return_value, QAbstractButton_ce_ptr);     
+				object_init_ex(return_value, QString_ce_ptr);     
 				zend_rsrc_list_entry le;                            
-				le.ptr = (void*) &return_object;                                       
+				le.ptr = (void*) return_object;                                       
 				php_qt_register(return_value,le);                   
 				return;                                             
 	}

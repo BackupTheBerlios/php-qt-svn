@@ -518,20 +518,42 @@ ZEND_METHOD(QGridLayout, columnStretch)
 ZEND_METHOD(QGridLayout, addWidget)
 {
 ///QWidget*
+	if (ZEND_NUM_ARGS() == 5){
+		zval *z_0; // define ZVAL
+		zval *z_1; // define ZVAL
+		zval *z_2; // define ZVAL
+        zval *z_3; // define ZVAL
+        zval *z_4; // define ZVAL
+        
+		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzzzz", &z_0, &z_1, &z_2, &z_3, &z_4) == SUCCESS) {
+
+//			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG && Z_TYPE_P(z_3) == IS_LONG && Z_TYPE_P(z_4) == IS_LONG){
+
+			    QGridLayout *obj = (QGridLayout*) PHP_QT_FETCH();
+			    QWidget* obj_z_0 = static_cast<QWidget*>(php_qt_fetch(z_0));
+
+			    if(obj_z_0->inherits("QWidget")) {
+				    obj->addWidget(obj_z_0, (int) Z_LVAL_P(z_1), (int) Z_LVAL_P(z_2), (int) Z_LVAL_P(z_3), (Qt::Alignment) Z_LVAL_P(z_4));
+			        RETURN_NULL();
+			    } else { php_error(E_ERROR,"argument is no QWidget"); }
+//			} else { php_error(E_ERROR,"argument not allowed"); }
+		}
+	}
+///QWidget*
 	if (ZEND_NUM_ARGS() == 3){
 		zval *z_0; // define ZVAL
 		zval *z_1; // define ZVAL
 		zval *z_2; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzz", &z_0, &z_1, &z_2) == SUCCESS) {
-			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG){
-			QGridLayout *obj = (QGridLayout*) PHP_QT_FETCH();
-			QWidget* obj_z_0 = static_cast<QWidget*>(php_qt_fetch(z_0));
+//			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG){
+			    QGridLayout *obj = (QGridLayout*) PHP_QT_FETCH();
+			    QWidget* obj_z_0 = static_cast<QWidget*>(php_qt_fetch(z_0));
 
-			if(obj_z_0->inherits("QWidget")) {
-				obj->addWidget(obj_z_0, (int) Z_LVAL_P(z_1), (Qt::Alignment) Z_LVAL_P(z_2));
-			    RETURN_NULL();
-			} else { php_error(E_ERROR,"argument is no QWidget"); }
-			} else { php_error(E_ERROR,"argument not allowed"); }
+			    if(obj_z_0->inherits("QWidget")) {
+				    obj->addWidget(obj_z_0, (int) Z_LVAL_P(z_1), (Qt::Alignment) Z_LVAL_P(z_2));
+			        RETURN_NULL();
+			    } else { php_error(E_ERROR,"argument is no QWidget"); }
+//			} else { php_error(E_ERROR,"argument not allowed"); }
 		}
 	}
 /*! o public*/
