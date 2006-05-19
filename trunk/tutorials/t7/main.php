@@ -3,7 +3,7 @@
     **
     ** Qt tutorial 7
     **
-    ** http://doc.trolltech.com/4.0/tutorial-t6.html
+    ** http://doc.trolltech.com/4.0/tutorial-t7.html
     **
     ****************************************************************/
 
