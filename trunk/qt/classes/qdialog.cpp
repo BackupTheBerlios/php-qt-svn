@@ -162,7 +162,7 @@ ZEND_METHOD(QDialog, tr)
           *return_object = static_cast < QString > (QDialog::tr((const char *)Z_STRVAL_P(z_0), (const char *)Z_STRVAL_P(z_1)));
         } zend_class_entry *ce;
 
-        object_init_ex(return_value, QDialog_ce_ptr);
+        object_init_ex(return_value, QString_ce_ptr);
         zend_rsrc_list_entry le;
 
         le.ptr = return_object;
@@ -178,21 +178,21 @@ ZEND_METHOD(QDialog, tr)
 
     if (zend_parse_parameters(ZEND_NUM_ARGS()TSRMLS_CC, "z", &z_0) == SUCCESS) {
       if (Z_TYPE_P(z_0) == IS_STRING) {
-        QString *return_object;
+        QString *return_object = new QString;
         if (getThis() != NULL) {
 /// return value is object: QString
-        QDialog *obj = static_cast<QDialog *>(PHP_QT_FETCH());
-          *return_object = static_cast < QString > (obj->tr((const char *)Z_STRVAL_P(z_0)));
+            QDialog *obj = static_cast<QDialog *>(PHP_QT_FETCH());
+            *return_object = static_cast < QString > (obj->tr((const char *)Z_STRVAL_P(z_0)));
 /// check whether method call is static.
         } else {
-          return_object = (QString *) malloc(sizeof (QDialog::tr((const char *)Z_STRVAL_P(z_0))));   /// memory allocation
-          *return_object = static_cast < QString > (QDialog::tr((const char *)Z_STRVAL_P(z_0)));
-        } zend_class_entry *ce;
-        object_init_ex(return_value, QToolButton_ce_ptr);
-        zend_rsrc_list_entry le;
-        le.ptr = return_object;
-        php_qt_register(return_value, le);
-        return;
+            *return_object = static_cast < QString > (QDialog::tr((const char *)Z_STRVAL_P(z_0)));
+        } 
+            zend_class_entry *ce;
+            object_init_ex(return_value, QString_ce_ptr);
+            zend_rsrc_list_entry le;
+            le.ptr = return_object;
+            php_qt_register(return_value, le);
+            return;
       } else {
         php_error(E_ERROR, "argument not allowed");
       }                         /// END check of argument types
