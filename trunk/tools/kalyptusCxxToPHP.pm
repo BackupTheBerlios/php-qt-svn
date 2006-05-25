@@ -50,6 +50,7 @@ use vars qw/
     *HEADER
 
     *AG_ZEND_CLASS_ENTRY
+    *AG_DEFINES
     *AG_EXTERN_ZEND_CLASS_ENTRY
     *AG_VOID_REGISTER
     *AG_ZEND_PHP_QT
@@ -167,6 +168,11 @@ sub handleMethod
     my ( $method ) = @_;
 
     my $methodname = $method->{astNodeName};
+
+    if(IshouldSkip($method)){
+        return;
+    }
+
     $methodname = "__construct" if($methodname eq $classname);
 
     print CLASS "ZEND_METHOD(".$classname.",".$methodname."){";
@@ -303,14 +309,16 @@ sub handleArguments
     my ( $params, $return, $flags, $methodname ) = @_;
 
     my $returnType = cplusplusToZVAL($return);      # example: BOOL, LONG, DOUBLE, STRING, OBJECT
+    my $is_constructor = ($method->{astNodeName} eq $classname);
+
     if($returnType eq "unknown"){
         print CLASS "php_error(E_ERROR,\"unsupported return type ".$return."\");";
         return;
     }
 
-    if($flags =~ /s/){
+    if($flags =~ /s/){  # static
     } else {
-        print CLASS "if(getThis() == NULL){php_error(E_ERROR,\"method '".$methodname."' is not static\"); RETURN_NULL;}";
+        print CLASS "if(getThis() == NULL){php_error(E_ERROR,\"method '".$methodname."' is not static\"); RETURN_NULL();}";
     }
 
 
@@ -320,7 +328,9 @@ sub handleArguments
     my @cargs = kdocUtil::splitUnnested(",", $params);  # fetch args
 
     $preparation .= "\n\t/// try ".$params."\n";
-    $preparation .= "if(getThis != NULL){".$classname." *selfpointer = static_cast<".$classname."*>(PHP_QT_FETCH());}";
+    if(!$is_constructor){   # fetch self pointer
+        $preparation .= "".$classname." *selfpointer; if(getThis() != NULL){selfpointer = static_cast<".$classname."*>(PHP_QT_FETCH());}";
+    }
 
     # argument handling
     foreach $arg (@cargs) {
@@ -341,6 +351,7 @@ sub handleArguments
         if(checkRPN($arg) eq "reference"){
             $postfix = "&"; # cast (old c cast)
             $prefix = "*";  # dereferencing the pointer
+            $prefix_ZVAL = "";
         } elsif (checkRPN($arg) eq "pointer"){
             $postfix = "*"; # cast
             $prefix = "";   # nothing, is already a pointer
@@ -348,6 +359,7 @@ sub handleArguments
         } elsif (checkRPN($arg) eq "normal"){
             $prefix = "*";  # dereferencing the pointer
             $postfix = "";  # nothing to do here
+            $prefix_ZVAL = "";
         }
 
         $cpp_call_params .= "(".checkConst($arg)." ".$classType.$postfix.")";
@@ -387,8 +399,9 @@ sub handleArguments
     }
 
     if($returnType eq "OBJECT"){
-        if($flags =~ /s/){
-            print CLASS "if(getThis() == NULL){".$prefix." return_object = static_cast<"                .$returnClassName.$infix.">(".$classname."::".$method->{astNodeName}."(".$cpp_call_params."));} else {print CLASS "                .$prefix." return_object = static_cast<"               .$returnClassName.$infix.">(selfpointer->".$method->{astNodeName}."(".$cpp_call_params."));}";
+        if($flags =~ /s/){  # static
+            print CLASS "if(getThis() == NULL){".$prefix." return_object = static_cast<"                .$returnClassName.$infix.">(".$classname."::".$method->{astNodeName}."(".$cpp_call_params."));} else {"
+            .$prefix." return_object = static_cast<"               .$returnClassName.$infix.">(selfpointer->".$method->{astNodeName}."(".$cpp_call_params."));}";
         } else {
             print CLASS $prefix." return_object = static_cast<"
                 .$returnClassName.$infix.">(selfpointer->".$method->{astNodeName}."(".$cpp_call_params."));";
@@ -400,15 +413,20 @@ sub handleArguments
         print CLASS "php_qt_register(return_value,le);";
         print CLASS "return;";
     } else {
-        if($method->{astNodeName} eq $classname){
-            print CLASS "PHP_QT_REGISTER(selfpointer->".$method->{astNodeName}."(".$cpp_call_params."));";
+        my $for_string;
+        if($returnType eq "STRING"){    # RETURN_STRING macro needs 2 params
+            $for_string = ", 1";
+        }
+        if($is_constructor){   # constructor
+            print CLASS $classname." *selfpointer = new ".$classname."(".$cpp_call_params.");";
+            print CLASS "PHP_QT_REGISTER(selfpointer);";
         } else {
-            if($flags =~ /s/){
+            if($flags =~ /s/){  # static
                 print CLASS "if(getThis() == NULL){RETURN_".$returnType."(".$classname."::"
-                    .$method->{astNodeName}."(".$cpp_call_params."));} else {RETURN_"
-                    .$returnType."(selfpointer->".$method->{astNodeName}."(".$cpp_call_params."));}";
+                    .$method->{astNodeName}."(".$cpp_call_params.")".$for_string.");} else {RETURN_"
+                    .$returnType."(selfpointer->".$method->{astNodeName}."(".$cpp_call_params.")".$for_string.");}";
             } else {
-                print CLASS "RETURN_".$returnType."(selfpointer->".$method->{astNodeName}."(".$cpp_call_params."));";
+                print CLASS "RETURN_".$returnType."(selfpointer->".$method->{astNodeName}."(".$cpp_call_params.")".$for_string.");";
             }
         }
     }
@@ -493,6 +511,11 @@ sub openAllFiles
     open( AG_ZEND_CLASS_ENTRY, ">$file_ag_zend_class_entry" ) || die "Couldn't create $file_ag_zend_class_entry\n";
     $file_ag_zend_class_entry =~ s/\.h/.h/;
 
+    # AG_ZEND_CLASS_ENTRY
+    my $file_ag_defines = "$outputdir/defined.h";
+    open( AG_DEFINES, ">$file_ag_defines" ) || die "Couldn't create $file_ag_defines\n";
+    $file_ag_defines =~ s/\.h/.h/;
+
     # AG_EXTERN_ZEND_CLASS_ENTRY
     my $file_ag_extern_zend_class_entry = "$outputdir/ag_extern_zend_class_entry.inc";
     open( AG_EXTERN_ZEND_CLASS_ENTRY, ">$file_ag_extern_zend_class_entry" ) || die "Couldn't create $file_ag_extern_zend_class_entry\n";
@@ -572,7 +595,7 @@ sub writeAllFiles
     my ($node) = @_;
 
     print AG_ZEND_CLASS_ENTRY "zend_class_entry *",$node->{astNodeName},"_ce_ptr;\n";
-    print AG_ZEND_CLASS_ENTRY "#ifndef PHP_QT_".$classname."\n#define PHP_QT_".$classname."\n\n";
+    print AG_DEFINES "#ifndef PHP_QT_".$classname."\n#define PHP_QT_".$classname."\n#endif\n\n";
 
     print AG_CONFIGM4 "\tqt/classes/",lc($node->{astNodeName}),".cpp \\ \n";
     print AG_EXTERN_ZEND_CLASS_ENTRY "extern zend_class_entry *",$node->{astNodeName},"_ce_ptr;\n";
@@ -608,6 +631,7 @@ ZEND_END_MODULE_GLOBALS(php_qt)
     ";
 
     close AG_ZEND_CLASS_ENTRY;
+    close AG_DEFINES;
     close AG_EXTERN_ZEND_CLASS_ENTRY;
     close AG_ZEND_PHP_QT;
     close AG_CONFIGM4;
@@ -704,7 +728,7 @@ sub DerivedClass
         const QMetaObject* metaObject() const;
         int qt_metacall(QMetaObject::Call _c, int _id, void **_a);
     };
-    PHP_QT_MOC(".$classname.");
+    //PHP_QT_MOC(".$classname.");
 ";
 # TODO:
 # virtual and private classes
@@ -778,10 +802,14 @@ sub cplusplusToZVAL
 {
 	my ( $cplusplusType )  = @_;
 
+    if($cplusplusType eq ""){
+        return "";
+    }
+
 	if ( $cplusplusType =~ /bool/) {
 		return "BOOL";
 	} elsif ( $cplusplusType =~ /\s*void\s*\**/ ) {
-		return "NULL";
+		return "VOID";
 	} elsif ( $cplusplusType =~ /\s*::\s*/) {
 		return "LONG";
 	} elsif ( $cplusplusType =~ /\s*\bint\s*\&*/) {
@@ -902,6 +930,42 @@ sub expandEndifs
         $endif .= "#endif\n\n";
     }
     return $endif;
+}
+
+# flags:
+# virtual           v
+# static            's'
+# pure              p
+# const             c
+# slots             l
+# inline            i
+# signal            n
+# k_dcop            d
+# k_dcop_signals    z
+# k_dcop_hidden     y
+# explicit          t
+
+sub IshouldSkip
+{
+    my ($method) = @_;
+
+    if($method->{astNodeName} =~ /qt_/)
+    {   # skip qt_cast, ...
+        return 1;
+    }
+#    if($method->{Flags} =~ /n|v|t/){    # skip slots
+    if($method->{Flags} =~ /n|v/){    # skip slots
+        return 1;
+    }
+    if($method->{Access} eq "protected"){
+        return 1;
+    }
+    if($method->{astNodeName} eq "className"
+        || $method->{astNodeName} eq "qObject")
+    {
+        return 1;
+    }
+
 }
 
 1;
