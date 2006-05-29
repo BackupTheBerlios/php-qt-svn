@@ -21,7 +21,6 @@
 # sub writeDoc                      $lib, $rootnode, $outputdir, $opt
 # sub writeClassDoc                 $node
 
-
 package kalyptusCxxToPHP;
 
 use File::Path;
@@ -44,6 +43,9 @@ use vars qw/
 	$pastaccess $pastname $pastreturn $pastparams $nullctor $ctorCount @properties @functions @constructors
 
     %methods
+    @protected;
+    @virtual;
+    @addIncludes;
 
     $classname;
     *CLASS
@@ -121,6 +123,8 @@ sub writeClassDoc
 
     handleAllMethods($class);
     Inheritance($class);
+
+
 
     closeClassFile();
 
@@ -418,7 +422,8 @@ sub handleArguments
             $for_string = ", 1";
         }
         if($is_constructor){   # constructor
-            print CLASS $classname." *selfpointer = new ".$classname."(".$cpp_call_params.");";
+            my $comma = "," if($cpp_call_params);
+            print CLASS $classname."_php_qt *selfpointer = new ".$classname."_php_qt(getThis()".$comma.$cpp_call_params.");";
             print CLASS "PHP_QT_REGISTER(selfpointer);";
         } else {
             if($flags =~ /s/){  # static
@@ -601,7 +606,6 @@ sub writeAllFiles
     print AG_EXTERN_ZEND_CLASS_ENTRY "extern zend_class_entry *",$node->{astNodeName},"_ce_ptr;\n";
     print AG_EXTERN_ZEND_CLASS_ENTRY "void \t_register_",$node->{astNodeName},"();\n";
 
-
     print PHP_QT_MINIT "\n\t_register_",$node->{astNodeName},"(TSRMLS_C);\n";
     print AG_QT_MINIT "\n\t_register_",$node->{astNodeName},"(TSRMLS_C);\n";
 
@@ -714,21 +718,62 @@ sub checkIncludes(){
 
 sub DerivedClass
 {
-    my ($node) = @_;
+    my ($class) = @_;
+
+    $constructor = findConstructor($class);
+
+    my $prepared_params;
+    my @paramList = kdocUtil::splitUnnested(",", $constructor->{Params});
+    foreach my $param (@paramList){
+
+        @ch = split(/=/, $param);
+
+        $prepared_params .= ",".@ch[0];
+    }
+
+    $comma = "," if ($prepared_params);
+
+    my $protected_declaration, $protected_implementation;
+    if(@protected){
+        $protected_declaration = "\nprotected:\n";
+        foreach my $method (@protected){
+            if($method->{astNodeName} eq "metaObject" || $method->{astNodeName} eq "className"){
+                next;
+            }
+            checkAddIncludes($method);
+            $protected_declaration .= "\n".checkConst($method->{Flags})." ".checkFlags($method->{Flags})." ".$method->{ReturnType}." ".$method->{astNodeName}."(".$method->{Params}.");";
+            $protected_implementation .= "\n ".$method->{ReturnType}." ".$classname."_php_qt::".$method->{astNodeName}."(".$method->{Params}."){}";
+        }
+    }
+
+    my $includes;
+    foreach $include (@addIncludes){
+        print CLASS "#include <".$include.">\n";
+    }
 
     print CLASS "#include <QMetaMethod>
     class ".$classname."_php_qt : public ".$classname."{
 
     public:
-        ".$classname."_php_qt(zval* zend_ptr);
+        ".$classname."_php_qt(zval* zend_ptr".$comma.$constructor->{Params}.");
 
         zval* zend_ptr;
         QMetaObject* dynamicMetaObject;
 
         const QMetaObject* metaObject() const;
         int qt_metacall(QMetaObject::Call _c, int _id, void **_a);
+    ".$protected_declaration."
     };
-    //PHP_QT_MOC(".$classname.");
+    ".$classname."_php_qt::".$classname."_php_qt(zval* zend_ptr".$prepared_params.")
+    {
+        this->zend_ptr = zend_ptr;
+        dynamicMetaObject = new QMetaObject;
+        dynamicMetaObject = php_qt_getMocData(this->zend_ptr,\"".$classname."\",&staticMetaObject);
+    }";
+
+    print CLASS $protected_implementation;
+
+    print CLASS "\nPHP_QT_MOC(".$classname.");
 ";
 # TODO:
 # virtual and private classes
@@ -892,6 +937,18 @@ sub checkConst
     return "";
 }
 
+# checks for const
+sub checkFlags
+{
+    my ($e) = @_;
+    my $return;
+    if($e =~ /v/){
+        $return .= "virtual";
+    }
+
+    return $return;
+}
+
 # invokes types for the Z_XVAL macro
 sub invokeTypeToZ_XVAL
 {
@@ -954,16 +1011,83 @@ sub IshouldSkip
         return 1;
     }
 #    if($method->{Flags} =~ /n|v|t/){    # skip slots
-    if($method->{Flags} =~ /n|v/){    # skip slots
+    if($method->{Flags} =~ /n/){    # skip slots
         return 1;
     }
+
     if($method->{Access} eq "protected"){
+        push @protected, $method;
         return 1;
     }
+
+    if($method->{Flags} =~ /v/){    # skip slots
+        return 1;
+    }
+
     if($method->{astNodeName} eq "className"
         || $method->{astNodeName} eq "qObject")
     {
         return 1;
+    }
+
+}
+
+#
+#   finds the constructor
+#
+sub findConstructor
+{
+    my ($class) = @_;
+
+    my @return;
+
+    Iter::MembersByType ($class,sub{},
+	sub
+    {
+        my ($class, $kid ) = @_;
+        if($kid->{NodeType} eq "method")
+        {
+            # there are some additional protected constructors, skip
+            if($kid->{Access} ne "protected"){
+                if($kid->{astNodeName} eq $classname){
+                    push @return, $kid;
+                }
+            }
+        }
+    },sub {}
+	);
+
+    # first is the constructor, second is destructor
+    return @return[0];
+
+}
+
+sub checkAddIncludes
+{
+    my ($method) = @_;
+
+    my @cargs = kdocUtil::splitUnnested(",", $method->{Params});
+
+    foreach my $arg (@cargs){
+        my @arg_ = split(/ /,$arg);
+        foreach my $m (@addIncludes){
+            # skip 'const'
+            if(@arg_[0] eq "const"){
+                if($m eq @arg_[1]){
+                    return;
+                }
+            } else {
+                if($m eq @arg_[0]){
+                    return;
+                }
+            }
+        }
+        if(@arg_[0] eq "const"){
+            push @addIncludes, @arg_[1];
+        } else {
+            push @addIncludes, @arg_[0];
+        }
+
     }
 
 }
