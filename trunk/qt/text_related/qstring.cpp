@@ -533,6 +533,7 @@ ZEND_METHOD(QString, toUpper){
  *    flags:    
  */
 ZEND_METHOD(QString, __construct){
+
 	if (ZEND_NUM_ARGS() == 0){
 			QString *QString_ptr = new QString();
 				PHP_QT_REGISTER(QString_ptr);
@@ -597,6 +598,8 @@ ZEND_METHOD(QString, __construct){
 			}
 		}
 	}
+
+    
 }
 
 /*********************************
@@ -1411,12 +1414,21 @@ ZEND_METHOD(QString, startsWith){
  *    function  remove
  *    flags:    
  */
+ /*
+ 
+QString & remove ( int pos, int len ) 
+QString & remove ( const QString & str, Qt::CaseSensitivity cs = Qt::CaseSensitive ) 
+QString & remove ( QChar ch, Qt::CaseSensitivity cs = Qt::CaseSensitive ) 
+QString & remove ( const QRegExp & rx )
+ 
+ */
+ 
 ZEND_METHOD(QString, remove){
-
+/*
 	if (ZEND_NUM_ARGS() == 1){
-		/* o public*/
+		// o public
 
-		/* const QRegExp& rx,  */
+		// const QRegExp& rx,  
 		zval *z_0; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
@@ -1429,12 +1441,12 @@ ZEND_METHOD(QString, remove){
 	}
 
 	if (ZEND_NUM_ARGS() == 2){
-		/* ol public*/
+		// ol public
 
-		/* const QString& s, int cs,  */
-		/* ll public*/
+		// const QString& s, int cs,  
+		// ll public
 
-		/* int i, int len,  */
+		// int i, int len,  
 		zval *z_0; // define ZVAL
 		zval *z_1; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
@@ -1457,7 +1469,256 @@ ZEND_METHOD(QString, remove){
 				return;                                             
 			}
 		}
-	}
+	}*/
+/*
+    zval** args = new zval*[ZEND_NUM_ARGS()];
+
+    char* parse_types = new char[ZEND_NUM_ARGS()];
+    int i;
+    for(i=0;i<ZEND_NUM_ARGS();i++){
+        parse_types[i] = 'z';
+    }
+    parse_types[i] = NULL;
+
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, parse_types, args) != SUCCESS){
+        php_error(E_ERROR,"argument could not be parsed\n");
+        return;
+    }
+
+    QString *obj = (QString*) PHP_QT_FETCH();
+
+    if(ZEND_NUM_ARGS() == 0){
+        php_error(E_ERROR,"more arguments needed.\n");
+
+    } else if(ZEND_NUM_ARGS() == 1 && Z_TYPE_P(args[0]) == IS_OBJECT){
+        if(Z_OBJCE_P(args[0]) == QChar_ce_ptr){
+            QChar *c = static_cast<QChar*>(php_qt_fetch(args[0]));
+            obj->remove((QChar) *c);
+        } else if(Z_OBJCE_P(args[0]) == QString_ce_ptr){
+            QString *c = static_cast<QString*>(php_qt_fetch(args[0]));
+            obj->remove((const QString&) *c);
+#ifdef PHP_QT_QREGEXP
+        } else if(Z_OBJCE_P(args[0]) == QRegExp_ce_ptr){
+            QRegExp *c = static_cast<QRegExp*>(php_qt_fetch(args[0]));
+            obj->remove((const QRegExp&) *c);
+#endif
+        }
+
+
+    } //else if (ZEND_NUM_ARGS() == 2 && Z_TYPE_P(args[0]) == IS_LONG && Z_TYPE_P(args[1]) == IS_LONG){
+      //  RETURN_LONG(obj->toInt((bool*) Z_LVAL_P(args[0]) ,(int) Z_LVAL_P(args[1])));
+
+    //} else {
+        php_error(E_ERROR,"argument could not be accepted\n");
+    }
+
+*/
+
+  ///int i, int len
+#ifdef PHP_QT_QString           // return type
+
+  if (ZEND_NUM_ARGS() == 2) {
+    PHP_QT_FETCH_2_ARGS();
+    if (1 && Z_TYPE_P(arg_0) == IS_LONG && Z_TYPE_P(arg_1) == IS_LONG) {
+      if (getThis() == NULL) {
+        php_error(E_ERROR, "method 'remove' is not static");
+        RETURN_NULL();
+      }
+      /// try int i, int len,
+      QString *selfpointer;
+
+      if (getThis() != NULL) {
+        selfpointer = static_cast < QString * >(PHP_QT_FETCH());
+      }
+      QString & return_object = static_cast < QString & >(selfpointer->remove((int)Z_LVAL_P(arg_0), (int)Z_LVAL_P(arg_1)));
+      zend_class_entry *ce;
+
+      object_init_ex(return_value, QString_ce_ptr);
+      zend_rsrc_list_entry le;
+
+      le.ptr = (void *)&return_object;
+      php_qt_register(return_value, le);
+      return;
+    }
+  }
+#endif // return type
+
+
+  ///QChar c, Qt::CaseSensitivity cs = Qt::CaseSensitive
+#ifdef PHP_QT_QString           // return type
+
+  if (ZEND_NUM_ARGS() == 1) {
+    PHP_QT_FETCH_1_ARGS();
+    if (1 && Z_TYPE_P(arg_0) == IS_OBJECT) {
+#ifdef PHP_QT_QChar
+      if (Z_OBJCE_P(arg_0) == QChar_ce_ptr) {
+        if (getThis() == NULL) {
+          php_error(E_ERROR, "method 'remove' is not static");
+          RETURN_NULL();
+        }
+        /// try QChar c,
+        QString *selfpointer;
+
+        if (getThis() != NULL) {
+          selfpointer = static_cast < QString * >(PHP_QT_FETCH());
+        }
+        QChar *cpp_arg_0 = static_cast < QChar * >(php_qt_fetch(arg_0));
+
+        QString & return_object = static_cast < QString & >(selfpointer->remove((QChar) * cpp_arg_0));
+        zend_class_entry *ce;
+
+        object_init_ex(return_value, QString_ce_ptr);
+        zend_rsrc_list_entry le;
+
+        le.ptr = (void *)&return_object;
+        php_qt_register(return_value, le);
+        return;
+      }
+#endif
+
+    }
+  }
+  if (ZEND_NUM_ARGS() == 2) {
+    PHP_QT_FETCH_2_ARGS();
+    if (1 && Z_TYPE_P(arg_0) == IS_OBJECT && Z_TYPE_P(arg_1) == IS_LONG) {
+#ifdef PHP_QT_QChar
+      if (Z_OBJCE_P(arg_0) == QChar_ce_ptr) {
+        if (getThis() == NULL) {
+          php_error(E_ERROR, "method 'remove' is not static");
+          RETURN_NULL();
+        }
+        /// try QChar c, Qt::CaseSensitivity cs = Qt::CaseSensitive,
+        QString *selfpointer;
+
+        if (getThis() != NULL) {
+          selfpointer = static_cast < QString * >(PHP_QT_FETCH());
+        }
+        QChar *cpp_arg_0 = static_cast < QChar * >(php_qt_fetch(arg_0));
+
+        QString & return_object = static_cast < QString & >(selfpointer->remove((QChar) * cpp_arg_0, (Qt::CaseSensitivity) Z_LVAL_P(arg_1)));
+        zend_class_entry *ce;
+
+        object_init_ex(return_value, QString_ce_ptr);
+        zend_rsrc_list_entry le;
+
+        le.ptr = (void *)&return_object;
+        php_qt_register(return_value, le);
+        return;
+      }
+#endif
+
+    }
+  }
+#endif // return type
+
+
+  ///const QString &s, Qt::CaseSensitivity cs = Qt::CaseSensitive
+#ifdef PHP_QT_QString           // return type
+
+  if (ZEND_NUM_ARGS() == 1) {
+    PHP_QT_FETCH_1_ARGS();
+    if (1 && Z_TYPE_P(arg_0) == IS_OBJECT) {
+#ifdef PHP_QT_QString
+      if (Z_OBJCE_P(arg_0) == QString_ce_ptr) {
+        if (getThis() == NULL) {
+          php_error(E_ERROR, "method 'remove' is not static");
+          RETURN_NULL();
+        }
+        /// try const QString &s,
+        QString *selfpointer;
+
+        if (getThis() != NULL) {
+          selfpointer = static_cast < QString * >(PHP_QT_FETCH());
+        }
+        QString *cpp_arg_0 = static_cast < QString * >(php_qt_fetch(arg_0));
+
+        QString & return_object = static_cast < QString & >(selfpointer->remove((const QString &)*cpp_arg_0));
+        zend_class_entry *ce;
+
+        object_init_ex(return_value, QString_ce_ptr);
+        zend_rsrc_list_entry le;
+
+        le.ptr = (void *)&return_object;
+        php_qt_register(return_value, le);
+        return;
+      }
+#endif
+
+    }
+  }
+  if (ZEND_NUM_ARGS() == 2) {
+    PHP_QT_FETCH_2_ARGS();
+    if (1 && Z_TYPE_P(arg_0) == IS_OBJECT && Z_TYPE_P(arg_1) == IS_LONG) {
+#ifdef PHP_QT_QString
+      if (Z_OBJCE_P(arg_0) == QString_ce_ptr) {
+        if (getThis() == NULL) {
+          php_error(E_ERROR, "method 'remove' is not static");
+          RETURN_NULL();
+        }
+        /// try const QString &s, Qt::CaseSensitivity cs = Qt::CaseSensitive,
+        QString *selfpointer;
+
+        if (getThis() != NULL) {
+          selfpointer = static_cast < QString * >(PHP_QT_FETCH());
+        }
+        QString *cpp_arg_0 = static_cast < QString * >(php_qt_fetch(arg_0));
+
+        QString & return_object = static_cast < QString & >(selfpointer->remove((const QString &)*cpp_arg_0, (Qt::CaseSensitivity) Z_LVAL_P(arg_1)));
+        zend_class_entry *ce;
+
+        object_init_ex(return_value, QString_ce_ptr);
+        zend_rsrc_list_entry le;
+
+        le.ptr = (void *)&return_object;
+        php_qt_register(return_value, le);
+        return;
+      }
+#endif
+
+    }
+  }
+#endif // return type
+
+
+  ///const QRegExp &rx
+#ifdef PHP_QT_QString           // return type
+
+  if (ZEND_NUM_ARGS() == 1) {
+    PHP_QT_FETCH_1_ARGS();
+    if (1 && Z_TYPE_P(arg_0) == IS_OBJECT) {
+#ifdef PHP_QT_QRegExp
+      if (Z_OBJCE_P(arg_0) == QRegExp_ce_ptr) {
+        if (getThis() == NULL) {
+          php_error(E_ERROR, "method 'remove' is not static");
+          RETURN_NULL();
+        }
+        /// try const QRegExp &rx,
+        QString *selfpointer;
+
+        if (getThis() != NULL) {
+          selfpointer = static_cast < QString * >(PHP_QT_FETCH());
+        }
+        QRegExp *cpp_arg_0 = static_cast < QRegExp * >(php_qt_fetch(arg_0));
+
+        QString & return_object = static_cast < QString & >(selfpointer->remove((const QRegExp &)*cpp_arg_0));
+        zend_class_entry *ce;
+
+        object_init_ex(return_value, QString_ce_ptr);
+        zend_rsrc_list_entry le;
+
+        le.ptr = (void *)&return_object;
+        php_qt_register(return_value, le);
+        return;
+      }
+#endif
+
+    }
+  }
+#endif // return type
+
+  php_error(E_ERROR, "could not parse argument");
+
+
 }
 
 /*********************************
@@ -2517,28 +2778,76 @@ ZEND_METHOD(QString, toLocal8Bit){
  */
 ZEND_METHOD(QString, toInt){
 
-	if (ZEND_NUM_ARGS() == 0){
-		/* ll public*/
+/*	if (ZEND_NUM_ARGS() == 0){
+		// ll public
 
 		QString *obj = (QString*) PHP_QT_FETCH();
 		RETURN_LONG(obj->toInt());
 
 	}
 	if (ZEND_NUM_ARGS() == 2){
-		/* ll public*/
+		// ll public
 
-		/* int* ok, int base,  */
+		// int* ok, int base, 
 		zval *z_0; // define ZVAL
 		zval *z_1; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG){
-			QString *obj = (QString*) PHP_QT_FETCH();
-
-
-			RETURN_LONG(obj->toInt((bool*) Z_LVAL_P(z_0) ,(int) Z_LVAL_P(z_1)));
+			    QString *obj = (QString*) PHP_QT_FETCH();
+			    RETURN_LONG(obj->toInt((bool*) Z_LVAL_P(z_0) ,(int) Z_LVAL_P(z_1)));
 			}
 		}
-	}
+	}*/
+/*
+    zval** args = new zval*[ZEND_NUM_ARGS()];
+
+    char* parse_types = new char[ZEND_NUM_ARGS()];
+    for(int i=0;i<ZEND_NUM_ARGS();i++){
+        parse_types[i] = 'z';
+    }
+
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, parse_types, args) != SUCCESS){
+        php_error(E_ERROR,"argument could not be parsed\n");
+        return;
+    }
+
+    QString *obj = (QString*) PHP_QT_FETCH();
+
+    if(ZEND_NUM_ARGS() == 0){
+        RETURN_LONG(obj->toInt());
+
+    } else if(ZEND_NUM_ARGS() == 1 && Z_TYPE_P(args[0]) == IS_BOOL){
+        RETURN_LONG(obj->toInt((bool*) &Z_LVAL_P(args[0])));
+
+    } else if (ZEND_NUM_ARGS() == 2 && Z_TYPE_P(args[0]) == IS_LONG && Z_TYPE_P(args[1]) == IS_LONG){
+        RETURN_LONG(obj->toInt((bool*) Z_LVAL_P(args[0]) ,(int) Z_LVAL_P(args[1])));
+
+    } else {
+        php_error(E_ERROR,"argument could not be accepted\n");
+    }*/
+
+  PHP_QT_FETCH_ARGS();
+  ///bool *ok=0, int base=10
+  if (ZEND_NUM_ARGS() == 0) {
+    /// try 
+    QString *selfpointer = static_cast < QString * >(PHP_QT_FETCH());
+
+    RETURN_LONG(selfpointer->toInt());
+  }
+  if (ZEND_NUM_ARGS() == 1 && Z_TYPE_P(args[0]) == IS_BOOL) {
+    /// try bool *ok=0,
+    QString *selfpointer = static_cast < QString * >(PHP_QT_FETCH());
+
+    RETURN_LONG(selfpointer->toInt((bool *) & Z_LVAL_P(args[0])));
+  }
+  if (ZEND_NUM_ARGS() == 2 && Z_TYPE_P(args[0]) == IS_BOOL && Z_TYPE_P(args[1]) == IS_LONG) {
+    /// try bool *ok=0, int base=10,
+    QString *selfpointer = static_cast < QString * >(PHP_QT_FETCH());
+
+    RETURN_LONG(selfpointer->toInt((bool *) & Z_LVAL_P(args[0]), (int)&Z_LVAL_P(args[1])));
+  }
+  php_error(E_ERROR, "argument could not be accepted.");
+
 }
 
 /*********************************
