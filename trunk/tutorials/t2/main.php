@@ -13,13 +13,14 @@
 	}
 
 
-    $app = new QApplication($argc,0);
+    $app = new QApplication($argc,$argv);
 
     $quit = new QPushButton("Quit");
     $quit->resize(75,30);
 //    $quit->setFont();
 
-    QObject::connect($quit,SIGNAL("clicked()"),$app,SLOT("quit()"));
+//    QObject::connect($quit,SIGNAL("clicked()"),$app,SLOT("quit()"));
+    $quit->connect($quit,SIGNAL("clicked()"),$app,SLOT("quit()"));
 
     $quit->show();
 

@@ -68,7 +68,7 @@
             $this->pendingAdditiveOperator = new QString();
             $this->pendingMultiplicativeOperator = new QString();
 
-            $this->display = new QLineEdit("0");
+            $this->display = new QLineEdit("Thor");
             $this->display->setReadOnly(true);
             $this->display->setAlignment(QT_ALIGNMENT_ALIGNRIGHT);
             $this->display->setMaxLength(15);
@@ -102,13 +102,13 @@
             $this->equalButton = $this->createButton("=", SLOT("equalClicked()"));
 
             $this->mainLayout = new QGridLayout($this);
+
 //            $this->mainLayout->setSizeConstraint("QLayout::SetFixedSize");
 
             $this->mainLayout->addWidget($this->display, 0, 0, 1, 6);
             $this->mainLayout->addWidget($this->backspaceButton, 1, 0, 1, 2);
             $this->mainLayout->addWidget($this->clearButton, 1, 2, 1, 2);
             $this->mainLayout->addWidget($this->clearAllButton, 1, 4, 1, 2);
-
             $this->mainLayout->addWidget($this->clearMemoryButton, 2, 0);
             $this->mainLayout->addWidget($this->readMemoryButton, 3, 0);
             $this->mainLayout->addWidget($this->setMemoryButton, 4, 0);
@@ -207,7 +207,7 @@
             $operand = $this->display->text()->toDouble();
 
             if (!$this->pendingMultiplicativeOperator->isEmpty()) {
-                if (!calculate($operand, $this->pendingMultiplicativeOperator)) {
+                if (!$this->calculate($operand, $this->pendingMultiplicativeOperator)) {
                     $this->abortOperation();
                     return;
                 }
@@ -218,7 +218,7 @@
             }
 
             if (!$this->pendingAdditiveOperator->isEmpty()) {
-                if (!calculate(operand, $this->pendingAdditiveOperator)) {
+                if (!$this->calculate(operand, $this->pendingAdditiveOperator)) {
                     $this->abortOperation();
                     return;
                 }

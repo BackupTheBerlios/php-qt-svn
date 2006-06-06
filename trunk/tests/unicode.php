@@ -27,6 +27,11 @@
 			foreach($dataNodes as $data)
 			{
 				$this->buttons[] = new QLineEdit(QString::fromUtf8($data->nodeValue, -1),$this);
+
+	            foreach($data->attributes as $attribute){
+                    $this->layout->addWidget(new QLabel($attribute->name.": ".$attribute->value));
+                }
+
 				$this->layout->addWidget($this->buttons[count($this->buttons)-1]);
 			}
 
@@ -40,7 +45,7 @@
 
 	}
 
-    $app = new QApplication();
+    $app = new QApplication($argc,$argv);
 	$widget = new TestButtons();
 	$widget->show();
 	$app->exec();

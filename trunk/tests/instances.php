@@ -3,7 +3,7 @@
     dl('php_qt.' . PHP_SHLIB_SUFFIX);
   }
  
-  $app = new QCoreApplication();
+  $app = new QCoreApplication($argc,$argv);
 
   echo $app." app\n";  
 

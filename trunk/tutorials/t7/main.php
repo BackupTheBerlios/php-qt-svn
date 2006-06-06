@@ -3,7 +3,7 @@
     **
     ** Qt tutorial 7
     **
-    ** http://doc.trolltech.com/4.0/tutorial-t7.html
+    ** http://doc.trolltech.com/4.0/tutorial-t6.html
     **
     ****************************************************************/
 
@@ -26,6 +26,7 @@
 
             $this->lcd = new QLCDNumber(2,$this);
             $this->slider = new QSlider($this);
+
             $this->slider->setOrientation(QT_ORIENTATIONS_HORIZONTAL);
 
             $this->slider->setRange(0, 99);
@@ -47,6 +48,10 @@
             $this->slider->setValue($value);
         }
 
+        function meinSlot(){
+            echo "meinSlot";
+        }
+
     };
 
     class MyWidget extends QWidget
@@ -60,8 +65,9 @@
             parent::__construct();
 
             $this->quit = new QPushButton("Quit");
-    //        $this->quit->setFont(QFont("Times", 18, QFont::Bold));
+            $this->quit->setFont(new QFont("Times", 18, 1));
             $this->connect($this->quit, SIGNAL("clicked()"), QApplication::instance(), SLOT("quit()"));
+
 
             $this->grid = new QGridLayout();
             for ($row = 0; $row < 3; ++$row) {
@@ -72,6 +78,7 @@
                         $this->connect($lcdRange, SIGNAL("valueChanged(int)"), $previousRange, SLOT("setValue(int)"));
                     $previousRange = $lcdRange;
                 }
+
             }
 
             $this->layout = new QVBoxLayout($this);
@@ -81,7 +88,7 @@
         }
     }
 
-    $app = new QApplication($argc,0);
+    $app = new QApplication($argc,$argv);
     $widget = new MyWidget();
     $widget->show();
     $app->exec();

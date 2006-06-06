@@ -32,7 +32,7 @@
 	}
 	
 	
-	$app = new QApplication();
+	$app = new QApplication($argc,$argv);
 
 	$box = new Box();
 	$box->show();

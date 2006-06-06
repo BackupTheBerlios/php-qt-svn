@@ -13,7 +13,7 @@
 
     require_once('calculator.php');
 
-    $app = new QApplication($argc,0);
+    $app = new QApplication($argc,$argv);
 
     $calc = new Calculator();
     $calc->show();

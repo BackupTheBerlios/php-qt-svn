@@ -13,16 +13,20 @@
 	}
 
 
-    $app = new QApplication($argc,0);
+    $app = new QApplication($argc,$argv);
 
     $window = new QWidget();
     $window->resize(200,120);
+
+    $window->setAccessibleName("Julchen");
+echo $window->accessibleName();
 
     $quit = new QPushButton("Quit", $window);
 //    $quit->setFont();
     $quit->setGeometry(10, 40, 180, 40);
 
-    QObject::connect($quit,SIGNAL("clicked()"),$app,SLOT("quit()"));
+//    QObject::connect($quit,SIGNAL("clicked()"),$app,SLOT("quit()"));
+    $quit->connect($quit,SIGNAL("clicked()"),$app,SLOT("quit()"));
 
     $window->show();
 

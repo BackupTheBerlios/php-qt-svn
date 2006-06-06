@@ -12,7 +12,7 @@
 	}
 
 
-    $app = new QApplication($argc,0);
+    $app = new QApplication($argc,$argv);
 
     $hello = new QPushButton("Hello world!");
 //    hello.resize(100, 30);
