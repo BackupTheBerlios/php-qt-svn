@@ -60,10 +60,15 @@ ZEND_DECLARE_MODULE_GLOBALS(php_qt)
 /* True global resources - no need for thread safety here */
 static int le_php_qt;
 
+// object list
 int le_php_qt_hashtype;
 HashTable php_qt_objptr_hash;
 
-zend_class_entry *QObject_ce_ptr;
+// metaobject list
+int le_php_qt_moc_hashtype;
+HashTable php_qt_objptr_moc_hash;
+
+//zend_class_entry *QObject_ce_ptr;
 //zend_class_entry *QEvent_ce_ptr;
 zend_class_entry *QMimeSource_ce_ptr;
 
@@ -956,14 +961,18 @@ PHP_MINIT_FUNCTION(php_qt)
 	  REGISTER_LONG_CONSTANT("QT_WINDOWMODALITY_WINDOWMODAL", Qt::WindowModal, CONST_CS | CONST_PERSISTENT);
 	  REGISTER_LONG_CONSTANT("QT_WINDOWMODALITY_APPLICATIONMODAL", Qt::ApplicationModal, CONST_CS | CONST_PERSISTENT);
 */
+	  REGISTER_LONG_CONSTANT("QBOXLAYOUT_DIRECTION_TOP_TO_BOTTOM", QBoxLayout::TopToBottom, CONST_CS | CONST_PERSISTENT);
 
 #include "ag_qt_minit.inc"
 
 
+    // object list
 	le_php_qt_hashtype = zend_register_list_destructors_ex(destroy_php_qt_hashtable, NULL, "PHP-Qt object list", module_number);
-
 	zend_hash_init_ex(&php_qt_objptr_hash, 50, NULL, NULL, 1, 0);
 
+    // metaobject list
+	le_php_qt_moc_hashtype = zend_register_list_destructors_ex(destroy_php_qt_hashtable, NULL, "PHP-Qt metaobject list", module_number);
+	zend_hash_init_ex(&php_qt_objptr_moc_hash, 50, NULL, NULL, 1, 0);
 
 	return SUCCESS;
 }
@@ -1151,7 +1160,7 @@ void* php_qt_fetch(zval* this_ptr){
 		php_error(E_ERROR,"reference to Qt object missing, %s",Z_OBJCE_P(this_ptr)->name);
 	} 
 	if(type != le_php_qt_hashtype){
-		php_error(E_ERROR,"wrong type, %s",Z_OBJCE_P(this_ptr)->name);
+		php_error(E_ERROR,"php_qt_fetch(): wrong type, %s",Z_OBJCE_P(this_ptr)->name);
 	}
 
 	return ptr;
@@ -1164,6 +1173,53 @@ static void destroy_php_qt_hashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 	php_error(E_ERROR,"Hashtable destroyed. Shutdown PHP-Qt now.");
 #endif
 }
+
+void php_qt_register_moc(zval* this_ptr, zend_rsrc_list_entry le){
+
+	zval *listhandle;
+	MAKE_STD_ZVAL(listhandle);
+	Z_TYPE_P(listhandle) = IS_LONG;
+	Z_LVAL_P(listhandle) = zend_list_insert(le.ptr, le_php_qt_moc_hashtype);
+
+	if(zend_hash_index_update(Z_OBJPROP_P(this_ptr), 1, &listhandle, sizeof(zval*), NULL) == FAILURE){
+		php_error(E_ERROR,"php_qt_register_moc(): could not bind resource to object.");
+	}
+
+	zval_add_ref(&this_ptr);
+
+	if(zend_hash_index_update(&php_qt_objptr_moc_hash, (long) le.ptr, (void*) &this_ptr, sizeof(zval *), NULL) == FAILURE){
+		php_error(E_ERROR,"php_qt_register_moc(): could not register MetaObject in resource table.");
+	}
+
+}
+
+void* php_qt_fetch_moc(zval* this_ptr){
+
+	if(this_ptr == NULL){
+	  php_error(E_ERROR,"fatal: object does not exists and could not be fetched, %s",Z_OBJCE_P(this_ptr)->name);
+	}
+
+	void *ptr;
+	zval **listhandle;
+	int type;
+	TSRMLS_FETCH();
+
+	if(zend_hash_index_find(Z_OBJPROP_P(this_ptr), 1, (void**) &listhandle) == FAILURE){
+	  php_error(E_ERROR,"MetaObject missing. '%s' fails",Z_OBJCE_P(this_ptr)->name,Z_OBJCE_P(this_ptr)->name);
+	}
+	ptr = zend_list_find(Z_LVAL_PP(listhandle), &type);
+
+	if(!ptr){
+		php_error(E_ERROR,"reference to MetaObject missing, %s",Z_OBJCE_P(this_ptr)->name);
+	} 
+	if(type != le_php_qt_moc_hashtype){
+		php_error(E_ERROR,"php_qt_fetch_moc(): wrong type, %s",Z_OBJCE_P(this_ptr)->name);
+	}
+
+	return ptr;
+
+}
+
 
 void php_qt_callmethod(zval* this_ptr, char* methodname, zend_uint param_count, zval** args[])
 {
@@ -1301,6 +1357,21 @@ QMetaObject* php_qt_getMocData(zval* this_ptr, char* classname, const QMetaObjec
 
 }
 
+zval* invokeToQString(zval* arg)
+{
+    if(Z_TYPE_P(arg) != IS_STRING){
+        return arg;
+    }
+
+    zend_class_entry *ce;
+    zval* return_value = (zval*) emalloc(sizeof(zval*));
+    object_init_ex(return_value, QString_ce_ptr);
+    zend_rsrc_list_entry le;
+    le.ptr = new QString(Z_STRVAL_P(arg));
+    php_qt_register(return_value, le);
+    return return_value;
+
+}
 
 
 ///

@@ -22,9 +22,17 @@
 
 /* define macros */
 #define debug
+#define MONITOR
+
+#include <iostream>
+using namespace std;
+
+#include "defined.h"
 
 #include <QTextStream>
 #include <QVariant>
+#include <QWidget>
+
 #define QOUT()                                              \
     extern QTextStream qout(stdout, QIODevice::WriteOnly);  \
 
@@ -315,6 +323,190 @@ ZEND_METHOD(classname,function){                                                
     RETURN_NULL();                                                              \
 }                                                                     
 
+//    zval** args = new zval*[ZEND_NUM_ARGS()*sizeof(zval)];          \
+
+#define PHP_QT_FETCH_ARGS();                                        \
+    zval** args = (zval**) malloc(ZEND_NUM_ARGS()*sizeof(zval));          \
+    for(int i=0;i<ZEND_NUM_ARGS();i++){                             \
+        zend_parse_parameters(1 TSRMLS_CC, "z", &args[i]);          \
+    }                                                               
+
+//     char* format = (char*) emalloc(ZEND_NUM_ARGS());    \
+
+//#define PHP_QT_FETCH_ARGS();                                        \
+//    zval* args[10];    \
+//    string format = "";\
+//    for(int i=0;i<ZEND_NUM_ARGS();i++){                             \
+//        format += "z";                 \
+//    }                                   \
+//    cout << format << ",\n";\
+//    zend_parse_parameters(1 TSRMLS_CC, (char*) format.data(), &args[0], &args[1], &args[2], &args[3], &args[4], &args[5], &args[6], &args[7], &args[8], &args[9]);          \
+
+#define PHP_QT_FETCH_0_ARGS();                                        \
+
+#define PHP_QT_FETCH_1_ARGS();                                        \
+    zval* arg_0;    \
+    zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, 1 TSRMLS_CC, "z", &arg_0);          
+
+#define PHP_QT_FETCH_2_ARGS();                                        \
+    zval* arg_0;    \
+    zval* arg_1;    \
+    zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, 2 TSRMLS_CC, "zz", &arg_0, &arg_1);          \
+
+#define PHP_QT_FETCH_3_ARGS();                                        \
+    zval* arg_0;    \
+    zval* arg_1;    \
+    zval* arg_2;    \
+    zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, 3 TSRMLS_CC, "zzz", &arg_0, &arg_1, &arg_2);          
+
+#define PHP_QT_FETCH_4_ARGS();                                        \
+    zval* arg_0;    \
+    zval* arg_1;    \
+    zval* arg_2;    \
+    zval* arg_3;    \
+    zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, 4 TSRMLS_CC, "zzzz", &arg_0, &arg_1, &arg_2, &arg_3);          
+
+#define PHP_QT_FETCH_5_ARGS();                                        \
+    zval* arg_0;    \
+    zval* arg_1;    \
+    zval* arg_2;    \
+    zval* arg_3;    \
+    zval* arg_4;    \
+    zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, 5 TSRMLS_CC, "zzzzz", &arg_0, &arg_1, &arg_2, &arg_3, &arg_4);          
+
+#define PHP_QT_FETCH_6_ARGS();                                        \
+    zval* arg_0;    \
+    zval* arg_1;    \
+    zval* arg_2;    \
+    zval* arg_3;    \
+    zval* arg_4;    \
+    zval* arg_5;    \
+    zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, 6 TSRMLS_CC, "zzzzzz", &arg_0, &arg_1, &arg_2, &arg_3, &arg_4, &arg_5);          
+
+#define PHP_QT_FETCH_7_ARGS();                                        \
+    zval* arg_0;    \
+    zval* arg_1;    \
+    zval* arg_2;    \
+    zval* arg_3;    \
+    zval* arg_4;    \
+    zval* arg_5;    \
+    zval* arg_6;    \
+    zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, 7 TSRMLS_CC, "zzzzzzz", &arg_0, &arg_1, &arg_2, &arg_3, &arg_4, &arg_5, &arg_6);          
+
+#define PHP_QT_FETCH_8_ARGS();                                        \
+    zval* arg_0;    \
+    zval* arg_1;    \
+    zval* arg_2;    \
+    zval* arg_3;    \
+    zval* arg_4;    \
+    zval* arg_5;    \
+    zval* arg_6;    \
+    zval* arg_7;    \
+    zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, 8 TSRMLS_CC, "zzzzzzzz", &arg_0, &arg_1, &arg_2, &arg_3, &arg_4, &arg_5, &arg_6, &arg_7);          
+
+#define PHP_QT_FETCH_9_ARGS();                                        \
+    zval* arg_0;    \
+    zval* arg_1;    \
+    zval* arg_2;    \
+    zval* arg_3;    \
+    zval* arg_4;    \
+    zval* arg_5;    \
+    zval* arg_6;    \
+    zval* arg_7;    \
+    zval* arg_8;    \
+    zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, 9 TSRMLS_CC, "zzzzzzzzz", &arg_0, &arg_1, &arg_2, &arg_3, &arg_4, &arg_5, &arg_6, &arg_7, &arg_8);          
+
+#define PHP_QT_FETCH_10_ARGS();                                        \
+    zval* arg_0;    \
+    zval* arg_1;    \
+    zval* arg_2;    \
+    zval* arg_3;    \
+    zval* arg_4;    \
+    zval* arg_5;    \
+    zval* arg_6;    \
+    zval* arg_7;    \
+    zval* arg_8;    \
+    zval* arg_9;    \
+    zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, 10 TSRMLS_CC, "zzzzzzzzzz", &arg_0, &arg_1, &arg_2, &arg_3, &arg_4, &arg_5, &arg_6, &arg_7, &arg_8, &arg_9);          
+
+
+#define PHP_QT_REGISTER_MOC(object)     \
+    zend_rsrc_list_entry le;        \
+    le.ptr = object;                \
+    php_qt_register_moc(this->zend_ptr,le);  \
+
+#define PHP_QT_FETCH_MOC()  \
+	php_qt_fetch_moc(this->zend_ptr) \
+
+
+#define PHP_QT_MOC(classname)                                               \
+const QMetaObject * classname##_php_qt::metaObject() const                  \
+{                                                                           \
+    QMetaObject* d = php_qt_getMocData(this->zend_ptr,#classname,&staticMetaObject); \
+}                                                                           \
+                                                                            \
+int classname##_php_qt::qt_metacall(QMetaObject::Call _c, int _id, void **_a)    \
+{                                                                           \
+    int _id2 = _id;                                                         \
+    _id = classname::qt_metacall(_c,_id,_a);                                \
+    QMetaObject* d = (QMetaObject*) classname##_php_qt::metaObject();       \
+    if (_id < 0)                                                            \
+        return _id;                                                         \
+    else _id = _id2;                                                        \
+    if (_c == QMetaObject::InvokeMetaMethod) {                              \
+     QMetaObject* d = (QMetaObject*) this->metaObject();                    \
+     char* method_name = new char[strlen((d->method(_id)).signature())];    \
+     strcpy(method_name,(char*) (d->method(_id)).signature());              \
+     int i;                                                                 \
+     for(i = 0; i < strlen(method_name); i++){                              \
+        if(method_name[i] == 40){                                           \
+            method_name[i] = 0;                                             \
+            break;                                                          \
+        }                                                                   \
+     }                                                                      \
+     if(d->method(_id).methodType() == QMetaMethod::Slot){                  \
+        int j = 0;                                                          \
+        zval** args[1];                                                     \
+        QList<QByteArray> qargs = d->method(_id).parameterTypes();          \
+        for(i = 0; i < qargs.count(); i++){                                 \
+            zval *arg;                                                      \
+            MAKE_STD_ZVAL(arg);                                             \
+            if(!strncmp("int",(const char*) qargs[i],3)){                   \
+                ZVAL_LONG(arg, *reinterpret_cast< int*>(_a[i+1]));          \
+            } else if(!strncmp("char*",(const char*) qargs[i],5)){          \
+                ZVAL_STRING(arg, *reinterpret_cast< char**>(_a[i+1]), 1);   \
+            } else if(!strncmp("bool",(const char*) qargs[i],4)){           \
+                ZVAL_BOOL(arg, *reinterpret_cast< bool*>(_a[i+1]));         \
+            } else if(!strncmp("double",(const char*) qargs[i],4)){         \
+                ZVAL_DOUBLE(arg, *reinterpret_cast< double*>(_a[i+1]));     \
+            } else {                                                        \
+                    zend_class_entry *ce;                                   \
+                    object_init_ex(arg, classname##_ce_ptr);                \
+                    zend_rsrc_list_entry le;                                \
+                    le.ptr = *reinterpret_cast< classname **>(_a[1]);       \
+                    php_qt_register(arg, le);                               \
+            }                                                               \
+            args[j++] = &arg;                                               \
+        }                                                                   \
+        php_qt_callmethod(this->zend_ptr, method_name, j, args);            \
+     } else {                                                               \
+        void *_b[] = { 0, _a[1] };                                          \
+        QMetaObject::activate(this, d, 0, _b);                              \
+     }                                                                      \
+     delete d;                                                              \
+     delete method_name;                                                    \
+    }                                                                       \
+    return _id;                                                             \
+}                                                                           
+
+#define RETURN_VOID(a) \
+a; \
+return;
+
+#define RETURN_ARRAY(a)\
+a; \
+return;
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -333,8 +525,14 @@ void* php_qt_fetch(zval* this_ptr);
 void php_qt_register(zval* this_ptr, zend_rsrc_list_entry le);
 void php_qt_setObject(zval* this_ptr, void* obj);
 static void destroy_php_qt_hashtable(zend_rsrc_list_entry *rsrc);
+
+void* php_qt_fetch_moc(zval* this_ptr);
+void php_qt_register_moc(zval* this_ptr, zend_rsrc_list_entry le);
+
 void php_qt_callmethod(zval* zend_ptr, char* methodname, zend_uint param_count, zval** params[]);
 QMetaObject* php_qt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata);
+zval* invokeToQString(zval* arg);
+bool inherits(zend_class_entry* ace, uint objectId, int recursion = 0);
 
 extern int le_php_qt_hashtype;
 extern HashTable php_qt_objptr_hash;
@@ -342,7 +540,9 @@ extern HashTable php_qt_objptr_hash;
 void _register_QObject();
 void _register_QEvent();
 
-extern zend_class_entry *QObject_ce_ptr;
+
+
+//extern zend_class_entry *QObject_ce_ptr;
 extern zend_class_entry *QEvent_ce_ptr;
 
 extern zend_class_entry *QCharRef_ce_ptr;
