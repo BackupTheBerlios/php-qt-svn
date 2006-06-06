@@ -13,13 +13,10 @@
 # *                                                                         *
 #***************************************************************************/
 
-# sub cplusplusToZEND               $cplusplusType
-# sub cplusplusToZENDType           $cplusplusType
-# sub cplusplusToPInvoke            $cplusplusType
-# sub cplusplusToMacro              $class, $cnode
-
 # sub writeDoc                      $lib, $rootnode, $outputdir, $opt
 # sub writeClassDoc                 $node
+
+# support for return types, access (can switch from public to private)
 
 package kalyptusCxxToPHP;
 
@@ -40,12 +37,22 @@ use vars qw/
     @clist
     $host $who $now $gentext %functionId $docTop
 	$lib $rootnode $outputdir $opt $debug $typeprefix $eventHandlerCount
-	$pastaccess $pastname $pastreturn $pastparams $nullctor $ctorCount @properties @functions @constructors
+	$pastaccess $pastname $pastreturn $pastparams $nullctor $ctorCount
+
+    $onlyPrivateConstructor
+    $classId
+
+    @properties
+    @functions
+    @constructors
 
     %methods
-    @protected;
-    @virtual;
-    @addIncludes;
+    %classes
+    @protected
+    @virtual
+    @addIncludes
+    @enums
+    @pure
 
     $classname;
     *CLASS
@@ -59,6 +66,7 @@ use vars qw/
     *AG_CONFIGM4
     *AG_QT_MINIT
     *AG_PHP_QT_CPP
+    *INHERITANCE
 
     *QTCTYPES
     *KDETYPES
@@ -95,10 +103,17 @@ sub writeDoc
 	my ( $lib, $rootnode, $outputdir_, $opt ) = @_;
 
     $outputdir = $outputdir_;
+    $global_rootnode = $rootnode;
+    $onlyPrivateConstructor = 1;
+    $classId = 1;
+    %classes = ();
 
 #    kdocAstUtil::dumpAst($rootnode);
+    report("reimplementation of protected and virtual methods temporarily disabled");
 
     openAllFiles();
+
+    generateInheritanceList();
 
 	# Document all compound nodes
 	Iter::LocalCompounds( $rootnode, sub { writeClassDoc( shift ); } );
@@ -114,49 +129,82 @@ sub writeClassDoc
 	my( $class ) = @_;
     $classname = $class->{astNodeName};
 
+    @addIncludes = ();
+    @virtual = ();
+    @protected = ();
+    @pure = ();
+    %methods = ();
+
     openClassFile($class);
 
     checkIncludes($class);
     writeAllFiles($class);
 
+    prepareMethods($class);
     DerivedClass($class);
 
     handleAllMethods($class);
     Inheritance($class);
 
-
-
     closeClassFile();
 
 }
 
-# all methods of this class
-
-sub handleAllMethods
+sub prepareMethods
 {
     my ($class) = @_;
 
     %methods = ();
+    @enums = ();
 
 	Iter::MembersByType ($class,sub{},
 		sub
         {
             my ($class, $kid ) = @_;
+            if ($kid->{NodeType} eq "enum" )
+            {
+                push @enums, $kid;
+            }
+
             if ($kid->{NodeType} eq "property" )
             {
                 push @properties, $kid;
             }
             if($kid->{NodeType} eq "method")
             {
+                # to handle overloaded methods
                 mergeMethods($kid);
             }
         },sub {}
 	);
 
+    foreach my $key (%methods){
+
+        $method = %methods->{$key};
+
+        if($method->{Flags} =~ /p/) {
+            push(@pure, $method);
+        } elsif($method->{Access} eq "protected" || $method->{Flags} =~ /v/){
+            if($method->{astNodeName} eq $classname){
+                report("protected constructor", 3);
+                next;
+            }
+            push @protected, $method;
+        } else {
+            report($method->{astNodeName}." skipped in prepareMethods()", 3) if ($method->{astNodeName} ne "" && $method->{astNodeName} =~ /v/);
+        }
+    }
+}
+
+# all methods of this class
+
+sub handleAllMethods
+{
     foreach my $key (keys %methods)
     {
         $method = %methods->{$key};
 
+        $method = prepareArgs($method);
         writeMethodDoc($method);
         handleMethod($method);
 
@@ -171,7 +219,7 @@ sub handleMethod
 {
     my ( $method ) = @_;
 
-    my $methodname = $method->{astNodeName};
+    my $methodname = $method->{astNodeName};    # for better reading
 
     if(IshouldSkip($method)){
         return;
@@ -180,7 +228,6 @@ sub handleMethod
     $methodname = "__construct" if($methodname eq $classname);
 
     print CLASS "ZEND_METHOD(".$classname.",".$methodname."){";
-    print CLASS "PHP_QT_FETCH_ARGS();";
 
     my $first = "true";
     # get _all_ arg
@@ -196,15 +243,15 @@ sub handleMethod
 
         my $zend_args_query;        # parameter for the type check statement
         my $ce_ptr_query;           # parameter for the class check statement
-        my $count_args=0;
+        my $count_args = 0;
         my @stack = ();             # argument stack, regular parameters
         my @stack_optional = ();    # argument stack, optional parameters
+        my $specialQString;         # converts php strings into QStrings
 
         my @ifdef_stack = ();       # object safety
 
         # check whether agument is optional or regular
         foreach my $cpp_arg ( @cargs ) {
-
             if($cpp_arg =~ /=/){
                 push(@stack_optional,$cpp_arg);
             } else {
@@ -226,39 +273,58 @@ sub handleMethod
                 next ARGLIST;
             }
 
-            $zend_args_query .= " && Z_TYPE_P(args[".$count_args."]) == IS_".$zend_arg;
+            # skip abstract class
+            if(isAbstract(unwrapClassType($overloadedmethod->{ReturnType}))){
+                print CLASS "\n// notice: abstract class ".unwrapClassType($overloadedmethod->{ReturnType})." cannot be instanciated, skipped\n";
+                next ARGLIST;
+            }
+
+            $zend_args_query .= " && Z_TYPE_P(arg_".$count_args.") == IS_".$zend_arg;
             if($zend_arg eq "OBJECT"){
-                if($count_args > 1){
-                    $ce_ptr_query .= "&& ";
+                my $classId = %classes->{ unwrapClassType($cpp_arg) };
+                if($classId == 0){
+                    $classId = "0";
                 }
-                $ce_ptr_query .= "Z_OBJCE_P(args[".$count_args."]) == ".unwrapClassType($cpp_arg)."_ce_ptr";
-                push(@ifdef_stack,unwrapClassType($cpp_arg));
+                $ce_ptr_query .= "inherits(Z_OBJCE_P(arg_".$count_args."), ".$classId.")";
+                push(@ifdef_stack,unwrapClassType(removeGeneric($cpp_arg)));
+                $ce_ptr_query .= "&&";
+            }
+            if($cpp_arg =~ /QString/){
+                $specialQString = "arg_".$count_args." = invokeToQString(arg_".$count_args.");\n";
             }
             $count_args++;
         }
+
+        # remove last '&&'
+        chop($ce_ptr_query);
+        chop($ce_ptr_query);
 
         # type check
         print CLASS "\n\t///".$overloadedmethod->{Params}."\n";
 
         # ifdef
-        print CLASS "#ifdef PHP_QT_".unwrapClassType($method->{ReturnType})." // return type\n\n"
-            if cplusplusToZVAL($method->{ReturnType}) eq "OBJECT";
+        print CLASS "#ifdef PHP_QT_".unwrapClassType(removeGeneric($overloadedmethod->{ReturnType}))." // return type\n\n"
+            if cplusplusToZVAL($overloadedmethod->{ReturnType}) eq "OBJECT";
 
-        print CLASS "if(ZEND_NUM_ARGS() == ".$count_args.$zend_args_query."){";
+        print CLASS "if(ZEND_NUM_ARGS() == ".$count_args."){";
+        print CLASS "PHP_QT_FETCH_".$count_args."_ARGS();";
+
+        print CLASS $specialQString."\n";
+        print CLASS "if(1 ".$zend_args_query."){";
 
         # class check if object
         if($ce_ptr_query ne ""){
             print CLASS "".expandIfdefs(@ifdef_stack);  # ifdef PHP_QT_QString
             print CLASS " if(".$ce_ptr_query."){";
-            handleArguments($params,$method->{ReturnType},$method->{Flags}, $methodname); # argument handling
+            handleArguments($params,$overloadedmethod->{ReturnType},$overloadedmethod->{Flags}, $methodname, $overloadedmethod); # argument handling
             print CLASS "}\n";
             print CLASS "".expandEndifs(@ifdef_stack);  # endif
 
         # simple types
         } else {
-            handleArguments($params,$method->{ReturnType},$method->{Flags}, $methodname); # argument handling
+            handleArguments($params,$overloadedmethod->{ReturnType},$overloadedmethod->{Flags}, $methodname, $overloadedmethod); # argument handling
         }
-        print CLASS "}";
+        print CLASS "}}"; # end if ZEND_NUM_ARGS
 
         #
         # for all optional parameters
@@ -271,35 +337,48 @@ sub handleMethod
             # intercept unknown types
             if($zend_arg eq "unknown"){
                 print CLASS "\n// notice: unknown argument ".$cpp_arg.", skipped\n";
+                # ifdef
+                print CLASS "#endif // return type\n\n" if cplusplusToZVAL($overloadedmethod->{ReturnType}) eq "OBJECT";
+
                 next ARGLIST;
             }
 
-            $zend_args_query .= " && Z_TYPE_P(args[".$count_args++."]) == IS_".$zend_arg;
+            $zend_args_query .= " && Z_TYPE_P(arg_".$count_args++.") == IS_".$zend_arg;
 
             # type check
-            print CLASS "if(ZEND_NUM_ARGS() == ".$count_args.$zend_args_query."){";
+            print CLASS "if(ZEND_NUM_ARGS() == ".$count_args."){";
+            print CLASS "PHP_QT_FETCH_".$count_args."_ARGS();";
+
+            # regular arg
+            print CLASS $specialQString;
+
+            # optional arg
+            if($cpp_arg =~ /QString/){
+                print CLASS "arg_".$count_args." = invokeToQString(arg_".$count_args.");\n";
+            }
+            print CLASS "if(1 ".$zend_args_query."){";
 
             # if object
             if($ce_ptr_query ne ""){
                 print CLASS "".expandIfdefs(@ifdef_stack);  # ifdef PHP_QT_QString
                 print CLASS " if(".$ce_ptr_query."){";  # ask object types
-                handleArguments($params,$method->{ReturnType},$method->{Flags}, $methodname); # argument handling
+                handleArguments($params,$overloadedmethod->{ReturnType},$overloadedmethod->{Flags}, $methodname, , $overloadedmethod); # argument handling
                 print CLASS "}\n";
                 print CLASS "".expandEndifs(@ifdef_stack);  # endif
             # if simple type
             } else {
                 # argument handling
-                handleArguments($params,$method->{ReturnType},$method->{Flags}, $methodname);
+                handleArguments($params,$overloadedmethod->{ReturnType},$overloadedmethod->{Flags}, $methodname, , $overloadedmethod);
             }
-            print CLASS "}"; # end type check
+            print CLASS "}}"; # end type check
 
         } # stack_optional
 
         # ifdef
-        print CLASS "#endif // return type\n\n" if cplusplusToZVAL($method->{ReturnType}) eq "OBJECT";
+        print CLASS "#endif // return type\n\n" if cplusplusToZVAL($overloadedmethod->{ReturnType}) eq "OBJECT";
     }
 
-    print CLASS "php_error(E_ERROR,\"could not parse argument\");";
+    print CLASS "php_error(E_ERROR,\"could not parse argument in ".$classname."::".$method->{astNodeName}."(...) \");";
     print CLASS "}\n";
 
 }
@@ -310,21 +389,38 @@ sub handleMethod
 
 sub handleArguments
 {
-    my ( $params, $return, $flags, $methodname ) = @_;
+    my ( $params, $return, $flags, $methodname, $overloadedmethod ) = @_;
 
     my $returnType = cplusplusToZVAL($return);      # example: BOOL, LONG, DOUBLE, STRING, OBJECT
     my $is_constructor = ($method->{astNodeName} eq $classname);
+
+#    print CLASS "#ifdef MONITOR\n cout << \"(".$classname.")\" << getThis() << \"::".$methodname."(".$params.")\\n\";\n#endif\n";
+#    print CLASS "#ifdef MONITOR\n php_error(E_NOTICE, \"".$classname."::".$methodname."(".$params.") accepted.\\n\");\n#endif\n";
 
     if($returnType eq "unknown"){
         print CLASS "php_error(E_ERROR,\"unsupported return type ".$return."\");";
         return;
     }
 
+    if($overloadedmethod->{Access} eq "protected"){
+        print CLASS "\n/// overloaded method is protected, skipped.\n";
+        report("overloaded protected method ".$methodname, 3);
+        return if ($methodname ne "__construct");
+    }
+
+    # QCharRef *selfpointer = new QCharRef(...);
+    if($onlyPrivateConstructor || $overloadedmethod->{Access} eq "private"){
+        report($classname." has only private constructors", 4);
+        print CLASS "\n/// method is private, skip\n";
+        print CLASS "php_error(E_ERROR,\"".$classname."::".$methodname."(...) cannot be called with '".$params."'.\");";
+        return;
+    }
+
+
     if($flags =~ /s/){  # static
     } else {
         print CLASS "if(getThis() == NULL){php_error(E_ERROR,\"method '".$methodname."' is not static\"); RETURN_NULL();}";
     }
-
 
     my $preparation;    # invoke zend to cpp, prepare return object if necessary
     my $cpp_call_params;    # the args passed to Qt method
@@ -346,6 +442,15 @@ sub handleArguments
             print CLASS "\n// unknown, skipped: ".$arg."\n";
             return; # return arg handling
         }
+
+        # Dummy
+        if($argType eq "ARRAY"){
+            $cpp_call_params .= "new char*[1],";
+            next;
+        }
+
+        # the Z_STRVAL_P macro delivers char*, but we simply need the first and only char
+        my $charSpecial = "[0]" if isChar($arg);
 
         # for all arg types, e.g. bool*
         $classType = unwrapClassType($arg);
@@ -370,11 +475,11 @@ sub handleArguments
 
         if($argType eq "OBJECT"){
             # example: QString *cpp_arg_0 = static_cast<QString*>(php_qt_fetch(args[0]);
-            $preparation .= $classType." *cpp_arg_".$count_args." = static_cast<".$classType."*>(php_qt_fetch(args[".$count_args."]));\n";
+            $preparation .= $classType." *cpp_arg_".$count_args." = static_cast<".$classType."*>(php_qt_fetch(arg_".$count_args."));\n";
             $cpp_call_params .= $prefix."cpp_arg_".$count_args." ";
         } else {
             # example: Z_LVAL_P(arg_0), Z_STRVAL(arg_0)
-            $cpp_call_params .= $prefix_ZVAL."Z_".invokeTypeToZ_XVAL($argType)."VAL_P(args[".$count_args."]) ";
+            $cpp_call_params .= $prefix_ZVAL."Z_".invokeTypeToZ_XVAL($argType)."VAL_P(arg_".$count_args.")".$charSpecial." ";
         }
 
         $cpp_call_params .= ",";
@@ -387,35 +492,74 @@ sub handleArguments
 
     # return handling
     my $returnClassName = unwrapClassType($return); # example: QString (from QString &c)
-    my $prefix, $postfix, $infix;
+    my $prefix, my $postfix, my $infix, my $le_ptr;
+    my $yrr, my $rxrr, my $pxrr;
+
+    # yrr,rxrr,pxrr defined for prefix
+    my $leftAssignment;
+    if($returnType eq "OBJECT"){
+        print CLASS "zend_class_entry *ce;";
+        print CLASS "object_init_ex(return_value, QString_ce_ptr);";
+        print CLASS "zend_rsrc_list_entry le;";
+        $yrr = "";
+    } else {
+        $yrr = $returnClassName;
+        $rxrr = "&";
+        $pxrr = "*";
+    }
+
+    # static_cast<...> or const_cast<...>
+    my $castWay = "static";
+    if($return =~ /const/){
+        $castWay = "const";
+    }
+
+    my $returnCast;
+    $returnCast = "(char*)" if isChar($return);
+    $returnCast = "(char*)" if ($returnType eq "STRING");
 
     if(checkRPN($return) eq "reference"){       # tested
-        $prefix = $returnClassName."&";
+        $prefix = $yrr.$rxrr;
+        # const_cast<...> => &const_cast<...>
+        $castWay = "&".$castWay;
         $infix = "&";
+        $le_ptr = "&";
     } elsif (checkRPN($return) eq "pointer"){
-        $prefix = $returnClassName."* ";
+        $prefix = $yrr.$pxrr;
+        $infix = "*";    # for static_cast, return_object
+        $le_ptr = "";
     } elsif (checkRPN($return) eq "normal"){    # tested with non-objects
-        # allocate memory on the heap
-        if($returnType eq "OBJECT"){
-            print CLASS $returnClassName." *return_object = new ".$returnClassName.";\n";
-        }
+        $infix = "";
         $prefix = "*";
+        $le_ptr = "";
+    }
+
+    # allocate memory on the heap if object
+    # QString *return_object = new QString;
+    # leftAssignment:
+    # *return_object = static_cast<.....
+    if($returnType eq "OBJECT"){
+        if (checkRPN($return) eq "normal"){
+            print CLASS $returnClassName." *return_object = new ".$returnClassName.";\n";
+            $leftAssignment = $prefix." return_object";
+        } else {
+            $leftAssignment = "le.ptr"; #le.ptr
+        }
     }
 
     if($returnType eq "OBJECT"){
         if($flags =~ /s/){  # static
-            print CLASS "if(getThis() == NULL){".$prefix." return_object = static_cast<"                .$returnClassName.$infix.">(".$classname."::".$method->{astNodeName}."(".$cpp_call_params."));} else {"
-            .$prefix." return_object = static_cast<"               .$returnClassName.$infix.">(selfpointer->".$method->{astNodeName}."(".$cpp_call_params."));}";
-        } else {
-            print CLASS $prefix." return_object = static_cast<"
+            print CLASS "if(getThis() == NULL){".$leftAssignment." = ".$castWay."_cast<"                .$returnClassName.$infix.">(".$classname."::".$method->{astNodeName}."(".$cpp_call_params."));} else {"
+            .$leftAssignment." = ".$castWay."_cast<"               .$returnClassName.$infix.">(selfpointer->".$method->{astNodeName}."(".$cpp_call_params."));}";
+        } else { #non-static
+            print CLASS $leftAssignment." = ".$castWay."_cast<"
                 .$returnClassName.$infix.">(selfpointer->".$method->{astNodeName}."(".$cpp_call_params."));";
         }
-        print CLASS "zend_class_entry *ce;";
-        print CLASS "object_init_ex(return_value, QString_ce_ptr);";
-        print CLASS "zend_rsrc_list_entry le;";
-        print CLASS "le.ptr = (void*) ".$infix."return_object;";
+        # normal
+        print CLASS "le.ptr = (void*) ".$le_ptr."return_object;" if (checkRPN($return) eq "normal");
         print CLASS "php_qt_register(return_value,le);";
         print CLASS "return;";
+
     } else {
         my $for_string;
         if($returnType eq "STRING"){    # RETURN_STRING macro needs 2 params
@@ -423,15 +567,30 @@ sub handleArguments
         }
         if($is_constructor){   # constructor
             my $comma = "," if($cpp_call_params);
+
+            # constructor:
+            # QString_php_qt *selfpointer = new QString_php_qt(...);
+            # there are two ways: allocate memory on heap or with emalloc
+
+            # cpp-way
             print CLASS $classname."_php_qt *selfpointer = new ".$classname."_php_qt(getThis()".$comma.$cpp_call_params.");";
-            print CLASS "PHP_QT_REGISTER(selfpointer);";
+
+            # experiment, do not use
+#            print CLASS $classname."_php_qt *selfpointer = static_cast<".$classname."_php_qt*>(new ".$classname."(".$cpp_call_params."));";
+#            print CLASS "selfpointer->zend_ptr = getThis();";
+
+            # zend-way with emalloc()
+#            print CLASS $classname."_php_qt *selfpointer = static_cast<".$classname."_php_qt*>(emalloc(sizeof(".$classname."_php_qt)));";
+#            print CLASS "new (selfpointer) ".$classname."_php_qt(getThis()".$comma.$cpp_call_params.");";
+
+            print CLASS "PHP_QT_REGISTER(selfpointer);RETURN_NULL();";
         } else {
             if($flags =~ /s/){  # static
                 print CLASS "if(getThis() == NULL){RETURN_".$returnType."(".$classname."::"
                     .$method->{astNodeName}."(".$cpp_call_params.")".$for_string.");} else {RETURN_"
                     .$returnType."(selfpointer->".$method->{astNodeName}."(".$cpp_call_params.")".$for_string.");}";
             } else {
-                print CLASS "RETURN_".$returnType."(selfpointer->".$method->{astNodeName}."(".$cpp_call_params.")".$for_string.");";
+                print CLASS "RETURN_".$returnType."(".$returnCast."selfpointer->".$method->{astNodeName}."(".$cpp_call_params.")".$for_string.");";
             }
         }
     }
@@ -443,10 +602,21 @@ sub mergeMethods
 {
 	my ( $method )  = @_;
 
+    # skip destructor
+    if($method->{ReturnType} =~ /~/){
+        return;
+    }
+
     # looking for existing list
     foreach my $key ( %methods ) {
         if ( $key->{astNodeName} eq $method->{astNodeName} ) {
-            #add to existing list
+
+            # report
+#             if($key->{ReturnType} ne $method->{ReturnType}){
+#                 report($classname .", ". $method->{astNodeName} .": <". $key->{ReturnType} ."> <". $method->{ReturnType}.">\n");
+#             }
+
+            # add to existing list
             push(@{$methods{ $method->{astNodeName} }->{"argList"}},$method);
 	        return;
  		}
@@ -510,6 +680,11 @@ sub openAllFiles
 
 	mkpath( $outputdir ) unless -f $outputdir;
     mkpath( $outputdir."/classes/" ) unless -f $outputdir."/classes/";
+
+    # INHERITANCE
+    my $file_inheritance = "$outputdir/inheritance.cpp";
+    open( INHERITANCE, ">$file_inheritance" ) || die "Couldn't create $file_inheritance\n";
+    $file_inheritance =~ s/\.h/.h/;
 
     # AG_ZEND_CLASS_ENTRY
     my $file_ag_zend_class_entry = "$outputdir/ag_zend_class_entry.inc";
@@ -641,6 +816,7 @@ ZEND_END_MODULE_GLOBALS(php_qt)
     close AG_CONFIGM4;
     close AG_QT_MINIT;
     close AG_PHP_QT_CPP;
+    close INHERITANCE;
 }
 
 sub openClassFile
@@ -720,61 +896,205 @@ sub DerivedClass
 {
     my ($class) = @_;
 
-    $constructor = findConstructor($class);
-
-    my $prepared_params;
-    my @paramList = kdocUtil::splitUnnested(",", $constructor->{Params});
-    foreach my $param (@paramList){
-
-        @ch = split(/=/, $param);
-
-        $prepared_params .= ",".@ch[0];
+    # handle enums
+    my $public_enum_declaration;
+    my $protected_enum_declaration;
+    foreach $enum (@enums){
+        # deactivated
+        $public_enum_declaration .= declareEnums($enum,"public");
+        $protected_enum_declaration .= declareEnums($enum,"protected");
     }
 
-    $comma = "," if ($prepared_params);
+    # handle constructors
+    @constructors = findConstructor($class);
 
-    my $protected_declaration, $protected_implementation;
-    if(@protected){
-        $protected_declaration = "\nprotected:\n";
+    # nothing to do
+    return if($onlyPrivateConstructor);
+
+    my $constructors_declaration, my $constructors_implementation;
+
+
+    foreach my $constructor (@constructors){
+
+        my $prepared_params, my $comma, my $call_params;
+        $call_params = prepareParamsForCall($constructor);
+
+        my @paramList = kdocUtil::splitUnnested(",", $constructor->{Params});
+        if(@paramList > 0){
+            foreach my $param (@paramList){
+                @ch = split(/=/, $param);
+                $prepared_params .= ",".@ch[0];
+            }
+            $comma = "," if ($prepared_params);
+        }
+
+        $constructors_declaration .= $classname."_php_qt(zval* zend_ptr".$comma.$constructor->{Params}.");";
+        $constructors_implementation .= $classname."_php_qt::".$classname."_php_qt(zval* zend_ptr".$prepared_params.") : ".$classname."(".$call_params.")
+        {
+            this->zend_ptr = zend_ptr;";
+
+        if(hasMetaObject()){
+            $constructors_implementation .= "
+// for future use:                   PHP_QT_REGISTER_MOC(php_qt_getMocData(this->zend_ptr,\"".$classname."\",&staticMetaObject));";
+        }
+        $constructors_implementation .= "\n}\n";
+    }
+
+    my $protected_declaration, my $protected_implementation;
+    my $virtual_declaration, my $virtual_implementation;
+
+    # handle pure methods
+    if(@pure){
+        foreach my $method (@pure){
+
+            if(IshouldSkipForReimplementation($method)){
+                next;
+            }
+
+            # add const to declaration and implementation
+            # someMethod() const
+            my $constant;
+            if($method->{Flags} =~ /c/){
+                $constant = "const\n";
+            }
+
+            writeMethodDoc($method);
+
+            if($method->{ReturnType} eq "void"){
+                $return = "";
+            } else {
+                $return = "return ";
+            }
+
+            checkAddIncludes($method);
+
+            $call_params = prepareParamsForCall($method);
+
+            # virtual protected methods will be implemented
+            if($method->{Flags} =~ /v/){
+                $virtual_declaration .= "\n".checkConst($method->{Flags})." ".checkFlags($method->{Flags})." ".$method->{ReturnType}." ".$method->{astNodeName}."(".$method->{Params}.")".$constant."; // pure \n";
+
+                $virtual_implementation .= "\n// virtual, pure \n\n ".$method->{ReturnType}." ".$classname."_php_qt::".$method->{astNodeName}."(".prepareParamsForArg($method).")".$constant."{}";
+
+            # protected methods with proxy methods
+            } else {
+
+                # SliderAction => QbstractSlider_php_qt::SliderAction
+                my $returnIType;
+                if(isEnum($method->{ReturnType})){
+                    $returnIType = $classname."::".$method->{ReturnType};
+                } else {
+                    $returnIType = $method->{ReturnType};
+                }
+
+                #   void protected_adjustPosition(QWidget * QWidget * s0);
+                $protected_declaration .= "\n".checkConst($method->{Flags})." ".checkFlags($method->{Flags})." ".$returnIType." protected_".$method->{astNodeName}."(".prepareParamsForDeclaration($method).")".$constant."; // pure \n";
+
+                $protected_implementation .= "\n ".$returnIType." ".$classname."_php_qt::protected_".$method->{astNodeName}."(".prepareParamsForArg($method).")".$constant."{".$return."this->".$method->{astNodeName}."(".$call_params.");}";
+            }
+
+        }
+    } # end pure
+
+    # handle protected methods
+    # temp. disabled
+    if(@protected && 0){
+
+        $protected_declaration;
+        my $return, my $call_params;
+
         foreach my $method (@protected){
-            if($method->{astNodeName} eq "metaObject" || $method->{astNodeName} eq "className"){
+
+            if(IshouldSkipForReimplementation($method)){
+                next;
+            }
+
+            # add const to declaration and implementation
+            # someMethod() const
+            my $constant;
+            if($method->{Flags} =~ /c/){
+                $constant = "const\n";
+            }
+
+            writeMethodDoc($method);
+
+            if($method->{ReturnType} eq "void"){
+                $return = "";
+            } else {
+                $return = "return ";
+            }
+            # skip special methods
+            if($method->{astNodeName} eq "metaObject"
+            || $method->{astNodeName} eq "className"){
                 next;
             }
             checkAddIncludes($method);
-            $protected_declaration .= "\n".checkConst($method->{Flags})." ".checkFlags($method->{Flags})." ".$method->{ReturnType}." ".$method->{astNodeName}."(".$method->{Params}.");";
-            $protected_implementation .= "\n ".$method->{ReturnType}." ".$classname."_php_qt::".$method->{astNodeName}."(".$method->{Params}."){}";
+
+            $call_params = prepareParamsForCall($method);
+
+            # virtual protected methods will be implemented
+            if($method->{Flags} =~ /v/){
+                $virtual_declaration .= "\n".checkConst($method->{Flags})." ".checkFlags($method->{Flags})." ".$method->{ReturnType}." ".$method->{astNodeName}."(".$method->{Params}.")".$constant.";";
+
+                $virtual_implementation .= "\n// virtual \n\n ".$method->{ReturnType}." ".$classname."_php_qt::".$method->{astNodeName}."(".prepareParamsForArg($method).")".$constant."{}";
+
+            # protected methods with proxy methods
+            } else {
+
+                # SliderAction => QbstractSlider_php_qt::SliderAction
+                my $returnIType;
+                if(isEnum($method->{ReturnType})){
+                    $returnIType = $classname."::".$method->{ReturnType};
+                } else {
+                    $returnIType = $method->{ReturnType};
+                }
+
+                #   void protected_adjustPosition(QWidget * QWidget * s0);
+                $protected_declaration .= "\n".checkConst($method->{Flags})." ".checkFlags($method->{Flags})." ".$returnIType." protected_".$method->{astNodeName}."(".prepareParamsForDeclaration($method).")".$constant.";";
+
+                $protected_implementation .= "\n ".$returnIType." ".$classname."_php_qt::protected_".$method->{astNodeName}."(".prepareParamsForArg($method).")".$constant."{".$return."this->".$method->{astNodeName}."(".$call_params.");}";
+            }
         }
+
     }
 
     my $includes;
     foreach $include (@addIncludes){
-        print CLASS "#include <".$include.">\n";
+        $include =~ s/\*|\&//;
+        print CLASS "#include <".$include.">\n" if $include ne "";
+    }
+
+    # handle moc implementation
+    my $moc_declaration, my $moc_implementation;
+    if(hasMetaObject()){
+        $moc_declaration = "
+        const QMetaObject* metaObject() const;
+        int qt_metacall(QMetaObject::Call _c, int _id, void **_a);";
+        $moc_implementation = "\nPHP_QT_MOC(".$classname.");\n";
     }
 
     print CLASS "#include <QMetaMethod>
     class ".$classname."_php_qt : public ".$classname."{
 
     public:
-        ".$classname."_php_qt(zval* zend_ptr".$comma.$constructor->{Params}.");
+        ".$constructors_declaration."
+        ".$public_enum_declaration."
 
-        zval* zend_ptr;
-        QMetaObject* dynamicMetaObject;
+        zval* zend_ptr;";
+    print CLASS $moc_declaration;
+    print CLASS $virtual_declaration;
+    print CLASS "protected:" if $protected_declaration;
+    print CLASS $protected_enum_declaration;
+    print CLASS $protected_declaration;
+    print CLASS "};";
 
-        const QMetaObject* metaObject() const;
-        int qt_metacall(QMetaObject::Call _c, int _id, void **_a);
-    ".$protected_declaration."
-    };
-    ".$classname."_php_qt::".$classname."_php_qt(zval* zend_ptr".$prepared_params.")
-    {
-        this->zend_ptr = zend_ptr;
-        dynamicMetaObject = new QMetaObject;
-        dynamicMetaObject = php_qt_getMocData(this->zend_ptr,\"".$classname."\",&staticMetaObject);
-    }";
-
+    print CLASS $constructors_implementation;
+    print CLASS $virtual_implementation;
     print CLASS $protected_implementation;
+    print CLASS $moc_implementation;
 
-    print CLASS "\nPHP_QT_MOC(".$classname.");
-";
+    print CLASS "\n";
+
 # TODO:
 # virtual and private classes
 
@@ -859,12 +1179,17 @@ sub cplusplusToZVAL
 		return "LONG";
 	} elsif ( $cplusplusType =~ /\s*\bint\s*\&*/) {
 		return "LONG";
-	} elsif ( $cplusplusType =~ /\s*int\s*\&*/) {
+	} elsif ( $cplusplusType =~ /\s*\buint\s*\&*/) {
 		return "LONG";
+#	} elsif ( $cplusplusType =~ /\s*int\s*\&*/) {
+#		return "LONG";
 	} elsif ( $cplusplusType =~ /\s*short\s*\&*/) {
 		return "LONG";
 	} elsif ( $cplusplusType =~ /\s*char\s*\*\*/ ) {
-		return "STRING";
+        # should e array
+		return "ARRAY";
+	} elsif ( $cplusplusType =~ /\s*uchar\s*\**/ ) {
+		return "unknown";
 	} elsif ( $cplusplusType =~ /\s*char\s*\**/ ) {
 		return "STRING";
 	} elsif ( $cplusplusType =~ /\s*unsigned int\s*\**/ ) {
@@ -1011,26 +1336,47 @@ sub IshouldSkip
         return 1;
     }
 #    if($method->{Flags} =~ /n|v|t/){    # skip slots
-    if($method->{Flags} =~ /n/){    # skip slots
+    if($method->{Flags} =~ /n|v/){    # skip slots
         return 1;
     }
 
     if($method->{Access} eq "protected"){
-        push @protected, $method;
-        return 1;
-    }
-
-    if($method->{Flags} =~ /v/){    # skip slots
         return 1;
     }
 
     if($method->{astNodeName} eq "className"
-        || $method->{astNodeName} eq "qObject")
-    {
+        || $method->{astNodeName} eq "qObject"
+        || $method->{astNodeName} =~ /operator/
+        || $method->{astNodeName} =~ /qt_/
+    ){
         return 1;
     }
 
 }
+
+sub IshouldSkipForReimplementation
+{
+    my ($method) = @_;
+
+    if($method->{astNodeName} =~ /qt_/)
+    {   # skip qt_cast, ...
+        return 1;
+    }
+
+    if($method->{Flags} =~ /n/){    # skip slots
+        return 1;
+    }
+
+    if($method->{astNodeName} eq "className"
+        || $method->{astNodeName} eq "qObject"
+        || $method->{astNodeName} =~ /operator/
+        || $method->{astNodeName} =~ /qt_/
+    ){
+        return 1;
+    }
+
+}
+
 
 #
 #   finds the constructor
@@ -1039,7 +1385,10 @@ sub findConstructor
 {
     my ($class) = @_;
 
-    my @return;
+    my @return, my $safetyConstructor;
+
+    $onlyPrivateConstructor = 1;
+    $main::doPrivate = 1;
 
     Iter::MembersByType ($class,sub{},
 	sub
@@ -1049,16 +1398,31 @@ sub findConstructor
         {
             # there are some additional protected constructors, skip
             if($kid->{Access} ne "protected"){
-                if($kid->{astNodeName} eq $classname){
-                    push @return, $kid;
+                if($kid->{Access} eq "private"){
+                    next;
                 }
+                if($kid->{astNodeName} eq $classname){
+                    if($kid->{ReturnType} =~ /~/){
+                        debug("destructor skipped");
+                    } else {
+                        $onlyPrivateConstructor = 0;
+                        push @return, $kid;
+                    }
+                }
+            }
+            if($kid->{Access} ne "protected" && $kid->{astNodeName} eq $classname){
+                $safetyConstructor = $kid;
             }
         }
     },sub {}
 	);
 
-    # first is the constructor, second is destructor
-    return @return[0];
+    if (@return == 0){
+        report("none or only protected constructors detected, we declared an empty destructor ".$safetyConstructor->{Params}, 3);
+        push @return, $safetyConstructor;
+    }
+
+    return @return;
 
 }
 
@@ -1069,6 +1433,11 @@ sub checkAddIncludes
     my @cargs = kdocUtil::splitUnnested(",", $method->{Params});
 
     foreach my $arg (@cargs){
+
+        if($arg =~ /::/){
+            return;
+        }
+
         my @arg_ = split(/ /,$arg);
         foreach my $m (@addIncludes){
             # skip 'const'
@@ -1076,19 +1445,445 @@ sub checkAddIncludes
                 if($m eq @arg_[1]){
                     return;
                 }
+            # skip enums
             } else {
                 if($m eq @arg_[0]){
                     return;
                 }
             }
         }
-        if(@arg_[0] eq "const"){
-            push @addIncludes, @arg_[1];
+
+        if(@arg_[0] =~ /Q/ || @arg_[1] =~ /Q/){
+            if(@arg_[0] eq "const"){
+                push @addIncludes, @arg_[1];
+            } else {
+                push @addIncludes, @arg_[0];
+            }
+        }
+    }
+
+}
+
+#
+#   for reimplementing of protected methods
+#   QFocusEvent * e => e
+#   int repeatTime = 50 s
+#
+#   warn: $method->{Params} will be modified!
+
+sub prepareParamsForCall
+{
+    my ($method) = @_;
+
+    # for typos:
+    # QWidget* => QWidget *, see
+    $method->{Params} =~ s/\*/ \*/;
+    $method->{Params} =~ s/\&/ \&/;
+    $method->{Params} =~ s/  / /;
+
+    my @cargs = kdocUtil::splitUnnested(",", $method->{Params});
+    my $param, my $params_replacement, my $safetyCount=0;
+
+    foreach my $arg (@cargs){
+
+        my $type_tmp = $arg;  # needed for @arg_ == 1
+
+        # safety
+        # QAbstractSlider::timerEvent(QTimerEvent*)
+        my $arg_s;
+        if($arg =~ /=/){
         } else {
-            push @addIncludes, @arg_[0];
+            $/ = " ";
+            chomp($arg);
+
+            # ' Type' => 'Type'
+            $arg =~ s/^ //;
+            my $c = ($arg =~ tr/ //);
+
+            if($c == 0){
+                # to prevent 'PaintDeviceMetrics0',
+                # should be 'PaintDeviceMetric s0' (see QWidget)
+                $arg = "";
+                $arg .= "s".$safetyCount;# if $arg =~ /^:/;
+            } else {
+                $arg .= "s".$safetyCount;# if $arg =~ /^:/;
+            }
+            $arg .= "s".$safetyCount if $arg =~ /^:/;
+            $arg_s = "s".$safetyCount++;    # for @arg_ == 1, to prevent 'bool bools0'
+        }
+
+        my @arg_ = split(/ /,$arg);
+        if(@arg_[0] eq ""){
+            shift(@arg_);
+        }
+        if(@arg_ == 1){
+            $params_replacement .= $type_tmp." ".$arg_s.",";
+        } else {
+            $params_replacement .= $arg.",";
+        }
+
+        #   int repeatTime = 50 s => repeatTime
+        if($arg =~ /=/){
+
+            # remove special signs
+            $arg_c = $arg;              # work with a copy
+            $arg_c =~ s/=/ /;           # remove '='
+            $arg_c =~ s/\*|\&|const//;  # remove special signs
+            $arg_c =~ s/  / /;          # remove double spaces
+
+            my @arg_c = split(/ /,$arg_c);
+            my @arg_stack;
+            foreach my $a (@arg_c){
+                next if($a eq "" | $a eq "const");
+                push (@arg_stack, $a);
+            }
+            if(@arg_stack == 2){
+                $param .= "s".$safetyCount.",";
+            } else {
+                pop (@arg_stack);
+                $param .= pop (@arg_stack).",";
+            }
+        #   QFocusEvent * e => e
+        } else {
+            my $arg__ = pop(@arg_);
+            $arg__ =~ s/\*|&//;
+            $param .= $arg__.",";
+
+        }
+    }
+
+    chop($param);
+    chop($params_replacement);
+    $param =~ s/\*|\&//;
+
+    $method->{Params} = $params_replacement;
+    return $param;
+
+}
+
+#
+#   prepare for implementation of protected methods
+#
+
+sub prepareParamsForArg
+{
+    my ($method) = @_;
+
+    my @cargs = kdocUtil::splitUnnested(",", $method->{Params});
+    my $arg_return;
+
+    foreach $param (@cargs){
+        my $arg_chunk;
+        if($param =~ /=/){
+            my @arg = split(/=/,$param);
+            $arg_chunk = shift(@arg);
+
+            # WId => 'WId s0'
+            my $c = ($arg_chunk =~ tr/ //);
+            if($c == 1){
+                report("Warning: parameter 's0' hardcoded, maybe dangerous!");
+                $arg_chunk .= "s0";
+            }
+
+        } else {
+            $arg_chunk = $param;
+        }
+
+        # SliderAction => QAbstractSlider::SliderAction
+        @arg_ = split(/ /,$arg_chunk);
+        if(isEnum(@arg_[0])){
+            $arg_chunk = $classname."::".$arg_chunk;
+        }
+
+        $arg_return .= $arg_chunk;
+
+        $arg_return .= ",";
+    }
+
+    chop($arg_return);
+
+    return $arg_return;
+
+}
+
+#
+#   prepare for implementation of protected methods
+#
+
+sub prepareParamsForDeclaration
+{
+    my ($method) = @_;
+
+    my @cargs = kdocUtil::splitUnnested(",", $method->{Params});
+    my $arg_return;
+
+    foreach $param (@cargs){
+        my $arg_chunk;
+
+        $arg_chunk = $param;
+
+        # SliderAction => QAbstractSlider::SliderAction
+        @arg_ = split(/ /,$arg_chunk);
+        if(isEnum(@arg_[0])){
+            $arg_chunk = $classname."::".$arg_chunk;
+        }
+
+        $arg_return .= $arg_chunk;
+
+        $arg_return .= ",";
+    }
+
+    chop($arg_return);
+
+    return $arg_return;
+
+}
+
+
+#
+#   for _all_ methods in class
+#   QEvent* => QEvent* s0
+
+sub prepareArgs
+{
+    my ($method) = @_;
+
+    # for typos:
+    # QWidget* => QWidget *
+    $method->{Params} =~ s/\*/ \*/;
+    $method->{Params} =~ s/\&/ \&/;
+    $method->{Params} =~ s/  / /;
+
+    my @cargs = kdocUtil::splitUnnested(",", $method->{Params});
+    my $params_replacement, my $safetyCount;
+
+    foreach $arg (@cargs){
+        my $type_tmp = $arg;  # needed for @arg_ == 1
+
+        # safety
+        # QAbstractSlider::timerEvent(QTimerEvent*)
+        $arg .= "s".$safetyCount++;
+
+        my @arg_ = split(/ /,$arg);
+        if(@arg_[0] eq ""){
+            shift(@arg_);
+        }
+
+        if(@arg_ == 1){
+            $params_replacement .= $type_tmp." ".$arg.",";
+        } else {
+            $params_replacement .= $arg.",";
         }
 
     }
+
+    chop($params_replacement);
+
+    $method->{Params} = $params_replacement;
+
+    return $method;
+
+}
+
+sub declareEnums
+{
+	my( $enum, $specifier ) = @_;
+
+	$enum->{Access} =~ /([^_]*)(.*)?\s*/;
+
+	if( $enum->{NodeType} eq "/* enum" && $enum->{Access} eq $specifier) {
+
+        my $enum_declaration = "enum ".$enum->{astNodeName}." {";   # return value
+
+		my @enums = split(",", $enum->{Params});
+		my $enumCount = 0;
+
+		if($enum->{astNodeName} ne " ") {
+
+			foreach my $enum_ ( @enums ) {
+				$enum_ =~ s/\s//g;
+				$enum_ =~ s/::/./g;
+				if($#enums == $enumCount){
+
+					if ( $enum_ =~ /(.*)=(.*)/ ) {
+						$enum_declaration .= "\n\t\t\t$1 = $2";
+					} else {
+						$enum_declaration .= "\n\t\t\t".$enum_." = $enumCount";
+					}
+
+				} else {
+
+					if ( $enum_ =~ /(.*)=(.*)/ ) {
+						$enum_declaration .= "\n\t\t\t$1 = $2,";
+					} else {
+						$enum_declaration .= "\n\t\t\t".$enum_." = $enumCount,";
+					}
+
+				}
+#                my @constant = split(/=/,$enum_);
+# what to skip?
+                    if(!(
+                            $classname =~ /QContextMenuEvent/
+                        ||  $classname =~ /QInputMethodEvent/
+                        ||  $classname =~ /QPainter/
+                        ||  $classname =~ /QTabletEvent/
+                    )){
+                        print AG_QT_MINIT "\t  REGISTER_LONG_CONSTANT(\"",uc($classname),"_",uc($enum->{astNodeName}),"_",uc($constant[0]),"\", ",$classname,"::",$constant[0],", CONST_CS | CONST_PERSISTENT);\n";
+                        $enumCount++;
+                    }
+			}
+
+			$enum_declaration .= "\n\t\t};*/\n";
+
+            return $enum_declaration;
+		}
+	}
+
+}
+
+#   remove generic syntax
+#   QList<Attribute> => QList
+sub removeGeneric
+{
+    my($myarg) = @_;
+    $myarg =~ s/<.*>//;
+    return $myarg;
+}
+
+sub generateInheritanceList
+{
+
+    print INHERITANCE "\n\n#include \"php_qt.h\"\nbool inherits(zend_class_entry* ace, uint objectId, int recursion){";
+
+    # generate list of Id's
+    my $classId;
+	Iter::LocalCompounds( $global_rootnode, sub {
+        $class = shift;
+        $classes{ $class->{astNodeName} } = ++$classId;
+    });
+
+    $classId = 0;   # reset
+
+    # write code
+	Iter::LocalCompounds( $global_rootnode, sub {
+
+        $class = shift;
+        $classId++;
+
+        # ask for all ancestors
+        @c = superclass_list($class);
+
+        print INHERITANCE "\n\n/// ".$class->{astNodeName}.", ID: ".$classId." \n";
+        print INHERITANCE "if(ace == ".$class->{astNodeName}."_ce_ptr){ switch(objectId){";
+        print INHERITANCE "case ".$classId.": //".$class->{astNodeName}."\nreturn true;";
+
+        # walk through relevant ancestors
+        foreach my $a (@c){
+            next if $a->{astNodeName} eq "";
+            print INHERITANCE "case ".%classes->{ $a->{astNodeName} }.": //".$a->{astNodeName}."\nreturn true;"
+        }
+
+        print INHERITANCE "default: return false;";
+        print INHERITANCE "}}";
+
+    } );
+
+    print INHERITANCE "\n// final: \nif(recursion == 10) {return false;} inherits(ace->parent, objectId, recursion++);}\n";
+
+}
+
+# helper function
+sub superclass_list($)
+{
+    my $classNode = shift;
+    my @super;
+    Iter::Ancestors( $classNode, $global_rootnode, undef, undef, sub {
+                        push @super, @_[0];
+                        push @super, superclass_list( @_[0] );
+                     }, undef );
+    return @super;
+}
+
+#
+#   returns 1 if enum
+#
+sub isEnum
+{
+    my ($name) = @_;
+
+    foreach $enum (@enums){
+        if($name eq $enum->{astNodeName}){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+# returns 1 if moc is needed
+
+sub hasMetaObject
+{
+    foreach my $key (keys %methods)
+    {
+        $method = %methods->{$key};
+        if($method->{astNodeName} eq "metaObject"){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+#
+# returns 1 if class is abstract
+# abstract classes cannot be instanciated
+
+sub isAbstract
+{
+    my ($className) = @_;
+
+    if($className eq "") {return 0;}
+
+    my $iter_class = kdocAstUtil::findRef( $global_rootnode, $className, sub{});
+
+    if($iter_class->{Pure} == 1){
+        return 1;
+    } else {
+        return 0;
+    }
+
+}
+
+sub isChar
+{
+
+    my ($arg) = @_;
+
+    my @arg_ = split(/ /,$arg);
+
+    foreach $chunk (@arg_){
+        return 1 if($chunk eq "char");
+    }
+
+    return 0;
+
+}
+
+sub debug
+{
+    my ($string) = @_;
+
+    print CLASS "/// DEBUG:".$string.".\n";
+
+}
+
+# 3     important hints
+# 4     informations for later
+
+sub report
+{
+    my ($string, $level) = @_;
+
+    print "REPORT ".$classname.": ".$string.".\n" if $level < 5;
 
 }
 
