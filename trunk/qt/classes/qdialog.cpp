@@ -738,7 +738,7 @@ ZEND_METHOD(QDialog, accepted)
       if (getThis() != NULL) {
         selfpointer = static_cast < QDialog * >(PHP_QT_FETCH());
       }
-      RETURN_VOID(selfpointer->accepted());
+//      RETURN_VOID(selfpointer->accepted());
     }
   }
   php_error(E_ERROR, "could not parse argument in QDialog::accepted(...) ");
@@ -932,7 +932,7 @@ ZEND_METHOD(QDialog, rejected)
       if (getThis() != NULL) {
         selfpointer = static_cast < QDialog * >(PHP_QT_FETCH());
       }
-      RETURN_VOID(selfpointer->rejected());
+//      RETURN_VOID(selfpointer->rejected());
     }
   }
   php_error(E_ERROR, "could not parse argument in QDialog::rejected(...) ");
@@ -973,7 +973,7 @@ ZEND_METHOD(QDialog, event)
         QEvent *
           cpp_arg_0 = static_cast < QEvent * >(php_qt_fetch(arg_0));
 
-        RETURN_BOOL(selfpointer->event((QEvent *) cpp_arg_0));
+//        RETURN_BOOL(selfpointer->event((QEvent *) cpp_arg_0));
       }
 #endif
 
@@ -1025,7 +1025,7 @@ ZEND_METHOD(QDialog, finished)
       if (getThis() != NULL) {
         selfpointer = static_cast < QDialog * >(PHP_QT_FETCH());
       }
-      RETURN_VOID(selfpointer->finished((int)Z_LVAL_P(arg_0)));
+//      RETURN_VOID(selfpointer->finished((int)Z_LVAL_P(arg_0)));
     }
   }
   php_error(E_ERROR, "could not parse argument in QDialog::finished(...) ");
