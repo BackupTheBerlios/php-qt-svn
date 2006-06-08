@@ -1,3 +1,14 @@
+2006-06-08  Thomas Moenicke <tm@ippfp.org>  (v.0.0.3) "Lilly"
+
+		* tutorial 7 and an example application
+		* automatically conversion of PHP strings into QStrings in method calls
+		* function 'qobject_cast' implemented
+		* handling of all allowed arguments in methods, with fast lookup table for inheritance
+		* Signals-Slots and custom Signals-Slots implemented
+		* better error handling for debugging
+		* #ifdef statements to exclude unimplemented classes to compile safely
+		* kalyptus extension rewritten
+
 2006-01-23  Thomas Moenicke  <tm@ippfp.org> (v.0.0.2) "Fridolin"
 
         * a lot of new classes added
