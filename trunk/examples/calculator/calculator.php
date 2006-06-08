@@ -68,11 +68,11 @@
             $this->pendingAdditiveOperator = new QString();
             $this->pendingMultiplicativeOperator = new QString();
 
-            $this->display = new QLineEdit("Thor");
+            $this->display = new QLineEdit("0");
             $this->display->setReadOnly(true);
             $this->display->setAlignment(QT_ALIGNMENT_ALIGNRIGHT);
             $this->display->setMaxLength(15);
-//            $this->display->installEventFilter($this);
+            $this->display->installEventFilter($this);
 
             for ($i = 0; $i < $this->NumDigitButtons; ++$i) {
                     $this->digitButtons[$i] = $this->createButton($i."", SLOT("digitClicked()"));
