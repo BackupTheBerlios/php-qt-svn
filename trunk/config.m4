@@ -44,7 +44,7 @@ if test "$PHP_PHP_QT" != "no"; then
 
   SEARCH_OBJ="/Qt/qobject.h"
 
-  SEARCH_PATH="/usr/local /usr /usr/lib/qt4"
+  SEARCH_PATH="/usr/local /usr /usr/lib/qt4 /usr/lib64/qt4"
   SEARCH_FOR="/include/qt4 /include"
   SEARCH_FOR_OTHER="/include/Qt/qobject.h"
 
