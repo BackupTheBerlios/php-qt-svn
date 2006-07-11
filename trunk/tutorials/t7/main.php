@@ -48,10 +48,6 @@
             $this->slider->setValue($value);
         }
 
-        function meinSlot(){
-            echo "meinSlot";
-        }
-
     };
 
     class MyWidget extends QWidget
