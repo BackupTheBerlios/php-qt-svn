@@ -18,9 +18,6 @@
     $window = new QWidget();
     $window->resize(200,120);
 
-    $window->setAccessibleName("Julchen");
-echo $window->accessibleName();
-
     $quit = new QPushButton("Quit", $window);
 //    $quit->setFont();
     $quit->setGeometry(10, 40, 180, 40);
