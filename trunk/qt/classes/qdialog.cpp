@@ -42,12 +42,17 @@ public:
   zval *zend_ptr;
   const QMetaObject *metaObject() const;
   int qt_metacall(QMetaObject::Call _c, int _id, void **_a);
+  bool event(QEvent* event);
 };
 
 QDialog_php_qt::QDialog_php_qt(zval * zend_ptr, QWidget * parent, Qt::WFlags f):QDialog(parent, f)
 {
   this->zend_ptr = zend_ptr;
 // for future use:                   PHP_QT_REGISTER_MOC(php_qt_getMocData(this->zend_ptr,"QDialog",&staticMetaObject));
+}
+
+bool QDialog_php_qt::event ( QEvent * event ){
+    return true;
 }
 
 PHP_QT_MOC(QDialog);
