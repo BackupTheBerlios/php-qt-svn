@@ -25,16 +25,20 @@ We prefer to build PHP-Qt as module! In this example php is
 installed in /usr/local/php511
 
 At first it is neccessary to check your environment for compiling. 
-To do that change into the php-5.1xxx/ext/php_qt directory and run phpize 
+To do that change into the php-5.1xxx/ext/php_qt directory and run phpize, kdeize
 and configure:
 
 /usr/local/php511/bin/phpize
 
-./configure --with-php_qt[=/usr/lib/qt4/include] 		\
-  --with-qtlib=/usr/lib/qt4 							\
-  --with-php-config=/usr/local/php511/bin/php-config	\
+./kdeize
 
-The arguments in brackets are optional but may be necessary on your system.
+./configure \
+  --enable-php_qt \
+  --with-qt-includes=/usr/lib/qt4/include \
+  --with-qt-libraries=/usr/lib/qt4 \
+  --with-php-config=/usr/local/php511/bin/php-config \
+
+If --with-qt-includes and --with-qt-config are omitted, configure will try to find files in default or standard pathes
 
 To remove old objectfiles run 
 

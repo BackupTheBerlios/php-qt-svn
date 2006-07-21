@@ -1,107 +1,144 @@
-dnl $Id$
-dnl config.m4 for extension php_qt
+
+dnl This is so we can use kde-common
+
+dnl includes kde build environment
+KDE_CREATE_LIBS_ALIASES
+
+AC_ENABLE_SHARED(yes)
+AC_ENABLE_STATIC(no)
+KDE_PROG_LIBTOOL
+
+m4_pattern_allow([AC_PATH_QT])dnl
+AC_PATH_QT()
+AC_SUBST(all_includes)
+AC_SUBST(all_libraries)
+
+dnl =======================================================
+dnl FILE: ./smoke/configure.in.in
+dnl =======================================================
+
+#AC_ARG_WITH(
+#   smoke,
+#   [  --with-smoke@<:@=qt|kde@:>@   Smoke: build Smoke for qt+kde or qt only @<:@default:qt@:>@],
+#   [ kde_build_libsmoke="$withval" ],
+#   [ kde_build_libsmoke="qt" ]
+#)
+#AC_SUBST(kde_build_libsmoke)
+
+dnl =======================================================
+dnl FILE: ./smoke/kde/configure.in.in
+dnl =======================================================
 
 
-dnl runtime
-PHP_ARG_WITH(qtlib,Qt runtime library,
-[  --with-qtlib=DIR         Qt library binaries])
+#AC_HAVE_GL
+#KDE_HAVE_GL=yes;
+#if test "X$GLLIB" = "X"; then
+#    KDE_HAVE_GL=no
+#fi
+#
+#AC_SUBST(KDE_HAVE_GL)   
+#
+#KDE_PREFIX=`$KDECONFIG --prefix --expandvars`
+#AC_SUBST(KDE_PREFIX)
+#
+#if test "X$kde_build_libsmoke" = "Xkde" -o "X$kde_build_libsmoke" = "Xqt kde"; then
+#
+#    AC_CONFIG_FILES([ smoke/kde/qtguess.pl ], [
+#        cd smoke/kde
+#        perl qtguess.pl
+#        cd ../..
+#    ])
+#    AC_CONFIG_FILES([ smoke/kde/generate.pl ], [
+#        cd smoke/kde
+#        perl generate.pl
+#        cd ../..
+#    ])
+#fi
 
-AC_MSG_CHECKING([for Qt binaries])
-
-if test "$PHP_QTLIB" != "yes"; then
-
-    if test -r "$PHP_QTLIB"; then
-        AC_MSG_RESULT(found in $PHP_QTLIB)
-    else 
-        AC_MSG_ERROR([Please check the Qt distribution] $PHP_QTLIB)
-    fi
-
-  PHP_ADD_LIBPATH($PHP_QTLIB/lib/qt4 )
-  PHP_ADD_LIBPATH($PHP_QTLIB/lib)
-  PHP_ADD_LIBPATH(/tmp/buildd/qt4-x11-4.0.1/lib)
-  PHP_ADD_LIBPATH($PHP_QTLIB/X11R6/lib)
-
-else
-    if test "$PHP_QTLIB" != "no"; then
-        PHP_ADD_LIBPATH(/usr/lib/qt4 )
-        PHP_ADD_LIBPATH(/usr/lib)
-        PHP_ADD_LIBPATH(/tmp/buildd/qt4-x11-4.0.1/lib)
-        PHP_ADD_LIBPATH(/usr/X11R6/lib)
-        AC_MSG_RESULT([default path])
-    else
-        AC_MSG_RESULT([skipped])
-    fi
-fi
+dnl =======================================================
+dnl FILE: ./smoke/qt/configure.in.in
+dnl =======================================================
 
 
-dnl build
+#AC_HAVE_GL
+#KDE_HAVE_GL=yes;
+#if test "X$GLLIB" = "X"; then
+#    KDE_HAVE_GL=no
+#fi
 
+#AC_SUBST(KDE_HAVE_GL)   
+
+#AC_ARG_WITH(
+#   threshold,
+#   [  --with-threshold@<:@=0..15@:>@  Smoke: Qt tests threshold Default:10 Lower=more tests],
+#   [ qt_test_threshold="$withval" ],
+#   [ qt_test_threshold=10 ]
+#)
+#AC_SUBST(qt_test_threshold)
+#
+#if test "X$kde_build_libsmoke" = "Xqt" -o "X$kde_build_libsmoke" = "Xqt kde"; then
+#
+#    AC_CONFIG_FILES([ smoke/qt/qtguess.pl ], [
+#        cd smoke/qt
+#        perl qtguess.pl
+#        cd ../..
+#    ])
+#    AC_CONFIG_FILES([ smoke/qt/generate.pl ], [
+#        cd smoke/qt
+#        perl generate.pl
+#        cd ../..
+#    ])
+#fi
+
+
+KDE_CREATE_SUBDIRSLIST
+#AM_CONDITIONAL(smoke_SUBDIR_included, test "x$smoke_SUBDIR_included" = xyes)
+
+AC_OUTPUT
 
 PHP_ARG_WITH(php_qt, for php_qt,
-[  --with-php_qt=DIR        Include Qt support and look for headers in /usr/local/include/qt4 /usr/include/qt4 /usr/lib/qt4/include])
+[  --enable-php_qt         Enable PHP-Qt support])
 
 if test "$PHP_PHP_QT" != "no"; then
 
-  SEARCH_OBJ="/Qt/qobject.h"
-
-  SEARCH_PATH="/usr/local /usr /usr/lib/qt4 /usr/lib64/qt4"
-  SEARCH_FOR="/include/qt4 /include"
-  SEARCH_FOR_OTHER="/include/Qt/qobject.h"
-
-  if test -r $PHP_PHP_QT/$SEARCH_FOR_OTHER; then 
-    PHP_QT_DIR=$PHP_PHP_QT
-    AC_MSG_RESULT(Qt header files found in $PHP_QT_DIR)
-  else 
-    AC_MSG_CHECKING([for Qt headers in default path])
-    AC_MSG_RESULT(trying different pathes)
-    for i in $SEARCH_PATH ; do
-     for j in $SEARCH_FOR ; do
-      AC_MSG_CHECKING(for $i$j$SEARCH_OBJ)
-      if test -r $i$j/$SEARCH_OBJ; then
-        PHP_QT_DIR=$i$j
-        AC_MSG_RESULT(found)
-        break 2
-      else
-        AC_MSG_RESULT(not found)
-      fi
-     done
-    done
-  fi
-
-  if test -z "$PHP_QT_DIR"; then
-    AC_MSG_RESULT([not found])
-    AC_MSG_ERROR([Please reinstall the Qt distribution])
-  fi
-
-  PHP_ADD_INCLUDE($PHP_QT_DIR/include)
-
-  dnl from qmake
-  LDFLAGS="$LDFLAGS -lQtGui -lXt -lpng -lSM -lICE -lXi -lXrender -lXrandr -lXcursor -lXinerama -lfreetype -lXext -lX11 -lm -lQtCore -lfontconfig -lz -ldl -lpthread"
-
+  PHP_QT_DIR="$qt_incdir";
+  LDFLAGS="$LDFLAGS $all_libraries $USER_LDFLAGS $LIBQT"
   PHP_REQUIRE_CXX
 
-  PHP_ADD_INCLUDE($PHP_QT_DIR/QtGui)
-  PHP_ADD_INCLUDE($PHP_QT_DIR/QtCore)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/include)
   PHP_ADD_INCLUDE($PHP_QT_DIR)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/Qt3Support)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtAssistant)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtCore)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtDesigner)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtGui)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtNetwork)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtOpenGL)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtSql)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtSvg)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtTest)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtUiTools)
+  PHP_ADD_INCLUDE($PHP_QT_DIR/QtXml)  
+#  PHP_ADD_INCLUDE(smoke/)
 
   PHP_NEW_EXTENSION(php_qt, \
-  qt/classes/qapplication.cpp \
-  qt/classes/qcoreapplication.cpp \
-  qt/classes/qwidget.cpp \
-  qt/classes/qabstractslider.cpp \
-  qt/classes/qframe.cpp \
-  qt/classes/qlineedit.cpp \
-  qt/classes/qslider.cpp \
-  qt/classes/qlayoutitem.cpp \
-  qt/classes/qlayout.cpp \
-  qt/classes/qboxlayout.cpp \
-  qt/classes/qhboxlayout.cpp \
-  qt/classes/qvboxlayout.cpp \
   qt/object_model/qobject.cpp \
   qt/text_related/qstring.cpp \
-  qt/classes/qlatin1string.cpp \
-  qt/classes/qchar.cpp \
   qt/event/qevent.cpp \
+	qt/classes/qapplication.cpp \
+	qt/classes/qcoreapplication.cpp \
+	qt/classes/qwidget.cpp \
+	qt/classes/qabstractslider.cpp \
+	qt/classes/qframe.cpp \
+	qt/classes/qlineedit.cpp \
+	qt/classes/qslider.cpp \
+	qt/classes/qlayoutitem.cpp \
+	qt/classes/qlayout.cpp \
+	qt/classes/qboxlayout.cpp \
+	qt/classes/qhboxlayout.cpp \
+	qt/classes/qvboxlayout.cpp \
+	qt/classes/qlatin1string.cpp \
+	qt/classes/qchar.cpp \
 	qt/classes/qactionevent.cpp \
 	qt/classes/qabstractbutton.cpp \
 	qt/classes/qcharref.cpp \
@@ -160,5 +197,12 @@ if test "$PHP_PHP_QT" != "no"; then
   ,$ext_shared,cli)
   PHP_ADD_BUILD_DIR($ext_builddir/qt)
 
-fi
+#  PHP_ADD_SOURCES_X(smoke/qt, \
+#    x_1.cpp x_2.cpp x_3.cpp x_4.cpp x_5.cpp x_6.cpp x_7.cpp \
+#    x_8.cpp x_9.cpp x_10.cpp x_11.cpp x_12.cpp x_13.cpp x_14.cpp x_15.cpp \
+#    x_16.cpp x_17.cpp x_18.cpp x_19.cpp x_20.cpp \
+#    smokedata.cpp,,shared_objects_php_qt,yes)
+#  PHP_ADD_BUILD_DIR($ext_builddir/smoke)
 
+
+fi
