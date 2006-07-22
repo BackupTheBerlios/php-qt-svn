@@ -25,12 +25,12 @@ We prefer to build PHP-Qt as module! In this example php is
 installed in /usr/local/php511
 
 At first it is neccessary to check your environment for compiling. 
-To do that change into the php-5.1xxx/ext/php_qt directory and run phpize, kdeize.sh
+To do that change into the php-5.1xxx/ext/php_qt directory and run phpize, kdeize
 and configure:
 
 /usr/local/php511/bin/phpize
 
-./kdeize.sh
+./kdeize
 
 ./configure \
   --enable-php_qt \
