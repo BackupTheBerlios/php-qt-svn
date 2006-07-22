@@ -1,4 +1,9 @@
 
+m4_pattern_allow([AM_INIT_AUTOMAKE])dnl
+m4_pattern_allow([AC_PACKAGE_TARNAME])dnl
+m4_pattern_allow([AC_PACKAGE_VERSION])dnl
+AM_INIT_AUTOMAKE([NO-DEFINE])
+
 dnl This is so we can use kde-common
 
 dnl includes kde build environment
