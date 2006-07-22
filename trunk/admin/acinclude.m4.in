@@ -1173,8 +1173,8 @@ dnl ------------------------------------------------------------
   fi
 fi
 
-LIBQT="-lQtGui_debug"
-kde_int_qt="-lQtGui_debug"
+LIBQT="-lQtGui"
+kde_int_qt="-lQtGui"
 
 AC_REQUIRE([AC_FIND_PNG])
 AC_REQUIRE([AC_FIND_JPEG])
@@ -1241,7 +1241,7 @@ else
   # if the Qt was given, the chance is too big that libqt.* doesn't exist
   qt_libdir=
   for dir in $qt_libdirs; do
-    try="ls -1 $dir/libQtCore_debug.la"
+    try="ls -1 $dir/libQtCore.la"
     if test -n "`$try 2> /dev/null`"; then qt_libdir=$dir; break; else echo "tried $dir" >&AC_FD_CC ; fi
   done
 fi
@@ -1270,7 +1270,7 @@ LIBS="$LIBS $LIBQT $KDE_MT_LIBS"
 
 KDE_PRINT_QT_PROGRAM
 
-ac_link='$LIBTOOL_SHELL --silent --mode=link ${CXX-g++} -o conftest $CXXFLAGS $all_includes $CPPFLAGS $LDFLAGS $all_libraries conftest.$ac_ext $LIBS -lQtGui_debug -lQtCore_debug $KDE_TEST_RPATH 1>&5'
+ac_link='$LIBTOOL_SHELL --silent --mode=link ${CXX-g++} -o conftest $CXXFLAGS $all_includes $CPPFLAGS $LDFLAGS $all_libraries conftest.$ac_ext $LIBS -lQtGui -lQtCore $KDE_TEST_RPATH 1>&5'
 
 if AC_TRY_EVAL(ac_link) && test -s conftest; then
   rm -f conftest*
@@ -1759,15 +1759,15 @@ AC_DEFUN([KDE_CREATE_LIBS_ALIASES],
    AC_SUBST(LIB_KSYCOCA, "-lkio")
    AC_SUBST(LIB_KFILE, "-lkio")
 #these are for Qt4 libs separation
-   AC_SUBST(LIB_QTCORE, "-lQtCore_debug")
-   AC_SUBST(LIB_QTXML, "-lQtXml_debug")
-   AC_SUBST(LIB_QTGUI, "-lQtGui_debug")
-   AC_SUBST(LIB_QTNETWORK, "-lQtNetwork_debug")
-   AC_SUBST(LIB_QTOPENGL, "-lQtOpenGL_debug")
-   AC_SUBST(LIB_QTSQL, "-lQtSql_debug")
-   AC_SUBST(LIB_QTTESTLIB, "-lQtTest_debug")
-   AC_SUBST(LIB_QT3SUPPORT, "-lQt3Support_debug")
-   AC_SUBST(LIB_QTDESIGNER, "-lQtDesigner_debug")
+   AC_SUBST(LIB_QTCORE, "-lQtCore")
+   AC_SUBST(LIB_QTXML, "-lQtXml")
+   AC_SUBST(LIB_QTGUI, "-lQtGui")
+   AC_SUBST(LIB_QTNETWORK, "-lQtNetwork")
+   AC_SUBST(LIB_QTOPENGL, "-lQtOpenGL")
+   AC_SUBST(LIB_QTSQL, "-lQtSql")
+   AC_SUBST(LIB_QTTESTLIB, "-lQtTest")
+   AC_SUBST(LIB_QT3SUPPORT, "-lQt3Support")
+   AC_SUBST(LIB_QTDESIGNER, "-lQtDesigner")
 ])
 
 AC_DEFUN([AC_PATH_KDE],
