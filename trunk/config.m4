@@ -73,14 +73,14 @@ dnl =======================================================
 
 #AC_SUBST(KDE_HAVE_GL)   
 
-#AC_ARG_WITH(
-#   threshold,
-#   [  --with-threshold@<:@=0..15@:>@  Smoke: Qt tests threshold Default:10 Lower=more tests],
-#   [ qt_test_threshold="$withval" ],
-#   [ qt_test_threshold=10 ]
-#)
-#AC_SUBST(qt_test_threshold)
-#
+AC_ARG_WITH(
+   threshold,
+   [  --with-threshold@<:@=0..15@:>@  Smoke: Qt tests threshold Default:10 Lower=more tests],
+   [ qt_test_threshold="$withval" ],
+   [ qt_test_threshold=10 ]
+)
+AC_SUBST(qt_test_threshold)
+
 if test "X$kde_build_libsmoke" = "Xqt" -o "X$kde_build_libsmoke" = "Xqt kde"; then
 
     AC_CONFIG_FILES([ smoke/qt/qtguess.pl ], [
