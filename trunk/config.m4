@@ -99,8 +99,6 @@ fi
 KDE_CREATE_SUBDIRSLIST
 #AM_CONDITIONAL(smoke_SUBDIR_included, test "x$smoke_SUBDIR_included" = xyes)
 
-AC_OUTPUT
-
 PHP_ARG_WITH(php_qt, for php_qt,
 [  --enable-php_qt         Enable PHP-Qt support])
 
