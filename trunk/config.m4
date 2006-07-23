@@ -22,13 +22,13 @@ dnl =======================================================
 dnl FILE: ./smoke/configure.in.in
 dnl =======================================================
 
-#AC_ARG_WITH(
-#   smoke,
-#   [  --with-smoke@<:@=qt|kde@:>@   Smoke: build Smoke for qt+kde or qt only @<:@default:qt@:>@],
-#   [ kde_build_libsmoke="$withval" ],
-#   [ kde_build_libsmoke="qt" ]
-#)
-#AC_SUBST(kde_build_libsmoke)
+AC_ARG_WITH(
+   smoke,
+   [  --with-smoke@<:@=qt|kde@:>@   Smoke: build Smoke for qt+kde or qt only @<:@default:qt@:>@],
+   [ kde_build_libsmoke="$withval" ],
+   [ kde_build_libsmoke="qt" ]
+)
+AC_SUBST(kde_build_libsmoke)
 
 dnl =======================================================
 dnl FILE: ./smoke/kde/configure.in.in
@@ -81,19 +81,19 @@ dnl =======================================================
 #)
 #AC_SUBST(qt_test_threshold)
 #
-#if test "X$kde_build_libsmoke" = "Xqt" -o "X$kde_build_libsmoke" = "Xqt kde"; then
-#
-#    AC_CONFIG_FILES([ smoke/qt/qtguess.pl ], [
-#        cd smoke/qt
-#        perl qtguess.pl
-#        cd ../..
-#    ])
-#    AC_CONFIG_FILES([ smoke/qt/generate.pl ], [
-#        cd smoke/qt
-#        perl generate.pl
-#        cd ../..
-#    ])
-#fi
+if test "X$kde_build_libsmoke" = "Xqt" -o "X$kde_build_libsmoke" = "Xqt kde"; then
+
+    AC_CONFIG_FILES([ smoke/qt/qtguess.pl ], [
+        cd smoke/qt
+        perl qtguess.pl
+        cd ../..
+    ])
+    AC_CONFIG_FILES([ smoke/qt/generate.pl ], [
+        cd smoke/qt
+        perl generate.pl
+        cd ../..
+    ])
+fi
 
 
 KDE_CREATE_SUBDIRSLIST
@@ -107,7 +107,19 @@ PHP_ARG_WITH(php_qt, for php_qt,
 if test "$PHP_PHP_QT" != "no"; then
 
   PHP_QT_DIR="$qt_incdir";
-  LDFLAGS="$LDFLAGS $all_libraries $USER_LDFLAGS $LIBQT"
+  smoke_libraries="$LIB_QTCORE \
+		   $LIB_QTGUI \
+		   $LIB_QTNETWORK \
+		   $LIB_QTOPENGL \
+		   $LIB_QTSQL \
+		   $LIB_QTCORE \
+		   $LIB_QTXML \
+		   $GLLIB \
+		   $LIBQSCINTILLA \
+		    -lQtSvg \
+		    -lQtUiTools"
+
+  LDFLAGS="$LDFLAGS $all_libraries $USER_LDFLAGS $LIBQT $smoke_libraries"
   PHP_REQUIRE_CXX
 
   PHP_ADD_INCLUDE($PHP_QT_DIR/include)
@@ -124,7 +136,7 @@ if test "$PHP_PHP_QT" != "no"; then
   PHP_ADD_INCLUDE($PHP_QT_DIR/QtTest)
   PHP_ADD_INCLUDE($PHP_QT_DIR/QtUiTools)
   PHP_ADD_INCLUDE($PHP_QT_DIR/QtXml)  
-#  PHP_ADD_INCLUDE(smoke/)
+  PHP_ADD_INCLUDE(smoke/)
 
   PHP_NEW_EXTENSION(php_qt, \
   qt/object_model/qobject.cpp \
@@ -202,12 +214,12 @@ if test "$PHP_PHP_QT" != "no"; then
   ,$ext_shared,cli)
   PHP_ADD_BUILD_DIR($ext_builddir/qt)
 
-#  PHP_ADD_SOURCES_X(smoke/qt, \
-#    x_1.cpp x_2.cpp x_3.cpp x_4.cpp x_5.cpp x_6.cpp x_7.cpp \
-#    x_8.cpp x_9.cpp x_10.cpp x_11.cpp x_12.cpp x_13.cpp x_14.cpp x_15.cpp \
-#    x_16.cpp x_17.cpp x_18.cpp x_19.cpp x_20.cpp \
-#    smokedata.cpp,,shared_objects_php_qt,yes)
-#  PHP_ADD_BUILD_DIR($ext_builddir/smoke)
+  PHP_ADD_SOURCES_X(smoke/qt, \
+    x_1.cpp x_2.cpp x_3.cpp x_4.cpp x_5.cpp x_6.cpp x_7.cpp \
+    x_8.cpp x_9.cpp x_10.cpp x_11.cpp x_12.cpp x_13.cpp x_14.cpp x_15.cpp \
+    x_16.cpp x_17.cpp x_18.cpp x_19.cpp x_20.cpp \
+    smokedata.cpp,,shared_objects_php_qt,yes)
+  PHP_ADD_BUILD_DIR($ext_builddir/smoke)
 
 
 fi
