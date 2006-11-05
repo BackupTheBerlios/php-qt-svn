@@ -70,7 +70,7 @@
 
             $this->display = new QLineEdit("0");
             $this->display->setReadOnly(true);
-            $this->display->setAlignment(QT_ALIGNMENT_ALIGNRIGHT);
+            $this->display->setAlignment(Qt::AlignRight);
             $this->display->setMaxLength(15);
             $this->display->installEventFilter($this);
 
@@ -154,6 +154,7 @@
 
             $clickedButton = qobject_cast($this->sender(),new QToolButton());
             $digitValue = $clickedButton->text()->toInt();
+
             if ($this->display->text() == "0" && $digitValue == 0.0)
                 return;
 
@@ -164,6 +165,7 @@
 
             $new_value = new QString();
             $display_text = $this->display->text();
+
             $number = QString::number($digitValue);
 
             $new_value->append($display_text);
@@ -179,15 +181,15 @@
             $operand = $this->display->text()->toDouble();
             $result;
 
-            if ($clickedOperator->toAscii() == $this->tr("Sqrt")->toAscii()) {
+            if ($clickedOperator->__toString() == "Sqrt") {
                 if ($operand < 0.0) {
                     $this->abortOperation();
                     return;
                 }
                 $result = sqrt($operand);
-            } else if ($clickedOperator->toAscii() == $this->tr("x\262")->toAscii()) {
+            } else if ($clickedOperator->__toString() == "x\262") {
                 $result = pow($operand, 2.0);
-            } else if ($clickedOperator->toAscii() == $this->tr("1/x")->toAscii()) {
+            } else if ($clickedOperator->__toString() == "1/x") {
                 if ($operand == 0.0) {
                     $this->abortOperation();
                     return;
@@ -238,7 +240,7 @@
             $clickedOperator = $clickedButton->text();
 
             $operand = $this->display->text()->toDouble();
-                                
+
             if (!$this->pendingMultiplicativeOperator->isEmpty()) {
                 if (!$this->calculate($operand, $this->pendingMultiplicativeOperator)) {
                     $this->abortOperation();
@@ -284,10 +286,10 @@
         {
             if ($this->waitingForOperand)
                 $this->display->setText("0");
-            if (!$this->display->text()->contains(".")){
 
+            if (!$this->display->text()->contains(".")){
                 $new_value = $this->display->text();
-                $new_value->append(".");
+                $new_value->append(new QString("."));
                 $this->display->setText($new_value);
                 
             }
@@ -300,7 +302,7 @@
             $value = $text->toDouble();
 
             if ($value > 0.0) {
-                $text->prepend("-");
+                $text->prepend(new QString("-"));
             } else if ($value < 0.0) {
                 $text->remove(0, 1);
             }
@@ -371,13 +373,13 @@
 
         function calculate($rightOperand, $pendingOperator)
         {
-            if ($pendingOperator->toAscii() == "+") {
+            if ($pendingOperator->__toString() == "+") {
                 $this->sumSoFar += $rightOperand;
-            } else if ($pendingOperator->toAscii() == "-") {
+            } else if ($pendingOperator->__toString() == "-") {
                 $this->sumSoFar -= $rightOperand;
-            } else if ($pendingOperator->toAscii() == "\327") {
+            } else if ($pendingOperator->__toString() == "\327") {
                 $this->factorSoFar *= $rightOperand;
-            } else if ($pendingOperator->toAscii() == "\367") {
+            } else if ($pendingOperator->__toString() == "\367") {
                 if ($rightOperand == 0.0)
                     return false;
                 $this->factorSoFar /= $rightOperand;

@@ -16,6 +16,7 @@
     $app = new QApplication($argc,$argv);
 
     $quit = new QPushButton("Quit");
+
     $quit->resize(75,30);
 //    $quit->setFont();
 

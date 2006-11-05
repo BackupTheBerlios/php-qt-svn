@@ -313,7 +313,7 @@ sub preParseClass
 	    $classNode->{Access} eq "protected" || # e.g. QPixmap::QPixmapData
 	    exists $classNode->{Tmpl} ||
 	    # Don't generate standard bindings for QString, this class is handled as a native type
-	    $className eq 'QString' ||
+#	    $className eq 'QString' ||
 	    $className eq 'QStringData' ||
 	    $className eq 'QLatin1String' ||
 	    $className eq 'QTLWExtra' ||

@@ -27,8 +27,7 @@
             $this->lcd = new QLCDNumber(2,$this);
             $this->slider = new QSlider($this);
 
-            $this->slider->setOrientation(QT_ORIENTATIONS_HORIZONTAL);
-
+            $this->slider->setOrientation(Qt::Horizontal);
             $this->slider->setRange(0, 99);
             $this->slider->setValue(0);
 
@@ -85,6 +84,7 @@
     }
 
     $app = new QApplication($argc,$argv);
+echo "argv";
     $widget = new MyWidget();
     $widget->show();
     $app->exec();

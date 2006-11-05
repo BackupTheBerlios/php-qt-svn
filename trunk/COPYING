@@ -3,7 +3,7 @@
 About licensing
 ===============
 
-PHP-Qt is licensed under the terms of the GNU Lesser General Public License.
+PHP-Qt is licensed under the terms of the GNU General Public License.
 Qt is dual licensed software. Please note that PHP-Qt is dynamically linked 
 against the Qt library, Qt header files are neccessary for building PHP-Qt.
 

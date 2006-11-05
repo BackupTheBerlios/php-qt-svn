@@ -29,7 +29,10 @@
 //            $quit->setFont();
 
             /* the macro qApp is not available in php-qt, we use QApplication::instance() directly. */
+
             $this->connect($this->quit, SIGNAL("clicked()"), QApplication::instance(), SLOT("quit()"));
+
+
 
         }
     

@@ -12,8 +12,9 @@
         function __construct($text){
 
             parent::__construct();
-//            $this->setSizePolicy("QSizePolicy::Expanding", "QSizePolicy::Preferred");
+///            $this->setSizePolicy("QSizePolicy::Expanding", "QSizePolicy::Preferred");
             $this->setText(new QString($text));
+
         }
 
     }

@@ -1,3 +1,12 @@
+2006-011-5  Thomas Moenicke <thomas.moenicke@kdemail.net>
+
+		* Code rewritten and ported to kdebindings::Smoke
+		* all classes and methods are supported with basic argument types and classes
+		* enum values are like eg Qt::Horizontal instead of QT_ALIGNMENT_HORIZONTAL
+		* License: GPL
+		* PHP-Qt objects are casted automatically
+		* QMetaObjects are created in class constructor and related pointers are stored in a hash table
+
 2006-06-08  Thomas Moenicke <tm@ippfp.org>  (v.0.0.3) "Lilli"
 
 		* tutorial 7 and an example application

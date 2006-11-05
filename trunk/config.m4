@@ -95,6 +95,8 @@ if test "X$kde_build_libsmoke" = "Xqt" -o "X$kde_build_libsmoke" = "Xqt kde"; th
     ])
 fi
 
+AC_CONFIG_FILES([ smoke/Makefile ])
+AC_CONFIG_FILES([ smoke/qt/Makefile ])
 
 KDE_CREATE_SUBDIRSLIST
 #AM_CONDITIONAL(smoke_SUBDIR_included, test "x$smoke_SUBDIR_included" = xyes)
@@ -115,7 +117,8 @@ if test "$PHP_PHP_QT" != "no"; then
 		   $GLLIB \
 		   $LIBQSCINTILLA \
 		    -lQtSvg \
-		    -lQtUiTools"
+		    -lQtUiTools \
+		    -lsmokeqt"
 
   LDFLAGS="$LDFLAGS $all_libraries $USER_LDFLAGS $LIBQT $smoke_libraries"
   PHP_REQUIRE_CXX
@@ -136,88 +139,13 @@ if test "$PHP_PHP_QT" != "no"; then
   PHP_ADD_INCLUDE($PHP_QT_DIR/QtXml)  
   PHP_ADD_INCLUDE(smoke/)
 
-  PHP_NEW_EXTENSION(php_qt, \
-  qt/object_model/qobject.cpp \
-  qt/text_related/qstring.cpp \
-  qt/event/qevent.cpp \
-	qt/classes/qapplication.cpp \
-	qt/classes/qcoreapplication.cpp \
-	qt/classes/qwidget.cpp \
-	qt/classes/qabstractslider.cpp \
-	qt/classes/qframe.cpp \
-	qt/classes/qlineedit.cpp \
-	qt/classes/qslider.cpp \
-	qt/classes/qlayoutitem.cpp \
-	qt/classes/qlayout.cpp \
-	qt/classes/qboxlayout.cpp \
-	qt/classes/qhboxlayout.cpp \
-	qt/classes/qvboxlayout.cpp \
-	qt/classes/qlatin1string.cpp \
-	qt/classes/qchar.cpp \
-	qt/classes/qactionevent.cpp \
-	qt/classes/qabstractbutton.cpp \
-	qt/classes/qcharref.cpp \
-	qt/classes/qchildevent.cpp \
-	qt/classes/qclipboardevent.cpp \
-	qt/classes/qcloseevent.cpp \
-	qt/classes/qcontextmenuevent.cpp \
-	qt/classes/qdate.cpp \
-	qt/classes/qdatetime.cpp \
-	qt/classes/qdialog.cpp \
-	qt/classes/qdragenterevent.cpp \
-	qt/classes/qdragleaveevent.cpp \
-	qt/classes/qdragmoveevent.cpp \
-	qt/classes/qdragresponseevent.cpp \
-	qt/classes/qdropevent.cpp \
-	qt/classes/qfileopenevent.cpp \
-	qt/classes/qfocusevent.cpp \
-	qt/classes/qfont.cpp \
-	qt/classes/qgridlayout.cpp \
-	qt/classes/qhelpevent.cpp \
-	qt/classes/qhideevent.cpp \
-	qt/classes/qhoverevent.cpp \
-	qt/classes/qicondragevent.cpp \
-	qt/classes/qinputevent.cpp \
-	qt/classes/qinputmethodevent.cpp \
-	qt/classes/qkeyevent.cpp \
-	qt/classes/qlabel.cpp \
-	qt/classes/qlatin1char.cpp \
-	qt/classes/qlcdnumber.cpp \
-	qt/classes/qmouseevent.cpp \
-	qt/classes/qmoveevent.cpp \
-	qt/classes/qobjectdata.cpp \
-	qt/classes/qobjectuserdata.cpp \
-	qt/classes/qpaintdevice.cpp \
-	qt/classes/qpaintevent.cpp \
-	qt/classes/qpainter.cpp \
-	qt/classes/qpushbutton.cpp \
-	qt/classes/qresizeevent.cpp \
-	qt/classes/qshortcutevent.cpp \
-	qt/classes/qshowevent.cpp \
-	qt/classes/qspaceritem.cpp \
-	qt/classes/qstatustipevent.cpp \
-	qt/classes/qtabletevent.cpp \
-	qt/classes/qtime.cpp \
-	qt/classes/qtimer.cpp \
-	qt/classes/qtimerevent.cpp \
-	qt/classes/qtoolbarchangeevent.cpp \
-	qt/classes/qtoolbutton.cpp \
-	qt/classes/qwhatsthisclickedevent.cpp \
-	qt/classes/qwheelevent.cpp \
-	qt/classes/qwidgetdata.cpp \
-	qt/classes/qwidgetitem.cpp \
-	qt/classes/qwindowstatechangeevent.cpp \
-  qt/php_qt.cpp \
-  qt/inheritance.cpp \
-  ,$ext_shared,cli)
-  PHP_ADD_BUILD_DIR($ext_builddir/qt)
-
   PHP_ADD_SOURCES_X(smoke/qt, \
     x_1.cpp x_2.cpp x_3.cpp x_4.cpp x_5.cpp x_6.cpp x_7.cpp \
     x_8.cpp x_9.cpp x_10.cpp x_11.cpp x_12.cpp x_13.cpp x_14.cpp x_15.cpp \
     x_16.cpp x_17.cpp x_18.cpp x_19.cpp x_20.cpp \
     smokedata.cpp,,shared_objects_php_qt,yes)
-  PHP_ADD_BUILD_DIR($ext_builddir/smoke)
 
+  PHP_NEW_EXTENSION(php_qt, qt/smokephp.cpp qt/php_qt.cpp ,$ext_shared,cli)
+  PHP_ADD_BUILD_DIR($ext_builddir/qt)
 
 fi
