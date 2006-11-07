@@ -1,3 +1,7 @@
+2006-011-7  Thomas Moenicke <thomas.moenicke@kdemail.net>
+
+		* function tr() implemented
+
 2006-011-5  Thomas Moenicke <thomas.moenicke@kdemail.net>
 
 		* Code rewritten and ported to kdebindings::Smoke

@@ -87,6 +87,7 @@ PHP_FUNCTION(confirm_php_qt_compiled);	/* For testing, remove later. */
 PHP_FUNCTION(SIGNAL);
 PHP_FUNCTION(SLOT);
 PHP_FUNCTION(qobject_cast);
+PHP_FUNCTION(tr);
 
 struct smokephp_object {
     bool allocated;

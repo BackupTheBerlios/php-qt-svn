@@ -30,9 +30,6 @@
 
 #include "ext/standard/php_string.h"
 
-#include <iostream>
-using namespace std;
-
 extern Smoke *qt_Smoke;
 extern void init_qt_Smoke();
 
@@ -58,7 +55,8 @@ function_entry php_qt_functions[] = {
 	PHP_FE(confirm_php_qt_compiled,	NULL)		/* For testing, remove later. */
 	PHP_FE(SIGNAL,	NULL)
 	PHP_FE(SLOT,	NULL)	
-	PHP_FE(qobject_cast,	NULL)	
+	PHP_FE(qobject_cast,	NULL)
+	PHP_FE(tr,	NULL)
 	{NULL, NULL, NULL}	/* Must be the last line in php_qt_functions[] */
 };
 
@@ -90,10 +88,11 @@ QHash<void*, long int>SmokeToPtr;
 QStack<QString*> methodNameStack;
 
 // cached
-static Smoke::Index qbool;
-static Smoke::Index qstring;
-static Smoke::Index qobject;
+Smoke::Index qbool;
+Smoke::Index qstring;
+Smoke::Index qobject;
 zend_class_entry* qobject_ce;
+zend_class_entry* qstring_ce;
 
 /**
  *	proxy handler
@@ -339,7 +338,8 @@ PHP_MINIT_FUNCTION(php_qt)
 // TODO		QObject Nummer suchen, nachher vergleichen
 	smokephp_findConnect();
 
-	Smoke::Index qobject_tmp = smokephp_getClassId("QObject");
+	Smoke::Index qobject = smokephp_getClassId("QObject");
+	Smoke::Index qstring = smokephp_getClassId("QString");
 
     php_qt_static_methods = (zend_function_entry***) safe_emalloc((qt_Smoke->numClasses), sizeof(zend_function_entry **), 0);
 
@@ -406,9 +406,13 @@ PHP_MINIT_FUNCTION(php_qt)
 	    INIT_CLASS_ENTRY(ce, qt_Smoke->classes[i].className, p);
 	    ce.name_length = strlen(qt_Smoke->classes[i].className);
 	    zend_class_entry* ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
-		if(qobject_tmp == i){
+		if(qobject == i){
 			qobject_ce = ce_ptr;
 		}
+		else if(qstring == i){
+			qstring_ce = ce_ptr;
+		}
+
 
         // register enums
 		if(!strcmp(qt_Smoke->classes[i].className, "Qt")){
@@ -468,102 +472,6 @@ PHP_MINFO_FUNCTION(php_qt)
 	DISPLAY_INI_ENTRIES();
 	*/
 }
-
-/* Every user-visible function in PHP should document itself in the source */
-/* proto string confirm_php_qt_compiled(string arg)
-   Return a string to confirm that the module is compiled in */
-PHP_FUNCTION(confirm_php_qt_compiled)
-{
-	char *arg = NULL;
-	int arg_len, len;
-	char string[256];
-
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
-		return;
-	}
-
-  	len = sprintf(string, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "php_qt", arg);
-	RETURN_STRINGL(string, len, 1);
-
-}
-
-/*!
- *	PHP userspace functions
- */
-
-/*!
- *  emulates the Qt SIGNAL() macro
- */
-
-PHP_FUNCTION(SIGNAL)
-{
-    const char* string;
-    int string_len;
-    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&string,&string_len)) {
-        return;
-    }
-
-    char* tmp = (char*) emalloc((int) string_len + 2);
-    strcpy(tmp,"2");
-
-    strncat(tmp, string, (int) string_len);
-
-    ZVAL_STRING(return_value,tmp,1);
-
-    efree(tmp);
-
-    return;
-}
-
-/*!
- *  emulates the Qt SLOT() macro
- */
-
-PHP_FUNCTION(SLOT)
-{
-    const char* string;
-    int string_len;
-    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&string,&string_len)) {
-        return;
-    }
-
-    char* tmp = (char*) emalloc((int) string_len + 2);
-    strcpy(tmp,"1");
-
-    strncat(tmp, string, (int) string_len);
-
-    ZVAL_STRING(return_value,tmp,1);
-
-    efree(tmp);
-
-    return;
-}
-
-/**
- *	simply returns the first parameter because objects are casted automatically in smokephp_convertReturn(...)
- *
- */
-
-PHP_FUNCTION(qobject_cast){
-
-    zval *obj;
-    zval *cast_type;
-
-    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz|", &obj, &cast_type) == FAILURE) {
-        php_error(E_WARNING,"error while casting object, wrong parameters");
-        return; 
-    }
-
-	ZVAL_ZVAL(return_value, obj, 0, 0);
-    return;
-
-}
-
-/*!
- *	tr()
- */
-
-// TODO: implement!
 
 /*!
  *	PHP-Qt internal functions
