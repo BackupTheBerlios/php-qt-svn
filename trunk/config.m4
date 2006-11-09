@@ -117,8 +117,7 @@ if test "$PHP_PHP_QT" != "no"; then
 		   $GLLIB \
 		   $LIBQSCINTILLA \
 		    -lQtSvg \
-		    -lQtUiTools \
-		    -lsmokeqt"
+		    -lQtUiTools"
 
   LDFLAGS="$LDFLAGS $all_libraries $USER_LDFLAGS $LIBQT $smoke_libraries"
   PHP_REQUIRE_CXX
