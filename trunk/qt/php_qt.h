@@ -39,6 +39,10 @@ using namespace std;
 #include <QCoreApplication>
 #include <QApplication>
 
+// for older php versions
+#ifndef ZEND_MN
+#define ZEND_MN ZEND_FN
+#endif
 
 #define QOUT()                                              \
     extern QTextStream qout(stdout, QIODevice::WriteOnly);  \
@@ -64,7 +68,7 @@ using namespace std;
     t->flags = flags_; \
     t++;
 
-#define PHP_QT_ME(classname, name, arg_info, flags)	PHP_QT_FENTRY(name, ZEND_FN(classname##_##name), arg_info, flags)
+#define PHP_QT_ME(classname, name, arg_info, flags)	PHP_QT_FENTRY(name, ZEND_MN(classname##_##name), arg_info, flags)
 
 
 #ifdef HAVE_CONFIG_H

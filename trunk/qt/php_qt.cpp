@@ -383,7 +383,7 @@ PHP_MINIT_FUNCTION(php_qt)
 								tmpMethodList[qt_Smoke->methodNames[qt_Smoke->methods[j].name]] = true;
 								t->fname = (char*) emalloc(strlen(qt_Smoke->methodNames[qt_Smoke->methods[j].name])+1);
 								t->fname = (char*) qt_Smoke->methodNames[qt_Smoke->methods[j].name];
-								t->handler = ZEND_FN(php_qt_generic_class_proxyMethod);
+								t->handler = ZEND_MN(php_qt_generic_class_proxyMethod);
 								t->arg_info = NULL;
 								t->flags = ZEND_ACC_PUBLIC|ZEND_ACC_STATIC;
 								t++;
