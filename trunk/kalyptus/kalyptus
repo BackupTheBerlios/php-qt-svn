@@ -2,7 +2,7 @@
 
 # KDOC -- C++ and CORBA IDL interface documentation tool.
 # Sirtaj Singh Kang <taj@kde.org>, Jan 1999.
-# $Id: kalyptus 558420 2006-07-05 11:43:10Z rdale $
+# $Id: kalyptus 596521 2006-10-17 19:47:11Z rdale $
 
 # All files in this project are distributed under the GNU General
 # Public License. This is Free Software.
@@ -469,13 +469,14 @@ LOOP:
 		$p =~ s/QT_MOC_COMPAT//;
 		$p =~ s/Q_EXPORT_CODECS_BIG5//;
 		$p =~ s/Q_DECL_DEPRECATED//;
+		$p =~ s/Q_SCRIPTABLE//;
 		$p =~ s/QT_COMPAT / /;
 		$p =~ s/Q_DISABLE_COPY\((\w+)\)/$1(const $1 &);\n$1 &operator=(const $1 &);/;
 		$p =~ s/QWIDGETSIZE_MAX/32767/; # Qt/E uses this #define as an enum value - yuck!
 		$p =~ s/Q_SIGNALS/signals/;
 		$p =~ s/ASYNC/void/;
-		$p =~ s/[A-Z_]*_EXPORT_DEPRECATED//;
-		$p =~ s/[A-Z_]*_EXPORT\s/ /;
+		$p =~ s/[A-Z_0-9]*_EXPORT_DEPRECATED//;
+		$p =~ s/[A-Z_0-9]*_EXPORT\s/ /;
 		$p =~ s/EXPORT_DOCKCLASS//;
 		$p =~ s/DLL_IMP_EXP_KMDICLASS//;
 		$p =~ s/KSVG_GET/KJS::Value get();/;
@@ -496,6 +497,8 @@ LOOP:
 		$p =~ s/KDOM_FORWARDPUT/bool putforward();/;
 		$p =~ s/KDOM_BASECLASS/virtual KJS::Value cache();/;
 		$p =~ s/KDOM_CAST/KJS::Value cast();/;
+		$p =~ s/Q_DECLARE_BUILTIN_METATYPE[^\)]*\)//;
+		$p =~ s/Q_[A-Z]+_EXPORT_INLINE//;
 		if ( $p =~ m/KDOM_DEFINE_PROTOTYPE\((\w+)\)/ ) {
 			push @inputqueue, split('\n',"namespace KDOM {\nclass $1 {\n};\n};");
 		}
@@ -574,6 +577,7 @@ LOOP:
 				     $p =~ m/^#\s*ifdef\s+Q_MOC_RUN/ or
 				     $p =~ m/^#\s*if\s+defined\s*\(QT3_SUPPORT/ or
 				     $p =~ m/^#\s*if\s+defined\s*\(qdoc/ or
+				     $p =~ m/^#\s*ifdef\s+qdoc/ or
 				     $p =~ m/^#\s*ifndef\s+QT_NO_MEMBER_TEMPLATES/ or
 				     $p =~ m/^#if\s*!defined\(Q_NO_USING_KEYWORD\)/ or
 				     $p =~ m/^#if\s*defined\(Q_INTERNAL_QAPP_SRC\)/ or
@@ -706,7 +710,16 @@ sub readDecl
 		return $l;
 	}
 	elsif ( $l =~ /Q_PROPERTY/ ) {	# property
-		return $l;
+		do {
+			$decl .= $l;
+	
+			if ( $l =~ /[)]/ ) {
+				$decl =~ s/\n/ /gs;
+				return $decl;
+			}
+			return undef if !defined ($l = readCxxLine());
+	
+		} while ( 1 );
 	}
 
 	do {

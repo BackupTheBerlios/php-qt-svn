@@ -229,9 +229,35 @@ BEGIN
    'QDockWidget::DockWidgetFeatures' => 'int',
    'QStyle::SubControls' => 'int',
    'RegisterOptions' => 'int',
+   'BindMode' => 'int',
+   'ButtonFeatures' => 'int',
+   'CacheMode' => 'int',
+   'CheckType' => 'int',
+   'CornerWidgets' => 'int',
+   'DockWidgetFeatures' => 'int',
+   'FileFlags' => 'int',
+   'FontFilters' => 'int',
+   'FrameFeatures' => 'int',
+   'GraphicsItemFlags' => 'int',
+   'InterfaceFlags' => 'int',
+   'IteratorFlags' => 'int',
+   'MenuItemType' => 'int',
+   'NumberOptions' => 'int',
+   'PageBreakFlags' => 'int',
+   'Qt::TextInteractionFlags' => 'int',
+   'Relation' => 'int',
+   'SectionPosition' => 'int',
+   'SelectedPosition' => 'int',
+   'StandardButtons' => 'int',
+   'State' => 'int',
+   'TabPosition' => 'int',
+   'ToolBarFeatures' => 'int',
+   'ToolBarPosition' => 'int',
+   'ToolButtonFeatures' => 'int',
+   'ViewItemFeatures' => 'int',
 );
 
-$headerSubdirectories = "kio/|kdevelop/|kinterfacedesigner/|kontact/|kate/|kparts/|dom/|kabc/|ksettings/|kjs/|ktexteditor/|kdeprint/|kdesu/|knewstuff|dbus-1.0/dbus/"
+$headerSubdirectories = "kio/|dnssd/|solid/|solid/ifaces/|phonon/|sonnet/|kdevelop/|kinterfacedesigner/|kontact/|kate/|kparts/|dom/|kabc/|ksettings/|kjs/|ktexteditor/|kdeprint/|kdesu/|knewstuff|dbus-1.0/dbus/"
 
 }
 
@@ -416,11 +442,16 @@ sub preParseClass
 	    $className eq 'KURL::List' ||
 	    $className eq 'KWin::Info' ||
 	    $className eq 'TerminalInterface' ||
+	    $className eq 'QAccessibleBridgePlugin' || # Qt4
 	    $className eq 'QForeachContainerBase' || # Qt4
 	    $className eq 'QInputMethodEvent::Attribute' || # Qt4
+	    $className eq 'QAbstractUndoItem' || # Qt4
 	    $className eq 'QAbstractTextDocumentLayout::PaintContext' || # Qt4
 	    $className eq 'QAbstractTextDocumentLayout::Selection' || # Qt4
 	    $className eq 'QBrushData' || # Qt4
+	    $className eq 'QDBusObjectPath' || # Qt4
+	    $className eq 'QDBusSignature' || # Qt4
+	    $className eq 'QDBusVariant' || # Qt4
 	    $className eq 'QIPv6Address' || # Qt4
 	    $className eq 'QImageTextKeyLang' || # Qt4
 	    $className eq 'QMap' || # Qt4
@@ -428,6 +459,7 @@ sub preParseClass
 	    $className eq 'QMap::iterator' || # Qt4
 	    $className eq 'QMapData' || # Qt4
 	    $className eq 'QMapData::Node' || # Qt4
+	    $className eq 'QObjectData' || # Qt4
 	    $className eq 'QProxyModel' || # Obsolete Qt4
 	    $className eq 'QSharedData' || # Qt4
 	    $className eq 'QPainterPath::Element' || # Qt4
@@ -615,6 +647,10 @@ sub preParseClass
 			|| ($classNode->{astNodeName} eq 'QwtThermo' and $name eq 'setAlarmColor')
 			|| ($classNode->{astNodeName} eq 'QwtThermo' and $name eq 'alarmColor')
 			|| ($classNode->{astNodeName} eq 'QwtWheel' and $name eq 'getScrollMode')
+			|| ($classNode->{astNodeName} eq 'QwtSpline' and $name eq 'points')
+			|| ($classNode->{astNodeName} eq 'QwtPlot' and $name eq 'drawItems')
+			|| ($classNode->{astNodeName} eq 'QwtPlot' and $name eq 'printCanvas')
+			|| ($classNode->{astNodeName} eq 'QwtPlot' and $name eq 'drawItems')
 			|| ($classNode->{astNodeName} eq 'QwtPlot' and $name eq 'setCanvasBackground')
 			|| ($classNode->{astNodeName} eq 'QwtPlot' and $name eq 'canvasBackground')
 			|| ($classNode->{astNodeName} eq 'QwtPlotLayout' and $name eq 'expandLineBreaks')
@@ -663,6 +699,8 @@ sub preParseClass
 			|| ($main::qt4
 				&& ( ($classNode->{astNodeName} eq 'QWidgetListItem' and $name eq 'operator=')
 				|| ($classNode->{astNodeName} eq 'QColormap' and $name eq 'operator=')
+				|| ($classNode->{astNodeName} eq 'QGraphicsLineItem' and $name eq 'QGraphicsLineItem' and $#{$m->{ParamList}} == 5)
+				|| ($classNode->{astNodeName} eq 'QGraphicsEllipseItem' and $name eq 'QGraphicsEllipseItem' and $#{$m->{ParamList}} == 5)
 				|| ($classNode->{astNodeName} eq 'QListWidget' and $name eq 'setItemPosition')
 				|| ($classNode->{astNodeName} eq 'QFontMetricsF' and $name eq 'operator=')
 				|| ($classNode->{astNodeName} eq 'QFontMetricsF' and $name eq 'QFontMetricsF' 
@@ -686,6 +724,8 @@ sub preParseClass
 					$m->{ReturnType} =~ /</ )
 				|| ($classNode->{astNodeName} eq 'QDBusBusService' and $name eq 'RequestName')
 				|| ($classNode->{astNodeName} eq 'QDBusBusService' and $name eq 'requestName')
+				|| ($classNode->{astNodeName} eq 'QGLFormat' and $name eq 'openGLVersionFlags')
+				|| ($classNode->{astNodeName} eq 'QAbstractUndoItem' and $name eq '~QAbstractUndoItem')
 				|| ($name eq 'qDBusMetaTypeId')
 				|| ($m->{ReturnType} =~ /QT3_SUPPORT/) ) )
 
@@ -980,13 +1020,6 @@ my $fhn =1; # static
 	    die if $incl eq '';
 	    print $fh "#include <$incl>\n";
 	}	
-	if (	$main::qt4
-			and (	defined $includes{"qtreewidget.h"} 
-					or defined $includes{"qlistwidget.h"} 
-					or defined $includes{"qtablewidget.h"} ) ) 
-	{
-	    print $fh "#include \"qwidgetitemdata_p.h\"\n";
-	}
 	print $fh "\n";
         for my $c( 0..$#code )
         {
@@ -2594,7 +2627,7 @@ sub writeSmokeDataFile($) {
 		die "arglist for $t not found" unless defined $arglist;
 		if ( $m->{Flags} =~ "p" ) {
 		    # Pure virtuals don't have a {case} number, that's normal
-		    die if defined $case;
+		    die "pure virtual $className\::$methName has a case number for sig=$sig" if defined $case;
 		    $case = -1; # This remains -1, not 0 !
 		} else {
 		    die "$className\::$methName has no case number for sig=$sig" unless defined $case;
