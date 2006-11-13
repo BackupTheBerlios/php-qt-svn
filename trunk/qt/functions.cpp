@@ -136,6 +136,7 @@ PHP_FUNCTION(tr)
 	o->smoke = qt_Smoke;
 	o->classId = qstring;
 	o->ce_ptr = qstring_ce;
+	o->zval_ptr = return_value;
 
 	object_init_ex(return_value, qstring_ce);
 	zend_rsrc_list_entry le;
@@ -144,3 +145,38 @@ PHP_FUNCTION(tr)
     return;
 }
 
+/*!
+ *	check_qobject()
+ *
+ */
+
+PHP_FUNCTION(check_qobject)
+{
+    zval* zobject;
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o",&zobject)) {
+        return;
+    }
+
+	smokephp_object* o = phpqt_fetch(zobject);
+
+	cout << "PHP-Qt object \n(" << endl;
+
+	cout << "\t       zval => " << zobject << endl;
+	cout << "\tclass entry => " << Z_OBJCE_P(zobject)->name << endl;
+	cout << "\t  ref count => " << zobject->refcount << endl;
+	cout << "\t     is_ref => " << zobject->is_ref << endl;
+	cout << "\t       type => " << zobject->type << endl;
+
+	cout << endl;
+
+	cout << "\t      smokeobj => " << o << endl;
+	cout << "\t         Smoke => " << o->smoke << endl;
+	cout << "\t       classId => " << o->classId << endl;
+	cout << "\t        Qt ptr => " << o->ptr << endl;
+	cout << "\t        ce_ptr => " << o->ce_ptr << endl;
+	cout << "\t      zval_ptr => " << o->zval_ptr << endl;
+	cout << "\t  QMetaObject* => " << o->meta << endl;
+
+	cout << ")" << endl;
+
+}

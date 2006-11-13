@@ -301,7 +301,7 @@ smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, Q
 void 
 smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const Smoke::Index ret, zval* return_value){
 
-    smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
+    smokephp_object* o;
 
     switch((type.flags & Smoke::tf_elem)){
         case Smoke::t_voidp:
@@ -345,6 +345,8 @@ smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const 
             break;
         case Smoke::t_class:
 
+ 			o = (smokephp_object*) emalloc(sizeof(smokephp_object));
+
 			// zval already exists
 //			if(zval_x_qt.find(o) != zval_x_qt.end()){
 			if(phpqt_zval2qtIsEnd(o)){
@@ -377,8 +379,9 @@ smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const 
 				o->zval_ptr = return_value;
 				o->ce_ptr = Z_OBJCE_P(return_value);
 				o->classId = qt_Smoke->types[ret].classId;
-// FIXME:	segfaults here:
-//				SmokeToPtr.insert(o->ptr, (long int) o);
+
+				if(!phpqt_SmokePHPObjectExists(o))
+					phpqt_setSmokePHPObject(o);
 
 				zend_rsrc_list_entry le;
 				le.ptr = o;

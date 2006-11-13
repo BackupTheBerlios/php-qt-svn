@@ -93,8 +93,9 @@ PHP_FUNCTION(SLOT);
 PHP_FUNCTION(qobject_cast);
 PHP_FUNCTION(tr);
 
+PHP_FUNCTION(check_qobject);
+
 struct smokephp_object {
-    bool allocated;
     Smoke *smoke;
     int classId;
     void *ptr;
@@ -116,6 +117,8 @@ int					phpqt_metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaO
 char*				phpqt_checkForOperator(const char* fname);
 bool				phpqt_zval2qtIsEnd(void *o);
 smokephp_object*	phpqt_getSmokePHPObject(void* ptr);
+void				phpqt_setSmokePHPObject(smokephp_object* o);
+bool				phpqt_SmokePHPObjectExists(smokephp_object* o);
 
 extern int le_php_qt_hashtype;
 extern HashTable php_qt_objptr_hash;
@@ -130,6 +133,5 @@ void				smokephp_callMethod(Smoke *smoke, void *obj, Smoke::Index method, Smoke:
 void				smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const Smoke::Index ret, zval* return_value);
 void				smokephp_init();
 Smoke::Index		smokephp_findConnect();
-smokephp_object*	smokephp_getSmokePHPObject(void* ptr);
 bool				smokephp_isConnect(Smoke::Index method);
 

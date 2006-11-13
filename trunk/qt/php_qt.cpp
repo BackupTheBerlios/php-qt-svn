@@ -57,6 +57,7 @@ function_entry php_qt_functions[] = {
 	PHP_FE(SLOT,	NULL)	
 	PHP_FE(qobject_cast,	NULL)
 	PHP_FE(tr,	NULL)
+	PHP_FE(check_qobject,	NULL)
 	{NULL, NULL, NULL}	/* Must be the last line in php_qt_functions[] */
 };
 
@@ -84,7 +85,7 @@ ZEND_GET_MODULE(php_qt)
 #endif
 
 static QHash<void*, zval*> zval_x_qt;
-QHash<void*, long int>SmokeToPtr;
+QHash<void*, size_t>SmokeToPtr;
 QStack<QString*> methodNameStack;
 
 // cached
@@ -244,7 +245,7 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 	} 
 
 	// store relations
-	SmokeToPtr.insert(o->ptr, (long int) o);
+	phpqt_setSmokePHPObject(o);
     PHP_QT_REGISTER(o);
 	zval_x_qt.insert(qargs[0].s_class, getThis());
 
@@ -805,7 +806,17 @@ phpqt_checkForOperator(const char* fname){
 
 smokephp_object*
 phpqt_getSmokePHPObject(void* ptr){
+	smokephp_object* a = (smokephp_object*) SmokeToPtr[ptr];
 	return (smokephp_object*) SmokeToPtr[ptr];
 }
 
+void
+phpqt_setSmokePHPObject(smokephp_object* o){
+	SmokeToPtr.insert(o->ptr, (size_t) o);
+}
+
+bool
+phpqt_SmokePHPObjectExists(smokephp_object* o){
+	return (SmokeToPtr.find(o->ptr) != SmokeToPtr.end());
+}
 
