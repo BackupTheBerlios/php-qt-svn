@@ -1,9 +1,11 @@
 <?php
+
     /****************************************************************
     **
     ** Qt Calculator
     **
-    ** http://doc.trolltech.com/4.0/widgets-calculator.html
+    ** original:
+    ** http://doc.trolltech.com/4.1/widgets-calculator.html
     **
     ****************************************************************/
 
@@ -13,7 +15,7 @@
 
     require_once('calculator.php');
 
-    $app = new QApplication($argc,$argv);
+    $app = new QApplication(&$argc,$argv);
 
     $calc = new Calculator();
     $calc->show();

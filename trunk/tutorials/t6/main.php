@@ -1,9 +1,11 @@
 <?php
+
     /****************************************************************
     **
     ** Qt tutorial 6
     **
-    ** http://doc.trolltech.com/4.0/tutorial-t6.html
+    ** original:
+    ** http://doc.trolltech.com/4.1/tutorial-t6.html
     **
     ****************************************************************/
 
@@ -13,43 +15,43 @@
 
     class LCDRange extends QWidget
     {
-        var $lcd;
-        var $slider;
-        var $layout;
+        private $lcd;
+        private $slider;
+        private $layout;
 
-        function __construct(){
-
+        function __construct()
+        {
             parent::__construct();
 
-            $this->lcd = new QLCDNumber(2,$this);
-            $this->slider = new QSlider($this);
-            $this->slider->setOrientation(Qt::Horizontal);
+            $this->lcd = new QLCDNumber(2);
+            $this->lcd->setSegmentStyle(QLCDNumber::Filled);
+
+            $this->slider = new QSlider(Qt::Horizontal);
             $this->slider->setRange(0, 99);
             $this->slider->setValue(0);
-            $this->connect($this->slider, SIGNAL("valueChanged(int)"),
-                    $this->lcd, SLOT("display(int)"));
-    
-            $this->layout = new QVBoxLayout($this);
+            $this->connect($this->slider, SIGNAL('valueChanged(int)'),
+                    $this->lcd, SLOT('display(int)'));
+
+            $this->layout = new QVBoxLayout();
             $this->layout->addWidget($this->lcd);
             $this->layout->addWidget($this->slider);
             $this->setLayout($this->layout);
         }
-
     };
 
     class MyWidget extends QWidget
     {
-        var $quit;
-        var $grid;
-        var $layout;
+        private $quit;
+        private $grid;
+        private $layout;
 
-        function __construct(){
-
+        function __construct()
+        {
             parent::__construct();
 
-            $this->quit = new QPushButton("Quit");
-    //        $this->quit->setFont(QFont("Times", 18, QFont::Bold));
-            $this->connect($this->quit, SIGNAL("clicked()"), QApplication::instance(), SLOT("quit()"));
+            $this->quit = new QPushButton(tr("Quit"));
+            $this->quit->setFont(new QFont("Times", 18, QFont::Bold));
+            $this->connect($this->quit, SIGNAL('clicked()'), QApplication::instance(), SLOT('quit()'));
 
             $this->grid = new QGridLayout();
             for ($row = 0; $row < 4; ++$row) {
@@ -58,14 +60,14 @@
                 }
             }
 
-            $this->layout = new QVBoxLayout($this);
+            $this->layout = new QVBoxLayout();
             $this->layout->addWidget($this->quit);
-            $this->layout->addLayout($this->grid,0);
+            $this->layout->addLayout($this->grid);
             $this->setLayout($this->layout);
         }
     }
 
-    $app = new QApplication($argc,$argv);
+    $app = new QApplication(&$argc,$argv);
     $widget = new MyWidget();
     $widget->show();
     $app->exec();

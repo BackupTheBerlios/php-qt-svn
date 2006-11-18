@@ -1,49 +1,50 @@
 <?php
+
     /****************************************************************
     **
     ** Qt Calculator
     **
-    ** http://doc.trolltech.com/4.0/widgets-calculator.html
+    ** original:
+    ** http://doc.trolltech.com/4.1/widgets-calculator.html
     **
     ****************************************************************/
 
-    require_once("button.php");
+    require_once('button.php');
 
     class Calculator extends QDialog {
-    
-        var $sumInMemory = 0.0;
-        var $sumSoFar = 0.0;
-        var $factorSoFar = 0.0;
-        var $pendingAdditiveOperator;
-        var $pendingMultiplicativeOperator;
-        var $waitingForOperand = true;
 
-        var $display;           /// QLineEdit
+        private $sumInMemory = 0.0;
+        private $sumSoFar = 0.0;
+        private $factorSoFar = 0.0;
+        private $pendingAdditiveOperator;
+        private $pendingMultiplicativeOperator;
+        private $waitingForOperand = true;
 
-        var $NumDigitButtons = 10;
-        var $digitButtons;      /// Array of buttons
+        private $display;
 
-        /// Buttons
-        var $pointButton;
-        var $changeSignButton;
-        var $backspaceButton;
-        var $clearButton;
-        var $clearAllButton;
-        var $clearMemoryButton;
-        var $readMemoryButton;
-        var $setMemoryButton;
-        var $addToMemoryButton;
+        const NumDigitButtons = 10;
+        private $digitButtons;
 
-        var $divisionButton;
-        var $timesButton;
-        var $minusButton;
-        var $plusButton;
-        var $squareRootButton;
-        var $powerButton;
-        var $reciprocalButton;
-        var $equalButton;
+        private $pointButton;
+        private $changeSignButton;
+        private $backspaceButton;
+        private $clearButton;
+        private $clearAllButton;
+        private $clearMemoryButton;
+        private $readMemoryButton;
+        private $setMemoryButton;
+        private $addToMemoryButton;
 
-        var $slots = array(
+        private $divisionButton;
+        private $timesButton;
+        private $minusButton;
+        private $plusButton;
+        private $squareRootButton;
+        private $powerButton;
+        private $reciprocalButton;
+        private $equalButton;
+
+        private $slots = array(
             "digitClicked()",
             "unaryOperatorClicked()",
             "additiveOperatorClicked()",
@@ -59,10 +60,10 @@
             "setMemory()",
             "addToMemory()"
         );
-        var $signals = array("");
+        private $signals = array("");
 
-        function __construct() {
-
+        function __construct()
+        {
             parent::__construct();
 
             $this->pendingAdditiveOperator = new QString();
@@ -74,53 +75,59 @@
             $this->display->setMaxLength(15);
             $this->display->installEventFilter($this);
 
-            for ($i = 0; $i < $this->NumDigitButtons; ++$i) {
-                    $this->digitButtons[$i] = $this->createButton($i."", SLOT("digitClicked()"));
+            $font = $this->display->font();
+            $font->setPointSize($font->pointSize() + 8);
+            $this->display->setFont($font);
+
+            $digitColor = new QColor(150, 205, 205);
+            $backspaceColor = new QColor(225, 185, 135);
+            $memoryColor = new QColor(100, 155, 155);
+            $operatorColor = new QColor(155, 175, 195);
+
+            for ($i = 0; $i < Calculator::NumDigitButtons; ++$i) {
+                    $this->digitButtons[$i] = $this->createButton(tr($i), $digitColor, SLOT('digitClicked()'));
             }
 
-            $this->pointButton = $this->createButton(".", SLOT("pointClicked()"));
-            $this->changeSignButton = $this->createButton("\261", SLOT("changeSignClicked()"));
+            $this->pointButton = $this->createButton(tr("."), $digitColor, SLOT('pointClicked()'));
+            $this->changeSignButton = $this->createButton(tr("\261"), $digitColor, SLOT('changeSignClicked()'));
 
-            $this->backspaceButton = $this->createButton("Backspace", SLOT("backspaceClicked()"));
-            $this->clearButton = $this->createButton("Clear", SLOT("clear()"));
-            $this->clearAllButton = $this->createButton("Clear All", SLOT("clearAll()"));
+            $this->backspaceButton = $this->createButton(tr("Backspace"), $backspaceColor, SLOT('backspaceClicked()'));
+            $this->clearButton = $this->createButton(tr("Clear"), $backspaceColor, SLOT('clear()'));
+            $this->clearAllButton = $this->createButton(tr("Clear All"), $backspaceColor, SLOT('clearAll()'));
 
-            $this->clearMemoryButton = $this->createButton("MC", SLOT("clearMemory()"));
-            $this->readMemoryButton = $this->createButton("MR", SLOT("read_Memory()"));
-            $this->setMemoryButton = $this->createButton("MS", SLOT("setMemory()"));
-            $this->addToMemoryButton = $this->createButton("M+", SLOT("addToMemory()"));
+            $this->clearMemoryButton = $this->createButton(tr("MC"), $memoryColor, SLOT('clearMemory()'));
+            $this->readMemoryButton = $this->createButton(tr("MR"), $memoryColor, SLOT('read_Memory()'));
+            $this->setMemoryButton = $this->createButton(tr("MS"), $memoryColor, SLOT('setMemory()'));
+            $this->addToMemoryButton = $this->createButton(tr("M+"), $memoryColor, SLOT('addToMemory()'));
 
-            $this->divisionButton = $this->createButton("\367", SLOT("multiplicativeOperatorClicked()"));
+            $this->divisionButton = $this->createButton(tr("\367"), $operatorColor, SLOT('multiplicativeOperatorClicked()'));
 
-            $this->timesButton = $this->createButton("\327", SLOT("multiplicativeOperatorClicked()"));
-            $this->minusButton = $this->createButton("-", SLOT("additiveOperatorClicked()"));
-            $this->plusButton = $this->createButton("+", SLOT("additiveOperatorClicked()"));
+            $this->timesButton = $this->createButton(tr("\327"), $operatorColor, SLOT('multiplicativeOperatorClicked()'));
+            $this->minusButton = $this->createButton(tr("-"), $operatorColor, SLOT('additiveOperatorClicked()'));
+            $this->plusButton = $this->createButton(tr("+"), $operatorColor, SLOT('additiveOperatorClicked()'));
 
-            $this->squareRootButton = $this->createButton("Sqrt", SLOT("unaryOperatorClicked()"));
-            $this->powerButton = $this->createButton("x\262", SLOT("unaryOperatorClicked()"));
-            $this->reciprocalButton = $this->createButton("1/x", SLOT("unaryOperatorClicked()"));
-            $this->equalButton = $this->createButton("=", SLOT("equalClicked()"));
+            $this->squareRootButton = $this->createButton(tr("Sqrt"), $operatorColor, SLOT('unaryOperatorClicked()'));
+            $this->powerButton = $this->createButton(tr("x\262"), $operatorColor, SLOT('unaryOperatorClicked()'));
+            $this->reciprocalButton = $this->createButton(tr("1/x"), $operatorColor, SLOT('unaryOperatorClicked()'));
+            $this->equalButton = $this->createButton(tr("="), $operatorColor, SLOT('equalClicked()'));
 
-            $this->mainLayout = new QGridLayout($this);
-
-//            $this->mainLayout->setSizeConstraint("QLayout::SetFixedSize");
+            $this->mainLayout = &new QGridLayout($this);
+            $this->mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
             $this->mainLayout->addWidget($this->display, 0, 0, 1, 6);
             $this->mainLayout->addWidget($this->backspaceButton, 1, 0, 1, 2);
             $this->mainLayout->addWidget($this->clearButton, 1, 2, 1, 2);
             $this->mainLayout->addWidget($this->clearAllButton, 1, 4, 1, 2);
+
             $this->mainLayout->addWidget($this->clearMemoryButton, 2, 0);
             $this->mainLayout->addWidget($this->readMemoryButton, 3, 0);
             $this->mainLayout->addWidget($this->setMemoryButton, 4, 0);
             $this->mainLayout->addWidget($this->addToMemoryButton, 5, 0);
 
-            for ($i = 1; $i < $this->NumDigitButtons; ++$i) {
-
+            for ($i = 1; $i < Calculator::NumDigitButtons; ++$i) {
                     $row = ceil(((8 - ($i+1))) / 3) + 2;
                     $column = ceil((($i-1) % 3)) + 1;
-
                     $this->mainLayout->addWidget($this->digitButtons[$i], (int) $row, (int) $column);
-
             }
 
             $this->mainLayout->addWidget($this->digitButtons[0], 5, 1);
@@ -131,28 +138,45 @@
             $this->mainLayout->addWidget($this->timesButton, 3, 4);
             $this->mainLayout->addWidget($this->minusButton, 4, 4);
             $this->mainLayout->addWidget($this->plusButton, 5, 4);
-                                
+
             $this->mainLayout->addWidget($this->squareRootButton, 2, 5);
             $this->mainLayout->addWidget($this->powerButton, 3, 5);
             $this->mainLayout->addWidget($this->reciprocalButton, 4, 5);
             $this->mainLayout->addWidget($this->equalButton, 5, 5);
 
             $this->setLayout($this->mainLayout);
-            $this->setWindowTitle(new QString("Calculator"));
+            $this->setWindowTitle(tr("Calculator"));
 
         }
 
-        function createButton($text, $member)
-        {
-            $button = new Button($text);
-            $this->connect($button, SIGNAL("clicked()"), $this, $member);
-            return $button;
+        function eventFilter($target, $event){
+            if ($target == $display) {
+                if ($event->type() == QEvent::MouseButtonPress
+                    || $event->type() == QEvent::MouseButtonDblClick
+                    || $event->type() == QEvent::MouseButtonRelease
+                    || $event->type() == QEvent::ContextMenu) {
+
+                    $mouseEvent = &$event;
+                    if ($mouseEvent->buttons() & Qt::LeftButton) {
+                        $newPalette = $this->palette();
+                        $newPalette->setColor(QPalette::Base,
+                            $this->display->palette()->color(QPalette::Text));
+                        $newPalette->setColor(QPalette::Text,
+                            $this->display->palette()->color(QPalette::Base));
+                        $this->display->setPalette($newPalette);
+                    } else {
+                        $this->display->setPalette($palette());
+                    }
+                    return true;
+                }
+            }
+            return QDialog::eventFilter($target, $event);
         }
 
         function digitClicked()
         {
 
-            $clickedButton = qobject_cast($this->sender(),new QToolButton());
+            $clickedButton = qobject_cast($this->sender(), new QToolButton());
             $digitValue = $clickedButton->text()->toInt();
 
             if ($this->display->text() == "0" && $digitValue == 0.0)
@@ -163,23 +187,15 @@
                 $this->waitingForOperand = false;
             }
 
-            $new_value = new QString();
-            $display_text = $this->display->text();
-
-            $number = QString::number($digitValue);
-
-            $new_value->append($display_text);
-            $new_value->append($number);
-
-            $this->display->setText($new_value);
+            $this->display->setText($this->display->text()->append(QString::number($digitValue)));
         }
 
         function unaryOperatorClicked()
         {
-            $clickedButton = qobject_cast($this->sender(), new Button(""));
+            $clickedButton = qobject_cast($this->sender(), $this->pointButton);
             $clickedOperator = $clickedButton->text();
             $operand = $this->display->text()->toDouble();
-            $result;
+            $result = 0.0;
 
             if ($clickedOperator->__toString() == "Sqrt") {
                 if ($operand < 0.0) {
@@ -203,9 +219,8 @@
 
         function additiveOperatorClicked()
         {
-            $clickedButton = qobject_cast($this->sender(), new Button(""));
+            $clickedButton = qobject_cast($this->sender(), $this->pointButton);
             $clickedOperator = $clickedButton->text();
-
             $operand = $this->display->text()->toDouble();
 
             if (!$this->pendingMultiplicativeOperator->isEmpty()) {
@@ -220,7 +235,7 @@
             }
 
             if (!$this->pendingAdditiveOperator->isEmpty()) {
-                if (!$this->calculate(operand, $this->pendingAdditiveOperator)) {
+                if (!$this->calculate($operand, $this->pendingAdditiveOperator)) {
                     $this->abortOperation();
                     return;
                 }
@@ -236,9 +251,8 @@
 
         function multiplicativeOperatorClicked()
         {
-            $clickedButton = qobject_cast($this->sender(), new Button(""));
+            $clickedButton = qobject_cast($this->sender(), $this->pointButton);
             $clickedOperator = $clickedButton->text();
-
             $operand = $this->display->text()->toDouble();
 
             if (!$this->pendingMultiplicativeOperator->isEmpty()) {
@@ -285,14 +299,11 @@
         function pointClicked()
         {
             if ($this->waitingForOperand)
-                $this->display->setText("0");
+                $this->display->setText(tr("0"));
 
-            if (!$this->display->text()->contains(".")){
-                $new_value = $this->display->text();
-                $new_value->append(new QString("."));
-                $this->display->setText($new_value);
-                
-            }
+            if (!$this->display->text()->contains(tr(".")))
+                $this->display->setText($this->display->text()->append(tr(".")));
+
             $this->waitingForOperand = false;
         }
 
@@ -302,7 +313,7 @@
             $value = $text->toDouble();
 
             if ($value > 0.0) {
-                $text->prepend(new QString("-"));
+                $text->prepend(tr("-"));
             } else if ($value < 0.0) {
                 $text->remove(0, 1);
             }
@@ -317,7 +328,7 @@
             $text = $this->display->text();
             $text->chop(1);
             if ($text->isEmpty()) {
-                $text = "0";
+                $text = tr("0");
                 $this->waitingForOperand = true;
             }
             $this->display->setText($text);
@@ -328,7 +339,7 @@
             if ($this->waitingForOperand)
                 return;
 
-            $this->display->setText("0");
+            $this->display->setText(tr("0"));
             $this->waitingForOperand = true;
         }
 
@@ -338,7 +349,7 @@
             $this->factorSoFar = 0.0;
             $this->pendingAdditiveOperator->clear();
             $this->pendingMultiplicativeOperator->clear();
-            $this->display->setText("0");
+            $this->display->setText(tr("0"));
             $this->waitingForOperand = true;
         }
 
@@ -346,7 +357,7 @@
         {
             $this->sumInMemory = 0.0;
         }
-                    
+
         function read_Memory()
         {
             $this->display->setText(QString::number($this->sumInMemory));
@@ -358,17 +369,24 @@
             $this->equalClicked();
             $this->sumInMemory = $this->display->text()->toDouble();
         }
-                            
+
         function addToMemory()
         {
             $this->equalClicked();
             $this->sumInMemory += $this->display->text()->toDouble();
         }
 
+        function createButton($text, &$color, $member)
+        {
+            $button = new Button($text, &$color);
+            $this->connect($button, SIGNAL('clicked()'), $this, $member);
+            return $button;
+        }
+
         function abortOperation()
         {
             $this->clearAll();
-            $this->display->setText($this->tr("####"));
+            $this->display->setText(tr("####"));
         }
 
         function calculate($rightOperand, $pendingOperator)
