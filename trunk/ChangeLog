@@ -1,3 +1,10 @@
+2006-011-18  Thomas Moenicke <thomas.moenicke@kdemail.net>
+
+		* method argument handling: support for arrays, references
+		* some enums added
+		* internal function check_function
+		* fixed some minor bugs
+
 2006-011-7  Thomas Moenicke <thomas.moenicke@kdemail.net>
 
 		* function tr() implemented

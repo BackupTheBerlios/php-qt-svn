@@ -250,36 +250,153 @@ smokephp_smokeCastThis(Smoke *smoke, Smoke::Index method, Smoke::Stack qargs, vo
  *  @param  Smoke::StackItem*       qargs
  */
 
+static
+int treatArray(zval **val, int num_args, va_list args, zend_hash_key *hash_key){
+
+	uint type = va_arg(args, uint);
+	int e_arrayc = va_arg(args, int);
+	void** e_arrayv = va_arg(args, void**);
+
+	smokephp_object *o;
+	if(type == IS_OBJECT)
+		o = phpqt_fetch(((zval*) *val));
+
+	switch(type){
+		case IS_STRING:
+			e_arrayv[e_arrayc] = emalloc(Z_STRLEN(**val)+1);
+ 			e_arrayv[e_arrayc++] = (void*) Z_STRVAL(**val);
+ 			break;
+ 		case IS_LONG:
+ 			e_arrayv[e_arrayc] = emalloc(sizeof(long));
+ 			e_arrayv[e_arrayc++] = (void*) Z_LVAL_PP(val);
+ 			break;
+ 		case IS_DOUBLE:
+ 			e_arrayv[e_arrayc] = emalloc(sizeof(double));
+ 			e_arrayv[e_arrayc++] = (void*) Z_LVAL_PP(val);
+ 			break;
+ 		case IS_BOOL:
+ 			e_arrayv[e_arrayc] = emalloc(sizeof(bool));
+ 			e_arrayv[e_arrayc++] = (void*) Z_BVAL_PP(val);
+ 			break;
+ 		case IS_OBJECT:
+ 			e_arrayv[e_arrayc] = emalloc(sizeof(o->ptr));
+ 			e_arrayv[e_arrayc++] = o->ptr;
+ 			break;
+		default:
+			php_error(E_ERROR, "PHP-Qt: unsupported array type %d", type);
+ 			break;
+	}
+
+	return ZEND_HASH_APPLY_KEEP;
+
+}
+
+static 
+void* transformArray(zval* args){
+
+	// array informations
+	int e_arrayc = zend_hash_num_elements(((zval) *args).value.ht);	// length
+	// find the first type
+	zval** first_elem;
+	if(zend_hash_get_current_data_ex(((zval) *args).value.ht, (void**) &first_elem, 0) == FAILURE){
+		php_error(E_ERROR, "PHP-Qt: could not get first value of hashtable.");
+	}
+	
+	uint type = (int) (**first_elem).type;
+	if(type < 0 || type > 9){
+		// should never happen
+		php_error(E_ERROR, "could not guess type of array");
+	}
+	
+	void* e_arrayv;
+
+	switch(type){
+		case IS_STRING:
+			e_arrayv = safe_emalloc(e_arrayc, sizeof(char*), 0);
+			break;
+		case IS_LONG:
+			e_arrayv = safe_emalloc(e_arrayc, sizeof(long), 0);
+			break;
+		case IS_DOUBLE:
+			e_arrayv = safe_emalloc(e_arrayc, sizeof(double), 0);
+			break;
+		case IS_BOOL:
+			e_arrayv = safe_emalloc(e_arrayc, sizeof(bool), 0);
+			break;
+		case IS_OBJECT:
+			e_arrayv = safe_emalloc(e_arrayc, sizeof(QObject*), 0);
+			break;
+		default:
+			php_error(E_ERROR, "PHP-Qt: unsupported array type %d", type);
+	}
+
+	zend_hash_apply_with_arguments(((zval) *args).value.ht, (apply_func_args_t) treatArray, 3, type, e_arrayc, e_arrayv);
+
+}
+
 void 
 smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, QStack<QString*> &methodNameStack) {
 
     for(int i=0;i<argc;i++){
+
 	    uint type = ((int) ((zval) **args[i]).type);
-	    if (type == IS_RESOURCE){
+
+		if (type == IS_RESOURCE){ // TODO
+
 	    } else if (type == IS_ARRAY){
-	        // convert array
-      	    char** c = new char*[1];
-      	    c[0] = "";
-      	    qargs[i+1].s_voidp = (void*) c;
+			// TODO reference
+      	    qargs[i+1].s_voidp = transformArray(*args[i]);
 			methodNameStack.top()->append("?");
+
 	    } else if (type == IS_BOOL){
-    	    qargs[i+1].s_bool = Z_BVAL_PP(args[i]);
+
+			// Reference
+	    	if((((zval) **args[i]).is_ref)){
+				qargs[1].s_voidp = &Z_LVAL_PP(args[i]);
+	    	} else {
+    	    	qargs[i+1].s_bool = Z_BVAL_PP(args[i]);
+    	    }
+
             methodNameStack.top()->append("$");
+
 	    } else if (type == IS_LONG){
-    	    qargs[i+1].s_short = Z_LVAL_PP(args[i]);
-    	    qargs[i+1].s_ushort = Z_LVAL_PP(args[i]);
-    	    qargs[i+1].s_int = Z_LVAL_PP(args[i]);
-    	    qargs[i+1].s_uint = Z_LVAL_PP(args[i]);
-    	    qargs[i+1].s_long = Z_LVAL_PP(args[i]);
-    	    qargs[i+1].s_ulong = Z_LVAL_PP(args[i]);
+
+	    	// Reference
+	    	if((((zval) **args[i]).is_ref)){
+				qargs[1].s_voidp = &Z_LVAL_PP(args[i]);
+	    	} else {
+				qargs[i+1].s_short = Z_LVAL_PP(args[i]);
+				qargs[i+1].s_ushort = Z_LVAL_PP(args[i]);
+				qargs[i+1].s_int = Z_LVAL_PP(args[i]);
+				qargs[i+1].s_uint = Z_LVAL_PP(args[i]);
+				qargs[i+1].s_long = Z_LVAL_PP(args[i]);
+				qargs[i+1].s_ulong = Z_LVAL_PP(args[i]);
+	    	}
+
     	    methodNameStack.top()->append("$");
+
 	    } else if (type == IS_DOUBLE){
-    	    qargs[i+1].s_double = Z_DVAL_PP(args[i]);
+
+	    	// Reference
+	    	if((((zval) **args[i]).is_ref)){
+				qargs[1].s_voidp = &Z_DVAL_PP(args[i]);
+	    	} else {
+    	    	qargs[i+1].s_double = Z_DVAL_PP(args[i]);
+    	    	qargs[i+1].s_float = Z_DVAL_PP(args[i]);
+    	    }
             methodNameStack.top()->append("$");
+
 	    } else if (type == IS_STRING){
-    	    qargs[i+1].s_class = emalloc(sizeof(QString)+strlen(Z_STRVAL_PP(args[i]))); // important
-    	    qargs[i+1].s_class = new QString(Z_STRVAL_PP(args[i]));
+
+			if((((zval) **args[i]).is_ref)){
+				qargs[i+1].s_class = phpqt_fetch(*args[i])->ptr;
+			} else {
+    	    	qargs[i+1].s_class = emalloc(sizeof(QString)+strlen(Z_STRVAL_PP(args[i]))); // important
+    	    	qargs[i+1].s_class = new QString(Z_STRVAL_PP(args[i]));
+            }
+
             methodNameStack.top()->append("$");
+
 	    } else if (type == IS_OBJECT){
 			smokephp_object *o = phpqt_fetch(((zval*) *args[i]));
             qargs[i+1].s_class = o->ptr;
@@ -290,10 +407,12 @@ smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, Q
             } else {
             	methodNameStack.top()->append("#");
             }
+
 	    } else {
 	        php_error(E_ERROR,"Unknown argument or unsupported argument type %d, type %d, exit\n", i, type);
 	        exit(FAILURE);
 	    }
+
     }
 
 }

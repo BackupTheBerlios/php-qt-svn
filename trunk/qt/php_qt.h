@@ -38,6 +38,7 @@ using namespace std;
 #include <QHash>
 #include <QCoreApplication>
 #include <QApplication>
+#include <QLayout>
 
 // for older php versions
 #ifndef ZEND_MN
@@ -134,4 +135,3 @@ void				smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type
 void				smokephp_init();
 Smoke::Index		smokephp_findConnect();
 bool				smokephp_isConnect(Smoke::Index method);
-

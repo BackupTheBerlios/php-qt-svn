@@ -154,6 +154,8 @@ ZEND_METHOD(php_qt_generic_class, __destruct)
 	RETVAL_NULL();
 }
 
+// TODO cache idClass
+
 ZEND_METHOD(php_qt_generic_class, __construct)
 {
 
@@ -182,18 +184,11 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 
 	smokephp_object *o = (smokephp_object*) emalloc(sizeof(smokephp_object));
 
-	// FIXME
-	if(!strcmp(ce->name, "QApplication")){
-		char** c = new char*[1];
-		c[0] = "";
-		int argc_dummy = 1;
-		qargs[0].s_class = new QApplication(argc_dummy, c);
-	// handle QString
-	} else if (!strcmp(ce->name, "QString")){
+	if (!strcmp(ce->name, "QString")){
 		if(argc > 0){
         	qargs[0].s_class = new QString(Z_STRVAL_PP(args[0]));
     	} else {
-    		qargs[0].s_class = new QString("");
+    		qargs[0].s_class = new QString("");	// create an empty string
     	}
 	} else {
 	    // call Qt method via Smoke
@@ -414,13 +409,28 @@ PHP_MINIT_FUNCTION(php_qt)
 			qstring_ce = ce_ptr;
 		}
 
-
         // register enums
 		if(!strcmp(qt_Smoke->classes[i].className, "Qt")){
 			zend_declare_class_constant_long(ce_ptr, "Horizontal", strlen("Horizontal"), Qt::Horizontal);
 			zend_declare_class_constant_long(ce_ptr, "Vertical", strlen("Vertical"), Qt::Vertical);
 			zend_declare_class_constant_long(ce_ptr, "AlignRight", strlen("AlignRight"), Qt::AlignRight);
+			zend_declare_class_constant_long(ce_ptr, "LeftButton", strlen("LeftButton"), Qt::LeftButton);
+		} else if(!strcmp(qt_Smoke->classes[i].className, "QPalette")){
+			zend_declare_class_constant_long(ce_ptr, "Button", strlen("Button"), QPalette::Button);
+			zend_declare_class_constant_long(ce_ptr, "Text", strlen("Text"), QPalette::Text);
+			zend_declare_class_constant_long(ce_ptr, "Base", strlen("Base"), QPalette::Base);
+		} else if(!strcmp(qt_Smoke->classes[i].className, "QSizePolicy")){
+			zend_declare_class_constant_long(ce_ptr, "Expanding", strlen("Expanding"), QSizePolicy::Expanding);
+			zend_declare_class_constant_long(ce_ptr, "Preferred", strlen("Preferred"), QSizePolicy::Preferred);
+		} else if(!strcmp(qt_Smoke->classes[i].className, "QLayout")){
+			zend_declare_class_constant_long(ce_ptr, "SetFixedSize", strlen("SetFixedSize"), QLayout::SetFixedSize);
+		} else if(!strcmp(qt_Smoke->classes[i].className, "QEvent")){
+			zend_declare_class_constant_long(ce_ptr, "MouseButtonPress", strlen("MouseButtonPress"), QEvent::MouseButtonPress);
+			zend_declare_class_constant_long(ce_ptr, "MouseButtonDblClick", strlen("MouseButtonDblClick"), QEvent::MouseButtonDblClick);
+			zend_declare_class_constant_long(ce_ptr, "MouseButtonRelease", strlen("MouseButtonRelease"), QEvent::MouseButtonRelease);
+			zend_declare_class_constant_long(ce_ptr, "ContextMenu", strlen("ContextMenu"), QEvent::ContextMenu);
 		}
+		
 	}
 
     for(Smoke::Index i = 1; i <= qt_Smoke->numClasses; i++){
