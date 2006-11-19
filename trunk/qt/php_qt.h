@@ -38,7 +38,10 @@ using namespace std;
 #include <QHash>
 #include <QCoreApplication>
 #include <QApplication>
+
 #include <QLayout>
+#include <QLCDNumber>
+#include <QFont>
 
 // for older php versions
 #ifndef ZEND_MN

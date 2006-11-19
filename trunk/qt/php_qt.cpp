@@ -429,7 +429,11 @@ PHP_MINIT_FUNCTION(php_qt)
 			zend_declare_class_constant_long(ce_ptr, "MouseButtonDblClick", strlen("MouseButtonDblClick"), QEvent::MouseButtonDblClick);
 			zend_declare_class_constant_long(ce_ptr, "MouseButtonRelease", strlen("MouseButtonRelease"), QEvent::MouseButtonRelease);
 			zend_declare_class_constant_long(ce_ptr, "ContextMenu", strlen("ContextMenu"), QEvent::ContextMenu);
-		}
+		} else if(!strcmp(qt_Smoke->classes[i].className, "QLCDNumber")){
+			zend_declare_class_constant_long(ce_ptr, "Filled", strlen("Filled"), QLCDNumber::Filled);
+		} else if(!strcmp(qt_Smoke->classes[i].className, "QFont")){
+			zend_declare_class_constant_long(ce_ptr, "Bold", strlen("Bold"), QFont::Bold);
+		} 
 		
 	}
 
