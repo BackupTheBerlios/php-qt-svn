@@ -352,7 +352,7 @@ smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, Q
 
 			// Reference
 	    	if((((zval) **args[i]).is_ref)){
-				qargs[1].s_voidp = &Z_LVAL_PP(args[i]);
+				qargs[i+1].s_voidp = &Z_LVAL_PP(args[i]);
 	    	} else {
     	    	qargs[i+1].s_bool = Z_BVAL_PP(args[i]);
     	    }
@@ -363,7 +363,7 @@ smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, Q
 
 	    	// Reference
 	    	if((((zval) **args[i]).is_ref)){
-				qargs[1].s_voidp = &Z_LVAL_PP(args[i]);
+				qargs[i+1].s_voidp = &Z_LVAL_PP(args[i]);
 	    	} else {
 				qargs[i+1].s_short = Z_LVAL_PP(args[i]);
 				qargs[i+1].s_ushort = Z_LVAL_PP(args[i]);
@@ -379,7 +379,7 @@ smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, Q
 
 	    	// Reference
 	    	if((((zval) **args[i]).is_ref)){
-				qargs[1].s_voidp = &Z_DVAL_PP(args[i]);
+				qargs[i+1].s_voidp = &Z_DVAL_PP(args[i]);
 	    	} else {
     	    	qargs[i+1].s_double = Z_DVAL_PP(args[i]);
     	    	qargs[i+1].s_float = Z_DVAL_PP(args[i]);
