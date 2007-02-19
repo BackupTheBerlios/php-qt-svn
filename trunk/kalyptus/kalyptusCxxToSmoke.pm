@@ -78,6 +78,7 @@ BEGIN
      'quint64' => '$',
      'qint64' => '$',
      'long long' => '$',
+     'qlonglong' => '$',
      'qulonglong' => '$',
      'WId' => '$',
      'Q_PID' => '$',
@@ -257,7 +258,7 @@ BEGIN
    'ViewItemFeatures' => 'int',
 );
 
-$headerSubdirectories = "kio/|dnssd/|solid/|solid/ifaces/|phonon/|sonnet/|kdevelop/|kinterfacedesigner/|kontact/|kate/|kparts/|dom/|kabc/|ksettings/|kjs/|ktexteditor/|kdeprint/|kdesu/|knewstuff|dbus-1.0/dbus/"
+$headerSubdirectories = "kio/|phonon/ui/|kmediaplayer/|dnssd/|solid/|solid/ifaces/|phonon/|sonnet/|kdevelop/|kinterfacedesigner/|kontact/|kate/|kparts/|dom/|kabc/|ksettings/|kjs/|ktexteditor/|kdeprint/|kdesu/|knewstuff/|dbus-1.0/dbus/"
 
 }
 
@@ -339,7 +340,7 @@ sub preParseClass
 	    $classNode->{Access} eq "protected" || # e.g. QPixmap::QPixmapData
 	    exists $classNode->{Tmpl} ||
 	    # Don't generate standard bindings for QString, this class is handled as a native type
-#	    $className eq 'QString' ||
+	    $className eq 'QString' ||
 	    $className eq 'QStringData' ||
 	    $className eq 'QLatin1String' ||
 	    $className eq 'QTLWExtra' ||
@@ -383,14 +384,18 @@ sub preParseClass
 	    ($className eq 'QSysInfo' and $main::qt4) ||
 	    ($className eq 'QPNGImageWriter' and $main::qt4) ||
 	    ($className eq 'QPNGImagePacker' and $main::qt4) ||
+	    ($className eq 'QSqlRelationalDelegate' and $main::qt4) ||
 	    ($className eq 'QTextCodec::ConverterState' and $main::qt4) ||
 	    ($className eq 'QTextLayout::Selection' and $main::qt4) ||
 	    ($className eq 'QTextStreamManipulator' and $main::qt4) ||
 	    $className eq 'DCOPArg' ||
 	    $className eq 'DCOPReply' ||
 	    $className eq 'KBookmarkMenu::DynMenuInfo' ||
+	    $className eq 'KDateTime::Spec' ||
+	    $className eq 'KEncodingFileDialog::Result' ||
 	    $className eq 'KDE' ||
 	    $className eq 'KDEDesktopMimeType::Service' ||
+	    $className eq 'KDialogButtonBox' ||
 	    $className eq 'KEntry' ||
 	    $className eq 'KEntryKey' ||
 	    $className eq 'KGlobalSettings::KMouseSettings' ||
@@ -398,12 +403,15 @@ sub preParseClass
 	    $className eq 'KNotifyClient::Instance' ||
 	    $className eq 'KParts::ComponentFactory' ||
 	    $className eq 'KParts::Plugin::PluginInfo' ||
+	    $className eq 'KParts::MainWindow' ||
 	    $className eq 'KProtocolInfo::ExtraField' ||
 	    $className eq 'KXMLGUIClient::StateChange' ||
 	    $className eq 'KIconTheme' ||
 	    $className eq 'KEditListBox::CustomEditor' ||
 		$className eq 'KIO::KBookmarkMenuNSImporter' ||
+		$className eq 'KIO::NetRC' ||
 	    $className eq 'KExtendedSocket' ||
+	    $className eq 'KSettings::PluginPage' ||
 	    $className eq 'KSocket' ||
 	    $className eq 'KPerDomainSettings' ||
 	    $className eq 'KApplicationPropsPlugin' ||
@@ -417,6 +425,7 @@ sub preParseClass
 	    $className eq 'KDEDModule' ||
 	    $className eq 'KFileMetaInfoProvider' ||
 	    $className eq 'KFileMimeTypeInfo' ||
+	    $className eq 'KMimeTypeChooserDialog' ||
 	    $className eq 'KExecPropsPlugin' ||
 	    $className eq 'KFilePermissionsPropsPlugin' ||
 	    $className eq 'KImageFilePreview' ||
@@ -427,11 +436,14 @@ sub preParseClass
 	    $className eq 'KSharedPixmap' ||
 	    $className eq 'KLibrary' ||
 	    $className eq 'KScanDialogFactory' ||
+	    $className eq 'KTimeZone::Transition' ||
+	    $className eq 'KTipDatabase' ||
 	    $className eq 'KBufferedIO' ||
 	    $className eq 'KDictSpellingHighlighter' ||
 		$className eq 'KPropertiesDialog' ||
 	    $className eq 'ProgressItem' ||
 	    $className eq 'KIO::ChmodInfo' ||
+	    $className eq 'KUrl::List' ||
 	    $className eq 'khtml::DrawContentsEvent' || # the khtml:: classes build, but don't link
 	    $className eq 'khtml::MouseDoubleClickEvent' ||
 	    $className eq 'khtml::MouseMoveEvent' ||
@@ -489,7 +501,11 @@ sub preParseClass
 	    $className =~ /.*Impl$/ ||
 	    $className =~ /.*Internal.*/ ||
 	    $classNode->{Deprecated} ||
-	    $classNode->{NodeType} eq 'union'  # Skip unions for now, e.g. QPDevCmdParam
+	    $classNode->{NodeType} eq 'union' || # Skip unions for now, e.g. QPDevCmdParam
+	    $className eq 'KImportedBookmarkMenu' || # KDE4
+	    $className eq 'KUndoRedoAction' || # KDE4
+	    $className eq 'KTzfileTimeZoneData' || # KDE4
+	    $className eq 'KUndoRedoAction' # KDE4
 	  ) {
 	    print STDERR "Skipping $className\n" if ($debug);
 	    print STDERR "Skipping union $className\n" if ( $classNode->{NodeType} eq 'union');
@@ -573,10 +589,24 @@ sub preParseClass
 
 	    # All we want from private methods is to check for virtuals, nothing else
 	    next if ( $m->{Access} =~ /private/ );
-		
 		# Don't generate code for deprecated methods, 
 		# or where the code won't compile/link for obscure reasons. Or even obvious reasons..
 		if ( ($classNode->{astNodeName} eq 'KCharSelectTable' and $name eq 'paintCell')
+			# KDE4
+			|| ($name eq 'operator<<' and $m->{ParamList}[0]->{ArgType} =~ /QDataStream/ and $m->{ParamList}[1]->{ArgType} =~ /KDateTime::Spec/ )
+			|| ($name eq 'operator>>' and $m->{ParamList}[0]->{ArgType} =~ /QDataStream/ and $m->{ParamList}[1]->{ArgType} =~ /KDateTime::Spec/ )
+                        || ($name eq 'operator<<' and $m->{ParamList}[0]->{ArgType} =~ /QDataStream/ and $m->{ParamList}[1]->{ArgType} =~ /const KDateTime/ )
+                        || ($name eq 'operator>>' and $m->{ParamList}[0]->{ArgType} =~ /QDataStream/ and $m->{ParamList}[1]->{ArgType} =~ /KDateTime/ )
+			|| ($classNode->{astNodeName} eq 'TextEvent' and $name eq 'data')
+			|| ($classNode->{astNodeName} eq 'KApplication' and $name eq 'startKdeinit')
+			|| ($classNode->{astNodeName} eq 'Slave' and $name eq 'Slave')
+			|| ($classNode->{astNodeName} eq 'KIcon' and $name eq 'setOverlays')
+			|| ($classNode->{astNodeName} eq 'KResolver' and $name eq 'setError')
+			|| ($classNode->{astNodeName} eq 'Entry' and $name eq 'setCompatibility')
+			|| ($classNode->{astNodeName} eq 'KTimeZone' and $name eq 'source')
+			|| ($classNode->{astNodeName} eq 'KTzfileTimeZoneSource' and $name eq 'location')
+			|| ($classNode->{astNodeName} eq 'Wallet' and $name eq 'Wallet')
+			# end KDE4
 			|| ($classNode->{astNodeName} eq 'KAnimWidget' and $name eq 'KAnimWidget' and @{$m->{ParamList}} == 2)
 			|| ($classNode->{astNodeName} eq 'KCModuleLoader' and $name eq 'errorModule')
 			|| ($classNode->{astNodeName} eq 'KDCOPActionProxy' and $name eq 'actions')
@@ -595,13 +625,19 @@ sub preParseClass
 			|| ($classNode->{astNodeName} eq 'SlaveBase' and $name eq 'cacheAuthentication')
 			|| ($classNode->{astNodeName} eq 'KInputDialog' and $name eq 'getDouble')
 			|| ($classNode->{astNodeName} eq 'KToolBar' and $name eq 'enable')
+			|| ($classNode->{astNodeName} eq 'KToolBar' and $name eq 'changeEvent')
 			|| ($classNode->{astNodeName} eq 'KAccel' and $name eq 'insert' and @{$m->{ParamList}} == 2)
 			|| ($classNode->{astNodeName} eq 'KAccel' and $name eq 'autoupdate')
 			|| ($classNode->{astNodeName} eq 'KAccel' and $name eq 'getAutoUpdate')
+			|| ($classNode->{astNodeName} eq 'KAction' and $name eq 'activated')
+			|| ($classNode->{astNodeName} eq 'KAction' and $name eq 'actionOfType')
+			|| ($classNode->{astNodeName} eq 'KAction' and $name eq 'actionsOfType')
+			|| ($classNode->{astNodeName} eq 'KActionCollection' and $name eq 'add')
 			|| ($classNode->{astNodeName} eq 'KStdAccel' and $name eq 'insert')
 			|| ($classNode->{astNodeName} eq 'KBookmarkMenu' and $name eq 'invalid')
 			|| ($classNode->{astNodeName} eq 'KCharsets' and $name eq 'languages')
 			|| ($classNode->{astNodeName} eq 'KCombiView' and $name eq 'setDropOptions')
+			|| ($classNode->{astNodeName} eq 'KDialogButtonBox' and $name eq 'using')
 			|| ($classNode->{astNodeName} eq 'KFileMetaInfoItem' and $name eq 'unit')
 			|| ($classNode->{astNodeName} eq 'KInstance' and $name eq 'charsets')
 			|| ($classNode->{astNodeName} eq 'KInstance' and $name eq 'KInstance' and $m->{Access} =~ /protected/)
@@ -628,10 +664,12 @@ sub preParseClass
 			|| ($classNode->{astNodeName} eq 'KIO' and $name eq 'pasteData')
 			|| ($classNode->{astNodeName} eq 'KIO' and $name eq 'pasteDataAsync')
 			|| ($classNode->{astNodeName} eq 'KIO' and $name eq 'isClipboardEmpty')
+			|| ($classNode->{astNodeName} eq 'KIO::NetRC' and $name eq 'lookup')
 			|| ($classNode->{astNodeName} eq 'DCOPRef' and $name eq 'callExt')
 			|| ($classNode->{astNodeName} eq 'DCOPRef' and $name eq 'call')
 			|| ($classNode->{astNodeName} eq 'DCOPRef' and $name eq 'send')
 			|| ($classNode->{astNodeName} eq 'DOM' and $name eq 'operator<<') # Avoid kdbgstream debugging method
+			|| ($name eq 'initgroups')
 			|| ($name eq 'qInitJpegIO' and $main::qt4)
 			|| ($name eq 'qInitPngIO' and $main::qt4)
 			|| ($name eq 'qt_metacast' and $main::qt4)
@@ -716,6 +754,9 @@ sub preParseClass
 				|| ($classNode->{astNodeName} eq 'QUrl' and $name eq 'QUrl'
 					and $#{$m->{ParamList}} == 0 && $m->{ParamList}[0]->{ArgType} eq 'QUrlPrivate&')
 				|| ($classNode->{astNodeName} eq 'QGlobalSpace' and $name eq 'operator<<' and $m->{ParamList}[0]->{ArgType} =~ /QDebug/)
+				|| ($classNode->{astNodeName} eq 'QGlobalSpace' and $name eq 'qDebug')
+				|| ($classNode->{astNodeName} eq 'QGlobalSpace' and $name eq 'qWarning')
+				|| ($classNode->{astNodeName} eq 'QGlobalSpace' and $name eq 'qCritical')
 				|| ($classNode->{astNodeName} eq 'QGlobalSpace' and $#{$m->{ParamList}} > 0 and $name =~ /operator/ and $m->{ParamList}[1]->{ArgType} =~ /QVariant::Type/)
 				|| ($#{$m->{ParamList}} > 0 and $m->{ParamList}[0]->{ArgType} =~ /Private/)
 				|| ($classNode->{astNodeName} eq 'QScrollArea' and $name eq 'alignment')
@@ -726,7 +767,10 @@ sub preParseClass
 				|| ($classNode->{astNodeName} eq 'QDBusBusService' and $name eq 'requestName')
 				|| ($classNode->{astNodeName} eq 'QGLFormat' and $name eq 'openGLVersionFlags')
 				|| ($classNode->{astNodeName} eq 'QAbstractUndoItem' and $name eq '~QAbstractUndoItem')
+				|| ($classNode->{astNodeName} eq 'QApplication' and $name eq 'setKeypadNavigationEnabled')
+				|| ($classNode->{astNodeName} eq 'QApplication' and $name eq 'keypadNavigationEnabled')
 				|| ($name eq 'qDBusMetaTypeId')
+				|| ($m->{ReturnType} =~ /template/)
 				|| ($m->{ReturnType} =~ /QT3_SUPPORT/) ) )
 
 			|| $m->{Deprecated} ) {
@@ -752,6 +796,24 @@ sub preParseClass
 				$kledAmbiguousConstructor = $m;
 			}
 		}
+
+		# cut the last arguments in size(), boundingRect(), both methods was ambiguous
+		if ($classNode->{astNodeName} eq 'QFontMetrics' and $name eq 'boundingRect' && $#{$m->{ParamList}} == 7) {
+			if ($m->{ParamList}[7]->{ArgType} =~ /int/ && defined $m->{ParamList}[7]->{DefaultValue}) {
+			    pop(@{$m->{ParamList}});
+			    $#{$m->{ParamList}}--;
+			    $m->{Params} =~ s/int \*tabarray\=0//;
+			}
+		}
+
+		if ($classNode->{astNodeName} eq 'QFontMetrics' and $name eq 'size' && $#{$m->{ParamList}} == 3) {
+			if ($m->{ParamList}[3]->{ArgType} =~ /int/ && defined $m->{ParamList}[3]->{DefaultValue}) {
+			    pop(@{$m->{ParamList}});
+			    $#{$m->{ParamList}}--;
+			    $m->{Params} =~ s/int \*tabarray\=0//;
+			}
+		}
+
 		
 	    my $argId = 0;
 	    my $firstDefaultParam;
@@ -1302,7 +1364,13 @@ sub generateVirtualMethod($$$$$)
 		$sig = $class_name . "::" . $signature;
 		$idx = $allMethods{$sig};
 	}
-    die "generateVirtualMethod: $className: No method found for $sig\n" if !defined $idx;
+#    die "generateVirtualMethod: $className: No method found for $sig\n" if !defined $idx;
+
+if ( !defined $idx ) {
+    print "generateVirtualMethod: $className: No method found for $sig\n";
+    return ('', '');
+}
+
     if($flags =~ "p") { # pure virtual
 	$methodCode .= "\t${libname}_Smoke->binding->callMethod($idx, (void*)$this, x, true /*pure virtual*/);\n";
     } else {

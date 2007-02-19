@@ -2,7 +2,7 @@
 
 # KDOC -- C++ and CORBA IDL interface documentation tool.
 # Sirtaj Singh Kang <taj@kde.org>, Jan 1999.
-# $Id: kalyptus 596521 2006-10-17 19:47:11Z rdale $
+# $Id: kalyptus 630755 2007-02-06 09:42:26Z rdale $
 
 # All files in this project are distributed under the GNU General
 # Public License. This is Free Software.
@@ -22,7 +22,7 @@ use kdocParseDoc;
 
 use vars qw/ %rootNodes $declNodeType @includes_list %options @formats_wanted $allow_k_dcop_accessors
         @includeclasses $includeclasses $skipInternal %defines $defines $match_qt_defines
-	$libdir $libname $outputdir @libs $parse_global_space $qt_embedded $qt4 $striphpath $doPrivate $readstdin
+	$libdir $libname $outputdir @libs $parse_global_space $qt_embedded $qt4 $properties $striphpath $doPrivate $readstdin
 	$Version $quiet $debug $debuggen $parseonly $currentfile $cSourceNode $exe
 	%formats %flagnames @allowed_k_dcop_accesors $allowed_k_dcop_accesors_re $rootNode 
 	@classStack $cNode $globalSpaceClassName
@@ -157,6 +157,7 @@ GetOptions( \%options,
 	"globspace",	\$parse_global_space,
 	"qte",	\$qt_embedded,
 	"qt4",	\$qt4,
+	"properties",	\$properties,
 	"allow_k_dcop_accessors", \$allow_k_dcop_accessors,
 
 	"cpp|P",	\$cpp,
@@ -470,10 +471,13 @@ LOOP:
 		$p =~ s/Q_EXPORT_CODECS_BIG5//;
 		$p =~ s/Q_DECL_DEPRECATED//;
 		$p =~ s/Q_SCRIPTABLE//;
+		$p =~ s/QT_STATIC_CONST_IMPL/const/;
+		$p =~ s/QT_STATIC_CONST/static const/;
 		$p =~ s/QT_COMPAT / /;
 		$p =~ s/Q_DISABLE_COPY\((\w+)\)/$1(const $1 &);\n$1 &operator=(const $1 &);/;
 		$p =~ s/QWIDGETSIZE_MAX/32767/; # Qt/E uses this #define as an enum value - yuck!
 		$p =~ s/Q_SIGNALS/signals/;
+		$p =~ s/Q_SLOTS/slots/;
 		$p =~ s/ASYNC/void/;
 		$p =~ s/[A-Z_0-9]*_EXPORT_DEPRECATED//;
 		$p =~ s/[A-Z_0-9]*_EXPORT\s/ /;
@@ -512,7 +516,6 @@ LOOP:
 		next if ( $p =~ /^\s*Q_ENUMS/           # ignore Q_ENUMS
                         || $p =~ /^\s*Q_FLAGS/       # and Q_FLAGS
                         || $p =~ /^\s*Q_DECLARE_FLAGS/       # and Q_DECLARE_FLAGS
-                        || ( !$qt4 && $p =~ /^\s*Q_PROPERTY/ )      # and Q_PROPERTY
                         || $p =~ /^\s*QDOC_PROPERTY/
                         || $p =~ /^\s*Q_GADGET/
                         || $p =~ /^\s*Q_OVERRIDE/       # and Q_OVERRIDE
@@ -712,8 +715,10 @@ sub readDecl
 	elsif ( $l =~ /Q_PROPERTY/ ) {	# property
 		do {
 			$decl .= $l;
-	
-			if ( $l =~ /[)]/ ) {
+			my $lparens = kdocUtil::countReg( $decl, '\(' );
+			my $rparens = kdocUtil::countReg( $decl, '\)' );
+
+			if ( $lparens == $rparens ) {
 				$decl =~ s/\n/ /gs;
 				return $decl;
 			}
@@ -803,8 +808,8 @@ sub identifyDecl
     # properties
     elsif ( $decl =~ s/Q_PROPERTY// ) {
 		print "Property: <$1>\n" if $debug;
-
-		$newNode = newProperty( $decl );
+		
+		$newNode = newProperty( $decl ) if $properties;
 	}
 	# Typedef struct/class
 	elsif ( $decl =~ /^\s*typedef
@@ -1773,10 +1778,12 @@ sub newProperty
     my @items = split(/ /,$property);
 
     do {
-	    my ( $node ) = Ast::New( $items[1] );
+	    my ( $node ) = Ast::New( "Q_PROPERTY_" . $items[1] );
 
 	    $node->AddProp( "NodeType", "property" );
-        $node->AddProp( "type", $items[0] );
+        my $type = $items[0];
+        $type =~ s/\(//g;
+        $node->AddProp( "Type", $type );
         $node->AddProp( "READ", $items[3] );
         $node->AddProp( "WRITE", $items[5] );
         $node->AddProp( "NOTIFY", $items[7] );

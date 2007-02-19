@@ -1,5 +1,6 @@
 PHP-Qt - an extension for PHP5 that aims to write software with the Qt Toolkit.
-===============================================================================
+================================================================================
+
 PHP-Qt is an extension for PHP5 that aims to write software with the Qt Toolkit. 
 It provides an object-oriented interface to the Qt4 Framework and allowes 
 to write Qt applications in the PHP language.
@@ -7,42 +8,43 @@ to write Qt applications in the PHP language.
 Requirements
 ============
 
-PHP-Qt requires PHP 5.1RC1 or greater and Qt4 header files.
+PHP-Qt requires PHP 5.1 or greater, the Qt4 header files and CMake.
 
 PHP5: You should have a the header files and the development scripts.
 Qt4: You should have the header files.
 
-Note: at this time it is only possible to compile it in a unix environment.
+Note: at this time compilation is only tested in a Unix environment.
 
 Compiling and installation
 ==========================
 
-You have a php-5.1.xxx build directory where you have compiled php. You also 
-have a copy of php_qt. After downloading or checking out from SVN copy the 
-unpacked php_qt directory into the php-5.1xxx/ext/ directory.
+short:
 
-We prefer to build PHP-Qt as module! In this example php is 
-installed in /usr/local/php511
+cmake /path/to/php_qt
+make
+make install
 
-At first it is neccessary to check your environment for compiling. 
-To do that change into the php-5.1xxx/ext/php_qt directory and run phpize, kdeize
-and configure:
+more detailed:
 
-/usr/local/php511/bin/phpize
+You have cmake installed and the path to your PHP5 header files. After 
+downloading or checking out from SVN the easiest way is to create a build 
+directory in your copy of PHP-Qt. The extension will be built out-of-source 
+which allows you to have a clean copy of PHP-Qt without any files of the build 
+system.
 
-./kdeize
+PHP-Qt will be compiled as module! 
 
-./configure \
-  --enable-php_qt \
-  --with-qt-includes=/usr/lib/qt4/include \
-  --with-qt-libraries=/usr/lib/qt4 \
-  --with-php-config=/usr/local/php511/bin/php-config \
+At first it is neccessary to create your build environment for compiling.
+To do that just change into the 'php_qt/build' directory and run cmake:
 
-If --with-qt-includes and --with-qt-config are omitted, configure will try to find files in default or standard pathes
+cmake ..
 
-To remove old objectfiles run 
+You can give arguments to cmake via the -D option:
+  -DQT_INCLUDE_DIR=/usr/lib/qt4/include \
+  -DQT_LIBRARY_DIR=/usr/lib/qt4
 
-make clean
+If no argument is given cmake will try to find the Qt4 and PHP5 files in the default or standard 
+pathes as /usr/include, /usr/local/include etc.
 
 Finally, run 
 
@@ -52,11 +54,15 @@ to build the extension. If the compilation is successful run
 
 make install
 
-to copy 'php_qt.so' into php's extension directory. If it fails please check 
-all related pathes on your system at first.
+to copy 'php_qt.so' into php's extension directory. If it fails please check if you have 
+permissions and all related pathes on your system are correct.
+
+To remove old objectfiles run 
+
+make clean
 
 To test it, simply run one of the test scripts in the php_qt/test/ subdirectory.
-
+To get a clean build system just remove all files in the build/ directory.
 
 Mailing lists
 =============
@@ -83,6 +89,6 @@ Website
 
 The website for the project:
 
-    http://php-qt.berlios.de
+    http://www.php-qt.org
 
 

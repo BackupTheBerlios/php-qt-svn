@@ -51,6 +51,7 @@ BEGIN
 'DCOPObject' => 'DCOPObjectInterface',
 'KDevCore' => 'KDevCoreInterface',
 'QSqlQuery' => 'QSqlQueryInterface',
+'QGraphicsItem' => 'QGraphicsItemInterface',
 
 );
 
@@ -2366,7 +2367,6 @@ BEGIN
 'Section&'  =>  'kde_Section*' ,
 'Section*&'  =>  'kde_Section*' ,
 'Section*'  =>  'kde_Section*' ,
-'SegmentStyle' => 'int',
 'SelectionInterface*' => 'kde_SelectionInterface*',
 'Separator' => 'int',
 'Server&'  =>  'Server*' ,

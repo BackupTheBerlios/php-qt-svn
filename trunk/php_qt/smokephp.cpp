@@ -22,10 +22,10 @@
 
 #include "php_qt.h"
 #include "smoke.h"
-#include <QMetaMethod>
-#include <QHash>
-#include <QCoreApplication>
-#include <QApplication>
+#include <QtCore/QMetaMethod>
+#include <QtCore/QHash>
+#include <QtCore/QCoreApplication>
+#include <QtGui/QApplication>
 
 extern Smoke *qt_Smoke;
 extern void init_qt_Smoke();
@@ -92,7 +92,7 @@ void
 smokephp_init() {
 
     if (qt_Smoke != 0L) {
-	php_error(E_ERROR,"could not initialize smoke");
+		php_error(E_ERROR,"could not initialize smoke");
     }
 
     init_qt_Smoke();

@@ -144,7 +144,7 @@ if test "$PHP_PHP_QT" != "no"; then
     x_16.cpp x_17.cpp x_18.cpp x_19.cpp x_20.cpp \
     smokedata.cpp,,shared_objects_php_qt,yes)
 
-  PHP_NEW_EXTENSION(php_qt, qt/smokephp.cpp qt/php_qt.cpp qt/functions.cpp,$ext_shared,cli)
-  PHP_ADD_BUILD_DIR($ext_builddir/qt)
+  PHP_NEW_EXTENSION(php_qt, php_qt/smokephp.cpp php_qt/php_qt.cpp php_qt/functions.cpp,$ext_shared,cli)
+  PHP_ADD_BUILD_DIR($ext_builddir/php_qt)
 
 fi

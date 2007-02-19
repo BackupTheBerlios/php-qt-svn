@@ -1,3 +1,9 @@
+2007-002-19  Thomas Moenicke <thomas.moenicke@kdemail.net>
+
+		* new cmake build system added
+		* implemented QString since it is not in Smoke
+		* Updated copies of smoke and kalyptus
+
 2006-011-18  Thomas Moenicke <thomas.moenicke@kdemail.net>
 
 		* method argument handling: support for arrays, references

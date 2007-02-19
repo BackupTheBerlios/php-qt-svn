@@ -23,25 +23,28 @@
 #define debug
 #define MONITOR
 
+#define COMPILE_DL_PHP_QT
+#define PHPQT_CLASS_COUNT 50
+
 #include <iostream>
 using namespace std;
 
 #include <zend_interfaces.h>
 #include "smoke.h"
 
-#include <QTextStream>
-#include <QVariant>
-#include <QWidget>
-#include <QStack>
-#include <QString>
-#include <QMetaMethod>
-#include <QHash>
-#include <QCoreApplication>
-#include <QApplication>
+#include <QtCore/QTextStream>
+#include <QtCore/QVariant>
+#include <QtCore/QStack>
+#include <QtCore/QString>
+#include <QtCore/QMetaMethod>
+#include <QtCore/QHash>
+#include <QtCore/QCoreApplication>
 
-#include <QLayout>
-#include <QLCDNumber>
-#include <QFont>
+#include <QtGui/QWidget>
+#include <QtGui/QApplication>
+#include <QtGui/QLayout>
+#include <QtGui/QLCDNumber>
+#include <QtGui/QFont>
 
 // for older php versions
 #ifndef ZEND_MN
@@ -73,11 +76,6 @@ using namespace std;
     t++;
 
 #define PHP_QT_ME(classname, name, arg_info, flags)	PHP_QT_FENTRY(name, ZEND_MN(classname##_##name), arg_info, flags)
-
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #include "php.h"
 #include "php_ini.h"

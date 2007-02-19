@@ -25,6 +25,7 @@
 
 //#define DEBUG=0
 
+#include <QtCore/qglobal.h>
 #include <zend_interfaces.h>
 #include "php_qt.h"
 
@@ -93,7 +94,7 @@ Smoke::Index qbool;
 Smoke::Index qstring;
 Smoke::Index qobject;
 zend_class_entry* qobject_ce;
-zend_class_entry* qstring_ce;
+extern zend_class_entry* qstring_ce;
 
 /**
  *	proxy handler
@@ -322,7 +323,7 @@ PHP_MINIT_FUNCTION(php_qt)
 	// object list
 	le_php_qt_hashtype = zend_register_list_destructors_ex(phpqt_destroy_hashtable, NULL, "PHP-Qt object list", module_number);
 	// FIXME: 50 is fix
-	zend_hash_init_ex(&php_qt_objptr_hash, 50, NULL, NULL, 1, 0);
+	zend_hash_init_ex(&php_qt_objptr_hash, PHPQT_CLASS_COUNT, NULL, NULL, 1, 0);
 
 	// overwrite method handler
 	php_qt_handler = *zend_get_std_object_handlers();
@@ -335,7 +336,7 @@ PHP_MINIT_FUNCTION(php_qt)
 	smokephp_findConnect();
 
 	Smoke::Index qobject = smokephp_getClassId("QObject");
-	Smoke::Index qstring = smokephp_getClassId("QString");
+//	Smoke::Index qstring = smokephp_getClassId("QString");
 
     php_qt_static_methods = (zend_function_entry***) safe_emalloc((qt_Smoke->numClasses), sizeof(zend_function_entry **), 0);
 
@@ -435,7 +436,7 @@ PHP_MINIT_FUNCTION(php_qt)
 			zend_declare_class_constant_long(ce_ptr, "Bold", strlen("Bold"), QFont::Bold);
 		} 
 		
-	}
+	} // end for
 
     for(Smoke::Index i = 1; i <= qt_Smoke->numClasses; i++){
 		zend_class_entry *ce = zend_fetch_class((char*) qt_Smoke->classes[i].className, strlen(qt_Smoke->classes[i].className), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
