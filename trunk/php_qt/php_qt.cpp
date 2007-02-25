@@ -45,8 +45,53 @@ static int le_php_qt;
 int le_php_qt_hashtype;
 HashTable php_qt_objptr_hash;
 
+// object handler
 static zend_object_handlers php_qt_handler;
 static zend_object_handlers zend_orig_handler;
+
+// opcode handler
+#define PHPQT_OPHANDLER_COUNT				((25 * 151) + 1)
+#define EX__(element) execute_data->element
+#define EX_T(offset) (*(temp_variable *)((char *) EX__(Ts) + offset))
+static opcode_handler_t *phpqt_original_opcode_handlers;
+static opcode_handler_t phpqt_opcode_handlers[PHPQT_OPHANDLER_COUNT];
+
+static int phpqt_op_fetch_constant(ZEND_OPCODE_HANDLER_ARGS) {
+
+	zend_op *opline = EX__(opline);
+	zend_class_entry *ce = NULL;
+	zval **value;
+
+	if (IS_CONST == IS_UNUSED) {
+		if (!zend_get_constant(opline->op2.u.constant.value.str.val, opline->op2.u.constant.value.str.len, &EX_T(opline->result.u.var).tmp_var TSRMLS_CC)) {
+			cout << "not found" << endl;
+			zend_error(E_NOTICE, "Use of undefined constant %s - assumed '%s'",
+						opline->op2.u.constant.value.str.val,
+						opline->op2.u.constant.value.str.val);
+			EX_T(opline->result.u.var).tmp_var = opline->op2.u.constant;
+			zval_copy_ctor(&EX_T(opline->result.u.var).tmp_var);
+		}
+		execute_data->opline++;
+	}
+
+	ce = EX_T(opline->op1.u.var).class_entry;
+
+	if (zend_hash_find(&ce->constants_table, opline->op2.u.constant.value.str.val, opline->op2.u.constant.value.str.len+1, (void **) &value) == SUCCESS) {
+		zval_update_constant(value, (void *) 1 TSRMLS_CC);
+		EX_T(opline->result.u.var).tmp_var = **value;
+		zval_copy_ctor(&EX_T(opline->result.u.var).tmp_var);
+	} else {
+		// try to get the Qt constant/enum
+		// opline->op2.u.constant.value.str.val
+		// ce->name
+		php_error(E_ERROR, "Undefined class constant '%s'", opline->op2.u.constant.value.str.val);
+	}
+
+	execute_data->opline++;
+	return 0;
+
+}
+
 
 /*! php_qt_functions[]
  *
@@ -330,6 +375,17 @@ PHP_MINIT_FUNCTION(php_qt)
 	zend_orig_handler = php_qt_handler;
 	php_qt_handler.get_method = proxyHandler;
 
+	// overwrite :: operator
+	memcpy(phpqt_opcode_handlers, zend_opcode_handlers, sizeof(phpqt_opcode_handlers));
+	phpqt_original_opcode_handlers = zend_opcode_handlers;
+	zend_opcode_handlers = phpqt_opcode_handlers;
+	{ 
+	int i; 
+	for(i = 0; i < 25; i++) 
+	    if (phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + i]) 
+		phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + i] = phpqt_op_fetch_constant; 
+	}
+
 	smokephp_init();
 
 // TODO		QObject Nummer suchen, nachher vergleichen
@@ -341,6 +397,8 @@ PHP_MINIT_FUNCTION(php_qt)
     php_qt_static_methods = (zend_function_entry***) safe_emalloc((qt_Smoke->numClasses), sizeof(zend_function_entry **), 0);
 
     int method_count;
+    // cache class entries
+    QHash<const char*, zend_class_entry*> tmpCeTable;
 	// loop for all classes, register them
 	for(Smoke::Index i = 1; i <= qt_Smoke->numClasses; i++){
 
@@ -350,7 +408,7 @@ PHP_MINIT_FUNCTION(php_qt)
         for(int j=0;j<qt_Smoke->numMethods;j++){
             if(qt_Smoke->methods[j].classId == i){
                 if(!(qt_Smoke->methods[j].flags & Smoke::mf_enum)){
-                    if((qt_Smoke->methods[j].flags & Smoke::mf_static) && (qt_Smoke->methods[j].classId == i)){
+                    if((qt_Smoke->methods[j].flags & Smoke::mf_static)){
                         // avoids overloaded methods
                         if(strcmp(qt_Smoke->methodNames[qt_Smoke->methods[j-1].name],qt_Smoke->methodNames[qt_Smoke->methods[j].name])){
                             method_count++;
@@ -368,7 +426,7 @@ PHP_MINIT_FUNCTION(php_qt)
         PHP_QT_ME(php_qt_generic_class,__toString,NULL,ZEND_ACC_PUBLIC);
         PHP_QT_ME(php_qt_generic_class,proxyMethod,NULL,ZEND_ACC_PUBLIC);
 
-		QHash<const char*, bool> tmpMethodList;	// avoids doubled method names
+	QHash<const char*, bool> tmpMethodList;	// avoids doubled method names
 
         for(int j=0;j<qt_Smoke->numMethods;j++){
             if(qt_Smoke->methods[j].classId == i){
@@ -398,58 +456,29 @@ PHP_MINIT_FUNCTION(php_qt)
         t->flags = NULL;
         t++;
 
-		// register class
-	    zend_class_entry ce;
-	    INIT_CLASS_ENTRY(ce, qt_Smoke->classes[i].className, p);
-	    ce.name_length = strlen(qt_Smoke->classes[i].className);
-	    zend_class_entry* ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
-		if(qobject == i){
-			qobject_ce = ce_ptr;
-		}
-		else if(qstring == i){
-			qstring_ce = ce_ptr;
-		}
-
-        // register enums
-		if(!strcmp(qt_Smoke->classes[i].className, "Qt")){
-			zend_declare_class_constant_long(ce_ptr, "Horizontal", strlen("Horizontal"), Qt::Horizontal);
-			zend_declare_class_constant_long(ce_ptr, "Vertical", strlen("Vertical"), Qt::Vertical);
-			zend_declare_class_constant_long(ce_ptr, "AlignRight", strlen("AlignRight"), Qt::AlignRight);
-			zend_declare_class_constant_long(ce_ptr, "LeftButton", strlen("LeftButton"), Qt::LeftButton);
-		} else if(!strcmp(qt_Smoke->classes[i].className, "QPalette")){
-			zend_declare_class_constant_long(ce_ptr, "Button", strlen("Button"), QPalette::Button);
-			zend_declare_class_constant_long(ce_ptr, "Text", strlen("Text"), QPalette::Text);
-			zend_declare_class_constant_long(ce_ptr, "Base", strlen("Base"), QPalette::Base);
-		} else if(!strcmp(qt_Smoke->classes[i].className, "QSizePolicy")){
-			zend_declare_class_constant_long(ce_ptr, "Expanding", strlen("Expanding"), QSizePolicy::Expanding);
-			zend_declare_class_constant_long(ce_ptr, "Preferred", strlen("Preferred"), QSizePolicy::Preferred);
-		} else if(!strcmp(qt_Smoke->classes[i].className, "QLayout")){
-			zend_declare_class_constant_long(ce_ptr, "SetFixedSize", strlen("SetFixedSize"), QLayout::SetFixedSize);
-		} else if(!strcmp(qt_Smoke->classes[i].className, "QEvent")){
-			zend_declare_class_constant_long(ce_ptr, "MouseButtonPress", strlen("MouseButtonPress"), QEvent::MouseButtonPress);
-			zend_declare_class_constant_long(ce_ptr, "MouseButtonDblClick", strlen("MouseButtonDblClick"), QEvent::MouseButtonDblClick);
-			zend_declare_class_constant_long(ce_ptr, "MouseButtonRelease", strlen("MouseButtonRelease"), QEvent::MouseButtonRelease);
-			zend_declare_class_constant_long(ce_ptr, "ContextMenu", strlen("ContextMenu"), QEvent::ContextMenu);
-		} else if(!strcmp(qt_Smoke->classes[i].className, "QLCDNumber")){
-			zend_declare_class_constant_long(ce_ptr, "Filled", strlen("Filled"), QLCDNumber::Filled);
-		} else if(!strcmp(qt_Smoke->classes[i].className, "QFont")){
-			zend_declare_class_constant_long(ce_ptr, "Bold", strlen("Bold"), QFont::Bold);
-		} 
-		
+	// register zend class
+	zend_class_entry ce;
+	INIT_CLASS_ENTRY(ce, qt_Smoke->classes[i].className, p);
+	ce.name_length = strlen(qt_Smoke->classes[i].className);
+	zend_class_entry* ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
+	tmpCeTable[qt_Smoke->classes[i].className] = ce_ptr;
+	// cache QObject
+	if(qobject == i){
+	    qobject_ce = ce_ptr;
+	}		
 	} // end for
 
+    // do inheritance
     for(Smoke::Index i = 1; i <= qt_Smoke->numClasses; i++){
-		zend_class_entry *ce = zend_fetch_class((char*) qt_Smoke->classes[i].className, strlen(qt_Smoke->classes[i].className), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
-
-        // inheritance
-	    for(Smoke::Index *p = qt_Smoke->inheritanceList + qt_Smoke->classes[i].parents; *p; p++) {
-		    zend_class_entry *parent_ce = zend_fetch_class((char*) qt_Smoke->classes[*p].className, strlen(qt_Smoke->classes[*p].className), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
-            zend_do_inheritance(ce, parent_ce TSRMLS_CC);
-        }
+	zend_class_entry* ce = tmpCeTable[qt_Smoke->classes[i].className];
+	for(Smoke::Index *p = qt_Smoke->inheritanceList + qt_Smoke->classes[i].parents; *p; p++) {
+	    zend_class_entry *parent_ce = tmpCeTable[qt_Smoke->classes[*p].className];
+    	    zend_do_inheritance(ce, parent_ce TSRMLS_CC);
+	}
     }
 
-	return SUCCESS;
-}
+    return SUCCESS;
+} // PHP_MINIT
 
 
 /* PHP_MSHUTDOWN_FUNCTION
