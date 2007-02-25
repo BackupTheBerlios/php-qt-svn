@@ -469,7 +469,7 @@ smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const 
 			// zval already exists
 //			if(zval_x_qt.find(o) != zval_x_qt.end()){
 			if(phpqt_zval2qtIsEnd(o)){
-				return_value = phpqt_fetch_zend_ptr((QObject*) o->ptr);
+				return_value = phpqt_fetchZendPtr((QObject*) o->ptr);
 			// create a new one
 			} else {
 				

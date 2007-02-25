@@ -108,13 +108,13 @@ struct smokephp_object {
 
 //zend_class_entry* php_qt_generic_class;
 
-static void 		phpqt_destroy_hashtable(zend_rsrc_list_entry *rsrc);
+static void 		phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc);
 smokephp_object* 	phpqt_fetch(zval* this_ptr);
 void 				phpqt_register(zval* this_ptr, zend_rsrc_list_entry le);
-zval* 				phpqt_callmethod(zval* zend_ptr, char* methodname, zend_uint param_count, zval** params[]);
+zval* 				phpqt_callMethod(zval* zend_ptr, char* methodname, zend_uint param_count, zval** params[]);
 bool 				phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname);
 bool 				phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, QMetaObject* metachar, QString* meta_stringdata, uint* signature);
-zval* 				phpqt_fetch_zend_ptr(const QObject *o);
+zval* 				phpqt_fetchZendPtr(const QObject *o);
 int					phpqt_metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a);
 char*				phpqt_checkForOperator(const char* fname);
 bool				phpqt_zval2qtIsEnd(void *o);

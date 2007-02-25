@@ -366,7 +366,7 @@ PHP_MINIT_FUNCTION(php_qt)
 {
 
 	// object list
-	le_php_qt_hashtype = zend_register_list_destructors_ex(phpqt_destroy_hashtable, NULL, "PHP-Qt object list", module_number);
+	le_php_qt_hashtype = zend_register_list_destructors_ex(phpqt_destroyHashtable, NULL, "PHP-Qt object list", module_number);
 	// FIXME: 50 is fix
 	zend_hash_init_ex(&php_qt_objptr_hash, PHPQT_CLASS_COUNT, NULL, NULL, 1, 0);
 
@@ -604,7 +604,7 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
 
         }
 
-        phpqt_callmethod(so->zval_ptr, method_name, j, args);
+        phpqt_callMethod(so->zval_ptr, method_name, j, args);
 
     // is a signal
     } else {
@@ -669,7 +669,7 @@ phpqt_fetch(zval* this_ptr){
 }
 
 static void 
-phpqt_destroy_hashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
+phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {
 #ifdef DEBUG
 	php_error(E_ERROR,"Hashtable destroyed. Shutdown PHP-Qt now.");
@@ -695,7 +695,7 @@ phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname)
 }
 
 zval* 
-phpqt_callmethod(zval* this_ptr, char* methodname, zend_uint param_count, zval** args[])
+phpqt_callMethod(zval* this_ptr, char* methodname, zend_uint param_count, zval** args[])
 {
 
 	if(this_ptr == NULL){
@@ -828,7 +828,7 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
  */
 
 zval* 
-phpqt_fetch_zend_ptr(const QObject *o){
+phpqt_fetchZendPtr(const QObject *o){
 	return zval_x_qt[(void*) o];
 }
 
