@@ -56,7 +56,7 @@ static zend_object_handlers zend_orig_handler;
 static opcode_handler_t *phpqt_original_opcode_handlers;
 static opcode_handler_t phpqt_opcode_handlers[PHPQT_OPHANDLER_COUNT];
 
-static int phpqt_op_fetch_constant(ZEND_OPCODE_HANDLER_ARGS) {
+static int constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
 
 	zend_op *opline = EX__(opline);
 	zend_class_entry *ce = NULL;
@@ -383,7 +383,7 @@ PHP_MINIT_FUNCTION(php_qt)
 	int i; 
 	for(i = 0; i < 25; i++) 
 	    if (phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + i]) 
-		phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + i] = phpqt_op_fetch_constant; 
+		phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + i] = constantHandler; 
 	}
 
 	smokephp_init();
