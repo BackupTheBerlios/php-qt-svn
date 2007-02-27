@@ -35,6 +35,100 @@ using namespace std;
 
 zend_class_entry* qstring_ce;
 
+static zend_function_entry QString_methods[] = {
+	ZEND_ME(QString,__toString,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,compare,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,utf16,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,constData,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,insert,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,clear,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,setUtf16,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,prepend,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,trimmed,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,chop,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,leftJustified,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,squeeze,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,count,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromAscii,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,toLongLong,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toUpper,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString, __construct,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,normalized,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromUtf16,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,isRightToLeft,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,setNum,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,endsWith,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,number,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,localeAwareCompare,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,section,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,isSimpleText,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,size,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,simplified,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toUInt,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toUShort,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,truncate,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toAscii,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,length,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,right,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,push_front,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toUtf8,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toULongLong,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,indexOf,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromRawData,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,constEnd,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,left,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromLocal8Bit,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,startsWith,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,remove,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,isEmpty,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,arg,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,vsprintf,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toFloat,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,isDetached,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,reserve,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toULong,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toShort,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,split,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,setUnicode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromLatin1,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,data,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toLatin1,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,end,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,contains,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,resize,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,replace,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fromUtf8,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(QString,toLong,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,detach,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,append,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,mid,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toDouble,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,fill,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,rightJustified,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toLower,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,lastIndexOf,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,unicode,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,at,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,begin,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,push_back,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,capacity,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,constBegin,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toLocal8Bit,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,toInt,NULL,ZEND_ACC_PUBLIC)
+	ZEND_ME(QString,isNull,NULL,ZEND_ACC_PUBLIC)
+
+    {NULL,NULL,NULL}
+};
+
+void _register_QString(TSRMLS_D)
+{
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce,"QString",QString_methods);
+    qstring_ce = zend_register_internal_class(&ce TSRMLS_CC);
+
+}
+
+
 ZEND_METHOD(QString,__toString){
 
   QString *QString_ptr = (QString *) PHP_QT_FETCH();
@@ -2103,8 +2197,6 @@ ZEND_METHOD(QString, append){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-
-
 				QString & return_object = (QString &) obj->append((char) Z_LVAL_P(z_0));
 				zend_class_entry *ce;                                   
 				object_init_ex(return_value, qstring_ce);     
@@ -2492,6 +2584,5 @@ ZEND_METHOD(QString, isNull){
 	}
 }
 
-# warning: implement me
 //PHP_QT_DESTRUCT(QString);
 

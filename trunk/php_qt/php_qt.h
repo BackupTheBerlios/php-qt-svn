@@ -136,3 +136,139 @@ void				smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type
 void				smokephp_init();
 Smoke::Index		smokephp_findConnect();
 bool				smokephp_isConnect(Smoke::Index method);
+
+
+class SmokeType {
+    Smoke::Type *_t;		// derived from _smoke and _id, but cached
+
+    Smoke *_smoke;
+    Smoke::Index _id;
+public:
+    SmokeType() : _t(0), _smoke(0), _id(0) {}
+    SmokeType(Smoke *s, Smoke::Index i) : _smoke(s), _id(i) {
+	if(_id < 0 || _id > _smoke->numTypes) _id = 0;
+	_t = _smoke->types + _id;
+    }
+    // default copy constructors are fine, this is a constant structure
+
+    // mutators
+    void set(Smoke *s, Smoke::Index i) {
+	_smoke = s;
+	_id = i;
+	_t = _smoke->types + _id;
+    }
+
+    // accessors
+    Smoke *smoke() const { return _smoke; }
+    Smoke::Index typeId() const { return _id; }
+    const Smoke::Type &type() const { return *_t; }
+    unsigned short flags() const { return _t->flags; }
+    unsigned short elem() const { return _t->flags & Smoke::tf_elem; }
+    const char *name() const { return _t->name; }
+    Smoke::Index classId() const { return _t->classId; }
+
+    // tests
+    bool isStack() const { return ((flags() & Smoke::tf_ref) == Smoke::tf_stack); }
+    bool isPtr() const { return ((flags() & Smoke::tf_ref) == Smoke::tf_ptr); }
+    bool isRef() const { return ((flags() & Smoke::tf_ref) == Smoke::tf_ref); }
+    bool isConst() const { return (flags() & Smoke::tf_const); }
+    bool isClass() const {
+	if(elem() == Smoke::t_class)
+	    return classId() ? true : false;
+	return false;
+    }
+
+    bool operator ==(const SmokeType &b) const {
+	const SmokeType &a = *this;
+	if(a.name() == b.name()) return true;
+	if(a.name() && b.name() && qstrcmp(a.name(), b.name()) == 0)
+	    return true;
+	return false;
+    }
+    bool operator !=(const SmokeType &b) const {
+	const SmokeType &a = *this;
+	return !(a == b);
+    }
+
+};
+
+ZEND_METHOD(QString, __toString);
+ZEND_METHOD(QString, compare);
+ZEND_METHOD(QString, utf16);
+ZEND_METHOD(QString, constData);
+ZEND_METHOD(QString, insert);
+ZEND_METHOD(QString, clear);
+ZEND_METHOD(QString, setUtf16);
+ZEND_METHOD(QString, prepend);
+ZEND_METHOD(QString, trimmed);
+ZEND_METHOD(QString, chop);
+ZEND_METHOD(QString, leftJustified);
+ZEND_METHOD(QString, squeeze);
+ZEND_METHOD(QString, count);
+ZEND_METHOD(QString, fromAscii);
+ZEND_METHOD(QString, toLongLong);
+ZEND_METHOD(QString, toUpper);
+ZEND_METHOD(QString, __construct);
+ZEND_METHOD(QString, normalized);
+ZEND_METHOD(QString, fromUtf16);
+ZEND_METHOD(QString, isRightToLeft);
+ZEND_METHOD(QString, setNum);
+ZEND_METHOD(QString, endsWith);
+ZEND_METHOD(QString, number);
+ZEND_METHOD(QString, localeAwareCompare);
+ZEND_METHOD(QString, section);
+ZEND_METHOD(QString, isSimpleText);
+ZEND_METHOD(QString, size);
+ZEND_METHOD(QString, simplified);
+ZEND_METHOD(QString, toUInt);
+ZEND_METHOD(QString, toUShort);
+ZEND_METHOD(QString, truncate);
+ZEND_METHOD(QString, toAscii);
+ZEND_METHOD(QString, length);
+ZEND_METHOD(QString, right);
+ZEND_METHOD(QString, push_front);
+ZEND_METHOD(QString, toUtf8);
+ZEND_METHOD(QString, toULongLong);
+ZEND_METHOD(QString, indexOf);
+ZEND_METHOD(QString, fromRawData);
+ZEND_METHOD(QString, constEnd);
+ZEND_METHOD(QString, left);
+ZEND_METHOD(QString, fromLocal8Bit);
+ZEND_METHOD(QString, startsWith);
+ZEND_METHOD(QString, remove);
+ZEND_METHOD(QString, isEmpty);
+ZEND_METHOD(QString, arg);
+ZEND_METHOD(QString, vsprintf);
+ZEND_METHOD(QString, toFloat);
+ZEND_METHOD(QString, isDetached);
+ZEND_METHOD(QString, reserve);
+ZEND_METHOD(QString, toULong);
+ZEND_METHOD(QString, toShort);
+ZEND_METHOD(QString, split);
+ZEND_METHOD(QString, setUnicode);
+ZEND_METHOD(QString, fromLatin1);
+ZEND_METHOD(QString, data);
+ZEND_METHOD(QString, toLatin1);
+ZEND_METHOD(QString, end);
+ZEND_METHOD(QString, contains);
+ZEND_METHOD(QString, resize);
+ZEND_METHOD(QString, replace);
+ZEND_METHOD(QString, fromUtf8);
+ZEND_METHOD(QString, toLong);
+ZEND_METHOD(QString, detach);
+ZEND_METHOD(QString, append);
+ZEND_METHOD(QString, mid);
+ZEND_METHOD(QString, toDouble);
+ZEND_METHOD(QString, fill);
+ZEND_METHOD(QString, rightJustified);
+ZEND_METHOD(QString, toLower);
+ZEND_METHOD(QString, lastIndexOf);
+ZEND_METHOD(QString, unicode);
+ZEND_METHOD(QString, at);
+ZEND_METHOD(QString, begin);
+ZEND_METHOD(QString, push_back);
+ZEND_METHOD(QString, capacity);
+ZEND_METHOD(QString, constBegin);
+ZEND_METHOD(QString, toLocal8Bit);
+ZEND_METHOD(QString, toInt);
+ZEND_METHOD(QString, isNull);

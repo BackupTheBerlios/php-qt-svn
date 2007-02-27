@@ -1,3 +1,10 @@
+2007-002-27  Thomas Moenicke <thomas.moenicke@kdemail.net>
+
+		* implemented constantHandler which fetchs constants from Qt
+		* registered QString
+		* improved inheritance
+		* added unittests
+
 2007-002-25  Thomas Moenicke <thomas.moenicke@kdemail.net>
 
 		* replaced the :: operator

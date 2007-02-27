@@ -81,10 +81,27 @@ static int constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
 		EX_T(opline->result.u.var).tmp_var = **value;
 		zval_copy_ctor(&EX_T(opline->result.u.var).tmp_var);
 	} else {
-		// try to get the Qt constant/enum
-		// opline->op2.u.constant.value.str.val
-		// ce->name
-		php_error(E_ERROR, "Undefined class constant '%s'", opline->op2.u.constant.value.str.val);
+		// enums are methods here
+		Smoke::Index method = qt_Smoke->findMethod(ce->name, opline->op2.u.constant.value.str.val);
+		if(method <= 0) // smoke could not find one
+		    php_error(E_ERROR, "undefined class constant '%s'", opline->op2.u.constant.value.str.val);
+
+		method = qt_Smoke->methodMaps[method].method;
+
+		// get the Qt value
+		Smoke::Stack args = (Smoke::Stack) safe_emalloc(1, sizeof(Smoke::Stack), 0);
+		void* dummy; // dummy here
+		smokephp_callMethod(qt_Smoke, dummy, method, args);
+
+		// write the zend return value
+		zval* return_value;
+		MAKE_STD_ZVAL(return_value);
+		ZVAL_LONG(return_value, args[0].s_enum);
+		EX_T(opline->result.u.var).tmp_var = *return_value;
+		zval_copy_ctor(&EX_T(opline->result.u.var).tmp_var);
+
+		efree(args);
+
 	}
 
 	execute_data->opline++;
@@ -140,6 +157,7 @@ Smoke::Index qstring;
 Smoke::Index qobject;
 zend_class_entry* qobject_ce;
 extern zend_class_entry* qstring_ce;
+extern void 	_register_QString();
 
 /**
  *	proxy handler
@@ -379,12 +397,7 @@ PHP_MINIT_FUNCTION(php_qt)
 	memcpy(phpqt_opcode_handlers, zend_opcode_handlers, sizeof(phpqt_opcode_handlers));
 	phpqt_original_opcode_handlers = zend_opcode_handlers;
 	zend_opcode_handlers = phpqt_opcode_handlers;
-	{ 
-	int i; 
-	for(i = 0; i < 25; i++) 
-	    if (phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + i]) 
-		phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + i] = constantHandler; 
-	}
+	phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + 0] = constantHandler; 
 
 	smokephp_init();
 
@@ -392,15 +405,15 @@ PHP_MINIT_FUNCTION(php_qt)
 	smokephp_findConnect();
 
 	Smoke::Index qobject = smokephp_getClassId("QObject");
-//	Smoke::Index qstring = smokephp_getClassId("QString");
 
-    php_qt_static_methods = (zend_function_entry***) safe_emalloc((qt_Smoke->numClasses), sizeof(zend_function_entry **), 0);
+	php_qt_static_methods = (zend_function_entry***) safe_emalloc((qt_Smoke->numClasses), sizeof(zend_function_entry **), 0);
 
-    int method_count;
-    // cache class entries
-    QHash<const char*, zend_class_entry*> tmpCeTable;
+	int method_count;
+	// cache class entries
+	Smoke::Index i = 1;
+	QHash<const char*, zend_class_entry*> tmpCeTable;
 	// loop for all classes, register them
-	for(Smoke::Index i = 1; i <= qt_Smoke->numClasses; i++){
+	for(i = 1; i <= qt_Smoke->numClasses; i++){
 
         // statical methods, there is no method handler which can be overwritten
         // hope this will be better in future / see zend_std_get_static_method()
@@ -468,14 +481,19 @@ PHP_MINIT_FUNCTION(php_qt)
 	}		
 	} // end for
 
-    // do inheritance
-    for(Smoke::Index i = 1; i <= qt_Smoke->numClasses; i++){
-	zend_class_entry* ce = tmpCeTable[qt_Smoke->classes[i].className];
-	for(Smoke::Index *p = qt_Smoke->inheritanceList + qt_Smoke->classes[i].parents; *p; p++) {
-	    zend_class_entry *parent_ce = tmpCeTable[qt_Smoke->classes[*p].className];
-    	    zend_do_inheritance(ce, parent_ce TSRMLS_CC);
+	_register_QString();
+	tmpCeTable[qt_Smoke->classes[i].className] = qstring_ce;
+
+	// do inheritance, all classes must be defined before
+	for(Smoke::Index i = 1; i <= qt_Smoke->numClasses; i++){
+	    zend_class_entry* ce = tmpCeTable[qt_Smoke->classes[i].className];
+	    for(Smoke::Index *p = qt_Smoke->inheritanceList + qt_Smoke->classes[i].parents; *p; p++) {
+		zend_class_entry *parent_ce = tmpCeTable[qt_Smoke->classes[*p].className];
+    		zend_do_inheritance(ce, parent_ce TSRMLS_CC);
+	    }
 	}
-    }
+
+    tmpCeTable.~QHash();
 
     return SUCCESS;
 } // PHP_MINIT
@@ -485,8 +503,8 @@ PHP_MINIT_FUNCTION(php_qt)
  */
 PHP_MSHUTDOWN_FUNCTION(php_qt)
 {
-    methodNameStack.~QStack();
-	SmokeToPtr.~QHash();
+//	methodNameStack.~QStack();
+//	SmokeToPtr.~QHash();
 	return SUCCESS;
 }
 
@@ -840,17 +858,16 @@ phpqt_zval2qtIsEnd(void *o){
 /**
  *	maps method names to the related names of operator-extension
  *	@param	const char*		fname		function name
- *  TODO: implement! ask in proxyHandler for it
  */
 
 char*
 phpqt_checkForOperator(const char* fname){
+#warning skip operator support
 	return (char*) fname;
 }
 
 smokephp_object*
 phpqt_getSmokePHPObject(void* ptr){
-	smokephp_object* a = (smokephp_object*) SmokeToPtr[ptr];
 	return (smokephp_object*) SmokeToPtr[ptr];
 }
 

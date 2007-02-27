@@ -91,14 +91,14 @@ public:
 void 
 smokephp_init() {
 
-    if (qt_Smoke != 0L) {
-		php_error(E_ERROR,"could not initialize smoke");
+/*    if (qt_Smoke != 0L) {
+	php_error(E_ERROR,"could not initialize smoke");
     }
-
+*/
     init_qt_Smoke();
 
     if(qt_Smoke->numClasses <= 0){
-		php_error(E_ERROR,"could not initialize smoke");
+	php_error(E_ERROR,"could not initialize smoke (no class definitions)");
     }
 
     qt_Smoke->binding = new PHPQtSmokeBinding(qt_Smoke);
