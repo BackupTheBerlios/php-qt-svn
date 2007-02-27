@@ -11,7 +11,7 @@
 	
 		function __construct() {
 			$this->mainWidget = new QWidget();
-			parent::__construct(QBOXLAYOUT_DIRECTION_TOP_TO_BOTTOM,$this->mainWidget);
+			parent::__construct(QBoxLayout::TopToBottom,$this->mainWidget);
 			$this->button1 = new QPushButton("About Qt!");
 			$this->button2 = new QPushButton("Quit");
 			$this->addWidget($this->button1);
@@ -32,7 +32,7 @@
 	}
 	
 	
-	$app = new QApplication($argc,$argv);
+	$app = new QApplication(&$argc,$argv);
 
 	$box = new Box();
 	$box->show();
