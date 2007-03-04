@@ -64,7 +64,6 @@ static int constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
 
 	if (IS_CONST == IS_UNUSED) {
 		if (!zend_get_constant(opline->op2.u.constant.value.str.val, opline->op2.u.constant.value.str.len, &EX_T(opline->result.u.var).tmp_var TSRMLS_CC)) {
-			cout << "not found" << endl;
 			zend_error(E_NOTICE, "Use of undefined constant %s - assumed '%s'",
 						opline->op2.u.constant.value.str.val,
 						opline->op2.u.constant.value.str.val);
@@ -147,8 +146,8 @@ zend_module_entry php_qt_module_entry = {
 ZEND_GET_MODULE(php_qt)
 #endif
 
-static QHash<void*, zval*> zval_x_qt;
-QHash<void*, size_t>SmokeToPtr;
+static QHash<smokephp_object*, zval*> zval_x_qt;
+QHash<void*, smokephp_object*> SmokeQtObjects;
 QStack<QString*> methodNameStack;
 
 // cached
@@ -166,6 +165,7 @@ extern void 	_register_QString();
 union _zend_function *proxyHandler(zval **obj_ptr, char* methodname, int methodname_len TSRMLS_DC){
 
     union _zend_function *fbc;
+
     // a try for non-Qt objects
     fbc = zend_orig_handler.get_method(obj_ptr, methodname, methodname_len);
 
@@ -201,7 +201,7 @@ static zend_function_entry*** php_qt_static_methods;
 ZEND_METHOD(php_qt_generic_class, __toString)
 {
 	if(!strcmp(Z_OBJCE_P(getThis())->name,"QString")){
-		smokephp_object* o = phpqt_fetch(getThis());
+		smokephp_object* o = phpqt_getSmokePHPObjectFromZval(getThis());
 		RETVAL_STRING((char*)((QString*) o->ptr)->toAscii().constData(), 1);
 //		RETVAL_STRING((char*)((QString*) o->ptr)->toLocal8Bit().constData(), 1);
 	} else {
@@ -212,9 +212,9 @@ ZEND_METHOD(php_qt_generic_class, __toString)
 
 ZEND_METHOD(php_qt_generic_class, __destruct)
 {
-    smokephp_object *o = phpqt_fetch(getThis());
-    zval_x_qt.remove(o->ptr);
-    SmokeToPtr.remove(o->ptr);
+    smokephp_object *o = phpqt_getSmokePHPObjectFromZval(getThis());
+    phpqt_removeZvalPtr(o);
+    SmokeQtObjects.remove(o->ptr);
 	RETVAL_NULL();
 }
 
@@ -240,11 +240,6 @@ ZEND_METHOD(php_qt_generic_class, __construct)
     Smoke::StackItem* qargs = (Smoke::StackItem*) safe_emalloc(argc+10, sizeof(Smoke::StackItem), 0);
     smokephp_convertArgsZendToCxx(args, ZEND_NUM_ARGS(), qargs, methodNameStack);
     Smoke::Index method = smokephp_getMethod(qt_Smoke,ce->name, (methodNameStack.top())->toAscii(), &qargs, ZEND_NUM_ARGS(), args);
-	
-	// connect uses char*
-	if(smokephp_isConnect(method)){
-    	smokephp_prepareConnect(args, ZEND_NUM_ARGS(), qargs, method);
-	}
 
 	smokephp_object *o = (smokephp_object*) emalloc(sizeof(smokephp_object));
 
@@ -278,7 +273,7 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 		QMetaObject *superdata = (QMetaObject *) i[0].s_voidp;
 
  		QString* phpqt_meta_stringdata = new QString("");
-        uint* phpqt_meta_data = (uint*) emalloc(sizeof(uint)*20*5+10);
+    		uint* phpqt_meta_data = (uint*) emalloc(sizeof(uint)*20*5+10);
 		
 		//	create the metaObject
 		if(phpqt_getMocData(
@@ -304,12 +299,14 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 	} 
 
 	// store relations
-	phpqt_setSmokePHPObject(o);
-    PHP_QT_REGISTER(o);
-	zval_x_qt.insert(qargs[0].s_class, getThis());
+
+	PHP_QT_REGISTER(o);
 
     // return value
     smokephp_convertReturn(&qargs[0], qt_Smoke->types[qt_Smoke->methods[method].ret], qt_Smoke->methods[method].ret, return_value);
+
+	phpqt_setSmokePHPObject(o);
+	phpqt_setZvalPtr(o, getThis());
 
     // cleanup
     efree(args);
@@ -340,7 +337,6 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
     while (qt_Smoke->idClass(ce->name) <= 0) {
 	    ce = ce->parent;
 	}
-
 	// arguments
     int j, argc = ZEND_NUM_ARGS();
     zval ***args;
@@ -353,12 +349,22 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
     Smoke::StackItem* qargs = (Smoke::StackItem*) safe_emalloc(argc+10, sizeof(Smoke::StackItem), 0);
     smokephp_convertArgsZendToCxx(args, argc, qargs, methodNameStack);
     Smoke::Index method = smokephp_getMethod(qt_Smoke,ce->name, (methodNameStack.top())->toAscii(), &qargs, argc, args);
-    smokephp_prepareConnect(args, argc, qargs, method);
+
+    if(smokephp_isConnect(method)){
+	smokephp_prepareConnect(args, argc, qargs, method);
+    }
 
     // self
     if(getThis()){
-    	smokephp_object *o = phpqt_fetch(getThis());
+    	smokephp_object *o = phpqt_getSmokePHPObjectFromZval(getThis());
         qargs[0].s_class = o->ptr;
+    }
+
+    if(method <= 0) {
+	if(methodNameStack.top()->toAscii().constData()) 
+	    php_error(E_ERROR,"Call to undefined method %s %s!", Z_OBJCE_P(getThis())->name, methodNameStack.top()->toAscii().constData());
+	else 
+	    php_error(E_ERROR,"Call to undefined method!");
     }
 
     // call
@@ -504,7 +510,7 @@ PHP_MINIT_FUNCTION(php_qt)
 PHP_MSHUTDOWN_FUNCTION(php_qt)
 {
 //	methodNameStack.~QStack();
-//	SmokeToPtr.~QHash();
+//	SmokeQtObjects.~QHash();
 	return SUCCESS;
 }
 
@@ -582,8 +588,10 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
 	// try the PHP one
 	// eg _q_buttonPressed(), breaking at the first bracket
 	char* method_name = estrdup((d->method(_id)).signature());
+
     for(int i = 0; i < strlen(method_name); i++){
-        if(method_name[i] == 40){
+#define LEFT_PARENTHESIS 40
+        if(method_name[i] == LEFT_PARENTHESIS){
             method_name[i] = 0;
             break;
         }
@@ -591,6 +599,7 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
 
     // is a Slot
     if(d->method(_id).methodType() == QMetaMethod::Slot){
+
         int j = 0;
         zval*** args = (zval***) safe_emalloc(2, sizeof(zval*), 0);
         QList<QByteArray> qargs = d->method(_id).parameterTypes();
@@ -658,33 +667,6 @@ phpqt_register(zval* this_ptr, zend_rsrc_list_entry le){
 
 }
 
-smokephp_object* 
-phpqt_fetch(zval* this_ptr){
-
-	if(this_ptr == NULL){
-	  php_error(E_ERROR,"fatal: object does not exists and could not be fetched, %s",Z_OBJCE_P(this_ptr)->name);
-	}
-
-	smokephp_object *ptr;
-	zval **listhandle;
-	int type;
-	TSRMLS_FETCH();
-
-	if(zend_hash_index_find(Z_OBJPROP_P(this_ptr), 0, (void**) &listhandle) == FAILURE){
-	  php_error(E_ERROR,"underlying Qt-Object missing. Make sure that the constructor of the parent is called, instance of type '%s' fails",Z_OBJCE_P(this_ptr)->name,Z_OBJCE_P(this_ptr)->name);
-	}
-	ptr = (smokephp_object*) zend_list_find(Z_LVAL_PP(listhandle), &type);
-
-	if(!ptr){
-		php_error(E_ERROR,"reference to Qt object missing, %s",Z_OBJCE_P(this_ptr)->name);
-	} 
-	if(type != le_php_qt_hashtype){
-		php_error(E_ERROR,"phpqt_fetch(): wrong type, %s",Z_OBJCE_P(this_ptr)->name);
-	}
-
-	return ptr;
-
-}
 
 static void 
 phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
@@ -845,13 +827,24 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
  *	@return	zval*
  */
 
+
+void
+phpqt_setZvalPtr(smokephp_object *o, zval* z) {
+	zval_x_qt.insert(o,z);
+}
+
+void
+phpqt_removeZvalPtr(smokephp_object *o) {
+	zval_x_qt.remove(o);
+}
+
 zval* 
-phpqt_fetchZendPtr(const QObject *o){
-	return zval_x_qt[(void*) o];
+phpqt_fetchZvalPtr(smokephp_object *o){
+	return zval_x_qt.value(o);
 }
 
 bool
-phpqt_zval2qtIsEnd(void *o){
+phpqt_ZvalPtrExists(smokephp_object *o){
 	return (zval_x_qt.find(o) != zval_x_qt.end());
 }
 
@@ -866,18 +859,52 @@ phpqt_checkForOperator(const char* fname){
 	return (char*) fname;
 }
 
+smokephp_object* 
+phpqt_getSmokePHPObjectFromZval(zval* this_ptr){
+
+	if(this_ptr == NULL){
+	  php_error(E_ERROR,"fatal: object does not exists and could not be fetched, %s",Z_OBJCE_P(this_ptr)->name);
+	}
+
+	smokephp_object *ptr;
+	zval **listhandle;
+	int type;
+	TSRMLS_FETCH();
+
+	if(zend_hash_index_find(Z_OBJPROP_P(this_ptr), 0, (void**) &listhandle) == FAILURE){
+	  php_error(E_ERROR,"underlying Qt-Object missing. Make sure that the constructor of the parent is called, instance of type '%s' fails",Z_OBJCE_P(this_ptr)->name,Z_OBJCE_P(this_ptr)->name);
+	}
+	ptr = (smokephp_object*) zend_list_find(Z_LVAL_PP(listhandle), &type);
+
+	if(!ptr){
+		php_error(E_ERROR,"reference to Qt object missing, %s",Z_OBJCE_P(this_ptr)->name);
+	} 
+	if(type != le_php_qt_hashtype){
+		php_error(E_ERROR,"phpqt_getSmokePHPObjectFromZval(): wrong type, %s",Z_OBJCE_P(this_ptr)->name);
+	}
+
+	return ptr;
+
+}
+
+void*
+phpqt_getQtObjectFromZval(zval* this_ptr){
+	smokephp_object* o = phpqt_getSmokePHPObjectFromZval(this_ptr);
+	return o->ptr;
+}
+
 smokephp_object*
-phpqt_getSmokePHPObject(void* ptr){
-	return (smokephp_object*) SmokeToPtr[ptr];
+phpqt_getSmokePHPObjectFromQt(void* QtPtr){
+	return (smokephp_object*) SmokeQtObjects.value(QtPtr);
 }
 
 void
 phpqt_setSmokePHPObject(smokephp_object* o){
-	SmokeToPtr.insert(o->ptr, (size_t) o);
+	SmokeQtObjects.insert(o->ptr, o);
 }
 
 bool
-phpqt_SmokePHPObjectExists(smokephp_object* o){
-	return (SmokeToPtr.find(o->ptr) != SmokeToPtr.end());
+phpqt_SmokePHPObjectExists(void* ptr){
+	return (SmokeQtObjects.find(ptr) != SmokeQtObjects.end());
 }
 

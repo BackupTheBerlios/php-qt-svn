@@ -64,7 +64,7 @@ using namespace std;
     phpqt_register(getThis(),le);  \
 
 #define PHP_QT_FETCH()  \
-	phpqt_fetch(getThis()) \
+	phpqt_getQtObjectFromZval(getThis()) \
 
 #define PHP_QT_FENTRY(zend_name, name_, arg_info_, flags_)	\
     t->fname = (char*) emalloc(strlen(#zend_name)+1); \
@@ -109,18 +109,24 @@ struct smokephp_object {
 //zend_class_entry* php_qt_generic_class;
 
 static void 		phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc);
-smokephp_object* 	phpqt_fetch(zval* this_ptr);
+
 void 				phpqt_register(zval* this_ptr, zend_rsrc_list_entry le);
 zval* 				phpqt_callMethod(zval* zend_ptr, char* methodname, zend_uint param_count, zval** params[]);
 bool 				phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname);
 bool 				phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, QMetaObject* metachar, QString* meta_stringdata, uint* signature);
-zval* 				phpqt_fetchZendPtr(const QObject *o);
-int					phpqt_metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a);
+int				phpqt_metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a);
 char*				phpqt_checkForOperator(const char* fname);
-bool				phpqt_zval2qtIsEnd(void *o);
-smokephp_object*	phpqt_getSmokePHPObject(void* ptr);
+
+void 				phpqt_setZvalPtr(smokephp_object *o, zval* z);
+void 				phpqt_removeZvalPtr(smokephp_object *o);
+zval* 				phpqt_fetchZvalPtr(smokephp_object *o);
+bool				phpqt_ZvalPtrExists(smokephp_object *o);
+
+void* 				phpqt_getQtObjectFromZval(zval* this_ptr);
+smokephp_object* 		phpqt_getSmokePHPObjectFromZval(zval* this_ptr);
+smokephp_object*		phpqt_getSmokePHPObjectFromQt(void* QtPtr);
 void				phpqt_setSmokePHPObject(smokephp_object* o);
-bool				phpqt_SmokePHPObjectExists(smokephp_object* o);
+bool				phpqt_SmokePHPObjectExists(void* ptr);
 
 extern int le_php_qt_hashtype;
 extern HashTable php_qt_objptr_hash;
@@ -134,7 +140,7 @@ void				smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs,
 void				smokephp_callMethod(Smoke *smoke, void *obj, Smoke::Index method, Smoke::Stack qargs);
 void				smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const Smoke::Index ret, zval* return_value);
 void				smokephp_init();
-Smoke::Index		smokephp_findConnect();
+Smoke::Index			smokephp_findConnect();
 bool				smokephp_isConnect(Smoke::Index method);
 
 

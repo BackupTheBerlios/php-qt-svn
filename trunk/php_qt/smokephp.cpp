@@ -29,6 +29,7 @@
 
 extern Smoke *qt_Smoke;
 extern void init_qt_Smoke();
+extern zend_class_entry* qstring_ce;
 
 Smoke::Index connect1;
 Smoke::Index connect2;
@@ -44,9 +45,9 @@ public:
     virtual void deleted(Smoke::Index, void*) {
             // ignore object deletion
     }
-    virtual bool callMethod(Smoke::Index method, void* ptr, Smoke::Stack args, bool /*isAbstract*/) {
+    virtual bool callMethod(Smoke::Index method, void* QtPtr, Smoke::Stack args, bool /*isAbstract*/) {
 
-		smokephp_object *o = (smokephp_object*) phpqt_getSmokePHPObject(ptr);
+		smokephp_object *o = (smokephp_object*) phpqt_getSmokePHPObjectFromQt(QtPtr);
 
 		if(!o){
 			// no related smokephp_object
@@ -259,7 +260,7 @@ int treatArray(zval **val, int num_args, va_list args, zend_hash_key *hash_key){
 
 	smokephp_object *o;
 	if(type == IS_OBJECT)
-		o = phpqt_fetch(((zval*) *val));
+		o = phpqt_getSmokePHPObjectFromZval(((zval*) *val));
 
 	switch(type){
 		case IS_STRING:
@@ -389,17 +390,32 @@ smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, Q
 	    } else if (type == IS_STRING){
 
 			if((((zval) **args[i]).is_ref)){
-				qargs[i+1].s_class = phpqt_fetch(*args[i])->ptr;
+				qargs[i+1].s_class = phpqt_getSmokePHPObjectFromZval(*args[i])->ptr;	
 			} else {
-    	    	qargs[i+1].s_class = emalloc(sizeof(QString)+strlen(Z_STRVAL_PP(args[i]))); // important
-    	    	qargs[i+1].s_class = new QString(Z_STRVAL_PP(args[i]));
-            }
+			    // create a new QString object
+    	    		    qargs[i+1].s_class = emalloc(sizeof(QString) + strlen(Z_STRVAL_PP(args[i]))); // important
+    	    		    qargs[i+1].s_class = new QString(Z_STRVAL_PP(args[i]));
+			    // create new smokephp_object
+			    smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
+			    o->ptr = qargs[i+1].s_class;
+			    o->zval_ptr = *args[i];
+			    o->ce_ptr = qstring_ce;
+			    o->classId = 0;	// QString is not in smoke
+			    o->smoke = qt_Smoke;
+			    phpqt_setSmokePHPObject(o);
+			    // register all 
+			    zend_rsrc_list_entry le;
+			    le.ptr = o;
+			    object_init_ex(*args[i], qstring_ce);
+			    phpqt_register(o->zval_ptr,le);
+			    phpqt_setZvalPtr(o, o->zval_ptr);
+        		}
 
-            methodNameStack.top()->append("$");
+        		methodNameStack.top()->append("$");
 
 	    } else if (type == IS_OBJECT){
-			smokephp_object *o = phpqt_fetch(((zval*) *args[i]));
-            qargs[i+1].s_class = o->ptr;
+			smokephp_object *o = phpqt_getSmokePHPObjectFromZval(((zval*) *args[i]));
+        		qargs[i+1].s_class = o->ptr;
             // as default QString is not supported in Smoke
             if(!strcmp(Z_OBJCE_P(((zval*) *args[i]))->name, "QString")){
             	qargs[i+1].s_class = new QString(((QString*) o->ptr)->toAscii().constData());
@@ -424,8 +440,34 @@ smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const 
 
     switch((type.flags & Smoke::tf_elem)){
         case Smoke::t_voidp:
-            RETVAL_NULL();
-            break;
+	    if(!type.name){
+        	RETVAL_NULL();
+	    } else {
+		if(!strcmp(type.name, "QString")) {
+		    // create new smokephp_object
+		    smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
+		    o->ptr = ret_val->s_voidp;
+		    o->zval_ptr = return_value;
+		    o->ce_ptr = qstring_ce;
+		    o->classId = 0;	// QString is not in smoke
+		    o->smoke = qt_Smoke;
+		    phpqt_setSmokePHPObject(o);
+		    // register all 
+		    zend_rsrc_list_entry le;
+		    le.ptr = o;
+		    object_init_ex(return_value, qstring_ce);
+		    phpqt_register(o->zval_ptr,le);
+		    phpqt_setZvalPtr(o, o->zval_ptr);
+
+		} else if(!strcmp(type.name, "QString*")) {
+		    php_error(E_WARNING,"No handler for returntype %s installed!", type.name);
+		} else if(!strcmp(type.name, "QString&")) {
+		    php_error(E_WARNING,"No handler for returntype %s installed!", type.name);
+		} else {
+		    php_error(E_WARNING,"No handler for returntype %s installed!", type.name);
+		}
+	    }
+    	    break;
         case Smoke::t_bool:
             RETVAL_BOOL(ret_val->s_bool);
             break;
@@ -463,19 +505,19 @@ smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const 
             php_error(E_WARNING,"type enum not implemented\n");
             break;
         case Smoke::t_class:
-
  			o = (smokephp_object*) emalloc(sizeof(smokephp_object));
 
 			// zval already exists
-//			if(zval_x_qt.find(o) != zval_x_qt.end()){
-			if(phpqt_zval2qtIsEnd(o)){
-				return_value = phpqt_fetchZendPtr((QObject*) o->ptr);
-			// create a new one
+
+			    if(phpqt_SmokePHPObjectExists(ret_val->s_voidp)) {
+				smokephp_object* o = phpqt_getSmokePHPObjectFromQt(ret_val->s_voidp);
+				ZVAL_ZVAL(return_value, o->zval_ptr,0,0);
+				zend_rsrc_list_entry le;
+				le.ptr = o;
+				phpqt_register(return_value, le);
 			} else {
-				
 				o->ptr = ret_val->s_class;
 				o->smoke = qt_Smoke;
-
 				if(!strcmp((char*) qt_Smoke->classes[qt_Smoke->types[ret].classId].className, "QObject")){
 					// cast from, to
 					o->ptr = o->smoke->cast(o->ptr, qt_Smoke->idClass("QObject"), qt_Smoke->types[ret].classId);
@@ -485,8 +527,8 @@ smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const 
 									ZEND_FETCH_CLASS_AUTO TSRMLS_DC));
 				//
 				} else if (!strcmp((char*) qt_Smoke->classes[qt_Smoke->types[ret].classId].className, "QBool")) {
-            		RETVAL_BOOL(*((QBool*) ret_val->s_class));
-            		return;
+            			    RETVAL_BOOL(*((QBool*) ret_val->s_class));
+            			    return;
 				// fallback, already with correct type
 				} else {
 					object_init_ex(return_value, 
@@ -499,7 +541,7 @@ smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const 
 				o->ce_ptr = Z_OBJCE_P(return_value);
 				o->classId = qt_Smoke->types[ret].classId;
 
-				if(!phpqt_SmokePHPObjectExists(o))
+				if(!phpqt_SmokePHPObjectExists(o->ptr))
 					phpqt_setSmokePHPObject(o);
 
 				zend_rsrc_list_entry le;
@@ -520,13 +562,15 @@ void
 smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method){
 
     int j;
-
     // second loop: we dont have the method-Id before the first call
     for(j = 0; j < argc; j++){
- 	    uint type = ((int) ((zval) **args[j]).type);    // als Macro!
-        if (type == IS_STRING) {
-        	qargs[j+1].s_voidp = args[j][0]->value.str.val;
-        }
+ 	uint type = ((int) ((zval) **args[j]).type);    // als Macro!
+	if (type == IS_OBJECT) {
+		if(Z_OBJCE_PP(args[j]) == qstring_ce) {
+		QString* o = (QString*) phpqt_getQtObjectFromZval(*args[j]);
+		qargs[j+1].s_voidp = (void*) o->toAscii().constData();
+	    }
+	}
     }
 
 }

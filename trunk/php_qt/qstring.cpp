@@ -28,12 +28,12 @@
 using namespace std;
 
 
-
 #include <QtCore/QString>
 #include <zend_interfaces.h>
 #include "php_qt.h"
 
 zend_class_entry* qstring_ce;
+extern Smoke* qt_Smoke;
 
 static zend_function_entry QString_methods[] = {
 	ZEND_ME(QString,__toString,NULL,ZEND_ACC_PUBLIC)
@@ -179,7 +179,7 @@ ZEND_METHOD(QString, compare){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -195,8 +195,8 @@ ZEND_METHOD(QString, compare){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
 
 
 			}
@@ -274,7 +274,7 @@ ZEND_METHOD(QString, insert){
 			}
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
 
 
 			}
@@ -291,7 +291,7 @@ ZEND_METHOD(QString, insert){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzz", &z_0, &z_1, &z_2) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_OBJECT && Z_TYPE_P(z_2) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
 
 
 			}
@@ -390,7 +390,7 @@ ZEND_METHOD(QString, prepend){
 			}
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -508,7 +508,7 @@ ZEND_METHOD(QString, count){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -527,7 +527,7 @@ ZEND_METHOD(QString, count){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -624,10 +624,26 @@ ZEND_METHOD(QString, toUpper){
  *    flags:    
  */
 ZEND_METHOD(QString, __construct){
+
+	smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
+//	o->ptr = ret_val->s_voidp;
+	o->zval_ptr = getThis();
+	o->ce_ptr = qstring_ce;
+	o->classId = 0;	// QString is not in smoke
+	o->smoke = qt_Smoke;
+	phpqt_setSmokePHPObject(o);
+	// register all 
+	zend_rsrc_list_entry le;
+	le.ptr = o;
+	object_init_ex(return_value, qstring_ce);
+	phpqt_register(o->zval_ptr,le);
+	phpqt_setZvalPtr(o, o->zval_ptr);
+
 	if (ZEND_NUM_ARGS() == 0){
-			QString *QString_ptr = new QString();
-				PHP_QT_REGISTER(QString_ptr);
-				RETURN_NULL();
+	    QString *QString_ptr = new QString();
+	    o->ptr = (void*) QString_ptr;
+//	    PHP_QT_REGISTER(QString_ptr);
+	    RETURN_NULL();
 	}
 
 	if (ZEND_NUM_ARGS() == 1){
@@ -646,18 +662,19 @@ ZEND_METHOD(QString, __construct){
 
 
 			QString *QString_ptr = new QString((char) Z_LVAL_P(z_0));
-				PHP_QT_REGISTER(QString_ptr);
+			o->ptr = (void*) QString_ptr;
+//				PHP_QT_REGISTER(QString_ptr);
 				RETURN_NULL();
 			}
 			if(Z_TYPE_P(z_0) == IS_STRING){
 
 			QString *QString_ptr = new QString( (const char*) Z_STRVAL_P(z_0));
-
-				PHP_QT_REGISTER(QString_ptr);
+				o->ptr = (void*) QString_ptr;
+//				PHP_QT_REGISTER(QString_ptr);
 				RETURN_NULL();
 			}
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -675,7 +692,7 @@ ZEND_METHOD(QString, __construct){
 		zval *z_1; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -683,10 +700,14 @@ ZEND_METHOD(QString, __construct){
 
 
 			QString *QString_ptr = new QString((int) Z_LVAL_P(z_0) ,(char) Z_LVAL_P(z_1));
-				PHP_QT_REGISTER(QString_ptr);
+			o->ptr = (void*) QString_ptr;
+//				PHP_QT_REGISTER(QString_ptr);
 				RETURN_NULL();
 			}
 		}
+	}
+	if (ZEND_NUM_ARGS() > 2) {
+	    php_error(E_ERROR, "Too many arguments in QString constructor\n");
 	}
 }
 
@@ -872,7 +893,7 @@ ZEND_METHOD(QString, endsWith){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -965,7 +986,7 @@ ZEND_METHOD(QString, localeAwareCompare){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -981,8 +1002,8 @@ ZEND_METHOD(QString, localeAwareCompare){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
 
 
 			}
@@ -1024,7 +1045,7 @@ ZEND_METHOD(QString, section){
 			}
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG && Z_TYPE_P(z_3) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1161,6 +1182,8 @@ ZEND_METHOD(QString, truncate){
 ZEND_METHOD(QString, toAscii){
 	if (ZEND_NUM_ARGS() == 0){
 			QString *obj = (QString*) PHP_QT_FETCH();
+//			smokephp_object* o = PHP_QT_FETCH();
+//			QString *obj = (QString*) o->ptr;
 			RETURN_STRING((char*) obj->toAscii().constData(), 1);
 	}
 }
@@ -1234,7 +1257,7 @@ ZEND_METHOD(QString, push_front){
 			}
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1298,7 +1321,7 @@ ZEND_METHOD(QString, indexOf){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1318,7 +1341,7 @@ ZEND_METHOD(QString, indexOf){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzz", &z_0, &z_1, &z_2) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1349,7 +1372,7 @@ ZEND_METHOD(QString, fromRawData){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1449,7 +1472,7 @@ ZEND_METHOD(QString, startsWith){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1473,7 +1496,7 @@ ZEND_METHOD(QString, remove){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1492,7 +1515,7 @@ ZEND_METHOD(QString, remove){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1542,8 +1565,8 @@ ZEND_METHOD(QString, arg){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
 
 
 			}
@@ -1566,22 +1589,22 @@ ZEND_METHOD(QString, arg){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzz", &z_0, &z_1, &z_2) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_OBJECT && Z_TYPE_P(z_2) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
-			QObject* obj_z_2 = (QObject*) phpqt_fetch(z_2);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
+			QObject* obj_z_2 = (QObject*) phpqt_getQtObjectFromZval(z_2);
 
 
 			}
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
-			QObject* obj_z_2 = (QObject*) phpqt_fetch(z_2);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
+			QObject* obj_z_2 = (QObject*) phpqt_getQtObjectFromZval(z_2);
 
 
 			}
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_2 = (QObject*) phpqt_fetch(z_2);
+			QObject* obj_z_2 = (QObject*) phpqt_getQtObjectFromZval(z_2);
 
 
 			}
@@ -1605,22 +1628,22 @@ ZEND_METHOD(QString, arg){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzzz", &z_0, &z_1, &z_2, &z_3) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG && Z_TYPE_P(z_3) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_3 = (QObject*) phpqt_fetch(z_3);
+			QObject* obj_z_3 = (QObject*) phpqt_getQtObjectFromZval(z_3);
 
 
 			}
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG && Z_TYPE_P(z_3) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_3 = (QObject*) phpqt_fetch(z_3);
+			QObject* obj_z_3 = (QObject*) phpqt_getQtObjectFromZval(z_3);
 
 
 			}
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_OBJECT && Z_TYPE_P(z_2) == IS_OBJECT && Z_TYPE_P(z_3) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
-			QObject* obj_z_2 = (QObject*) phpqt_fetch(z_2);
-			QObject* obj_z_3 = (QObject*) phpqt_fetch(z_3);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
+			QObject* obj_z_2 = (QObject*) phpqt_getQtObjectFromZval(z_2);
+			QObject* obj_z_3 = (QObject*) phpqt_getQtObjectFromZval(z_3);
 
 
 			}
@@ -1639,7 +1662,7 @@ ZEND_METHOD(QString, arg){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzzzz", &z_0, &z_1, &z_2, &z_3, &z_4) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG && Z_TYPE_P(z_3) == IS_LONG && Z_TYPE_P(z_4) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_4 = (QObject*) phpqt_fetch(z_4);
+			QObject* obj_z_4 = (QObject*) phpqt_getQtObjectFromZval(z_4);
 
 
 			}
@@ -1664,7 +1687,7 @@ ZEND_METHOD(QString, vsprintf){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_STRING && Z_TYPE_P(z_1) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
 
 
 			}
@@ -1801,7 +1824,7 @@ ZEND_METHOD(QString, split){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1818,7 +1841,7 @@ ZEND_METHOD(QString, split){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzz", &z_0, &z_1, &z_2) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1843,7 +1866,7 @@ ZEND_METHOD(QString, setUnicode){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1943,7 +1966,7 @@ ZEND_METHOD(QString, contains){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -1962,7 +1985,7 @@ ZEND_METHOD(QString, contains){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -2019,8 +2042,8 @@ ZEND_METHOD(QString, replace){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
 
 
 			}
@@ -2046,14 +2069,14 @@ ZEND_METHOD(QString, replace){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzz", &z_0, &z_1, &z_2) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_OBJECT && Z_TYPE_P(z_2) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
 
 
 			}
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_OBJECT && Z_TYPE_P(z_2) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_1 = (QObject*) phpqt_fetch(z_1);
+			QObject* obj_z_1 = (QObject*) phpqt_getQtObjectFromZval(z_1);
 
 
 			}
@@ -2071,7 +2094,7 @@ ZEND_METHOD(QString, replace){
 			}
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_2 = (QObject*) phpqt_fetch(z_2);
+			QObject* obj_z_2 = (QObject*) phpqt_getQtObjectFromZval(z_2);
 
 
 			}
@@ -2089,7 +2112,7 @@ ZEND_METHOD(QString, replace){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzzz", &z_0, &z_1, &z_2, &z_3) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_OBJECT && Z_TYPE_P(z_3) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_2 = (QObject*) phpqt_fetch(z_2);
+			QObject* obj_z_2 = (QObject*) phpqt_getQtObjectFromZval(z_2);
 
 
 			}
@@ -2218,10 +2241,10 @@ ZEND_METHOD(QString, append){
 				return;                                             
 			}
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
-			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
-
-
+			    QString *obj = (QString*) PHP_QT_FETCH();
+			    QString* obj_z_0 = (QString*) phpqt_getQtObjectFromZval(z_0);
+			    obj->append((QString) *obj_z_0);
+			    RETURN_NULL();
 			}
 		}
 	}
@@ -2381,7 +2404,7 @@ ZEND_METHOD(QString, lastIndexOf){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -2401,7 +2424,7 @@ ZEND_METHOD(QString, lastIndexOf){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzz", &z_0, &z_1, &z_2) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}
@@ -2498,7 +2521,7 @@ ZEND_METHOD(QString, push_back){
 			}
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 			QString *obj = (QString*) PHP_QT_FETCH();
-			QObject* obj_z_0 = (QObject*) phpqt_fetch(z_0);
+			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
 
 
 			}

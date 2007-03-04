@@ -18,24 +18,24 @@
     echo "\n";
 
 /* this does not work */
-	echo $QString_2." ".$QString_1." ".$QString_3;
+	echo $QString_2."-".$QString_1."-".$QString_3;
     echo "\n";
 
 /* this does not work */
-	$tmp = $QString_2." ".$QString_1." ".$QString_3;
+	$tmp = $QString_2."+".$QString_1."+".$QString_3;
 	print($tmp);
 
     echo "\n";
 
 /* this does not work */
 	$tmp2 = $QString_2;
-	$tmp2 = $QString_1;
-	$tmp2 = $QString_3;
-	echo $tmp;
+	$tmp2 .= $QString_1;
+	$tmp2 .= $QString_3;
+	echo $tmp2;
     echo "\n";
 
 /* this does not work */
-	echo "$QString_2 $QString_1 $QString_3";
+	echo "$QString_2#$QString_1#$QString_3";
     echo "\n";
 
 /* this work: */

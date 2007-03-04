@@ -157,7 +157,7 @@ PHP_FUNCTION(check_qobject)
         return;
     }
 
-	smokephp_object* o = phpqt_fetch(zobject);
+	smokephp_object* o = phpqt_getSmokePHPObjectFromZval(zobject);
 
 	cout << "PHP-Qt object \n(" << endl;
 
