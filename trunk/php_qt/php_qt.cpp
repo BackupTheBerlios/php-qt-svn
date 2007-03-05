@@ -31,6 +31,8 @@
 
 #include "ext/standard/php_string.h"
 
+#define MOC_DEBUG 0
+
 extern Smoke *qt_Smoke;
 extern void init_qt_Smoke();
 
@@ -257,8 +259,22 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 	o->ptr = qargs[0].s_class;
 	o->zval_ptr = getThis();
 	o->ce_ptr = ce;
+	o->parent_ce_ptr = ce;
 	o->classId = qt_Smoke->idClass(ce->name);
 	o->smoke = qt_Smoke;
+
+	// store relations
+
+	PHP_QT_REGISTER(o);
+	phpqt_setSmokePHPObject(o);
+	phpqt_setZvalPtr(o, return_value);
+
+    // return value
+    smokephp_convertReturn(&qargs[0], qt_Smoke->types[qt_Smoke->methods[method].ret], qt_Smoke->methods[method].ret, return_value);
+
+	// make sure it is the right object
+	o->zval_ptr = return_value;
+	o->ce_ptr = Z_OBJCE_P(return_value);	// overwrite
 
 	// if QObject
 	if(smokephp_isQObject(qt_Smoke, qt_Smoke->idClass(ce->name))){
@@ -274,11 +290,11 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 
  		QString* phpqt_meta_stringdata = new QString("");
     		uint* phpqt_meta_data = (uint*) emalloc(sizeof(uint)*20*5+10);
-		
+
 		//	create the metaObject
 		if(phpqt_getMocData(
 				getThis(),
-				Z_OBJCE_P(getThis())->name,
+				o->parent_ce_ptr->name,
 				superdata,
 				o->meta,
 				phpqt_meta_stringdata,
@@ -298,15 +314,6 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 
 	} 
 
-	// store relations
-
-	PHP_QT_REGISTER(o);
-
-    // return value
-    smokephp_convertReturn(&qargs[0], qt_Smoke->types[qt_Smoke->methods[method].ret], qt_Smoke->methods[method].ret, return_value);
-
-	phpqt_setSmokePHPObject(o);
-	phpqt_setZvalPtr(o, getThis());
 
     // cleanup
     efree(args);
@@ -350,8 +357,32 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
     smokephp_convertArgsZendToCxx(args, argc, qargs, methodNameStack);
     Smoke::Index method = smokephp_getMethod(qt_Smoke,ce->name, (methodNameStack.top())->toAscii(), &qargs, argc, args);
 
+    if(method <= 0) {
+	if(methodNameStack.top()->toAscii().constData()) 
+	    php_error(E_ERROR,"Call to undefined method %s %s!", ce->name, methodNameStack.top()->toAscii().constData());
+	else 
+	    php_error(E_ERROR,"Call to undefined method!");
+    }
+
     if(smokephp_isConnect(method)){
 	smokephp_prepareConnect(args, argc, qargs, method);
+//	smokephp_callMethod(qt_Smoke, qargs[0].s_class, method, qargs);
+
+	QString* o1 = (QString*) phpqt_getQtObjectFromZval(*args[1]);
+	QString* o2 = (QString*) phpqt_getQtObjectFromZval(*args[3]);
+	smokephp_object *oo1 = phpqt_getSmokePHPObjectFromZval(((zval*) *args[0]));
+	smokephp_object *oo2 = phpqt_getSmokePHPObjectFromZval(((zval*) *args[2]));
+
+#if MOC_DEBUG
+	cout << "QObject::connect(" << ((QObject*) oo1->ptr)->metaObject()->className();;
+	cout << ", " << o1->toAscii().constData();
+	cout << ", " << ((QObject*) oo2->ptr)->metaObject()->className();;
+	cout << ", " << o2->toAscii().constData();
+	cout << ")" << endl;
+#endif
+
+	QObject::connect((QObject*) oo1->ptr, o1->toAscii().constData(), (QObject*)oo2->ptr, o2->toAscii().constData());
+	return;
     }
 
     // self
@@ -360,12 +391,6 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
         qargs[0].s_class = o->ptr;
     }
 
-    if(method <= 0) {
-	if(methodNameStack.top()->toAscii().constData()) 
-	    php_error(E_ERROR,"Call to undefined method %s %s!", Z_OBJCE_P(getThis())->name, methodNameStack.top()->toAscii().constData());
-	else 
-	    php_error(E_ERROR,"Call to undefined method!");
-    }
 
     // call
     smokephp_callMethod(qt_Smoke, qargs[0].s_class, method, qargs);
@@ -472,7 +497,7 @@ PHP_MINIT_FUNCTION(php_qt)
         t->fname = NULL;
         t->handler = NULL;
         t->arg_info = NULL;
-        t->flags = NULL;
+        t->flags = (zend_uint) NULL;
         t++;
 
 	// register zend class
@@ -553,6 +578,10 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
 //	int offset = d->methodOffset();
 	int offset = d->methodCount();
 
+#if MOC_DEBUG
+	cout << "qt_metacall " << so->ce_ptr->name << endl;
+#endif
+
 	// call the C++ one
 	if(_id < offset){
 		// find parent
@@ -571,6 +600,10 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
 			i[3].s_voidp = (void*) args[3].s_voidp;
 			(*fn)(m.method, so->ptr, i);
 
+#if MOC_DEBUG
+			cout << "\tcall Qt method " << so->ce_ptr->name << "::" << qt_Smoke->methodNames[method] << endl;
+#endif
+
 			if((int)i[0].s_int < 0)
 				return i[0].s_int;	
 
@@ -588,6 +621,7 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
 	// try the PHP one
 	// eg _q_buttonPressed(), breaking at the first bracket
 	char* method_name = estrdup((d->method(_id)).signature());
+
 
     for(int i = 0; i < strlen(method_name); i++){
 #define LEFT_PARENTHESIS 40
@@ -630,6 +664,10 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
             args[j++] = &arg;
 
         }
+
+#if MOC_DEBUG
+    cout << "\tcall PHP method " << so->ce_ptr->name << "::" << method_name << endl;
+#endif
 
         phpqt_callMethod(so->zval_ptr, method_name, j, args);
 
@@ -739,6 +777,7 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
 
     if((zslot)->type==IS_ARRAY && (zsignal)->type==IS_ARRAY ) {
 
+
         HashTable* slots_hash = HASH_OF(zslot);
         HashTable* signals_hash = HASH_OF(zsignal);
 
@@ -747,6 +786,12 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
 
         int signaturecount;
         signaturecount = 2 + strlen(classname);
+
+#if MOC_DEBUG
+	QString *qr = new QString();
+	cout << "+== begin metaobject dump ==+\n";
+	cout << "\t" << classname << "\n\t1 0 0 0 " << zend_hash_num_elements(slots_hash)+zend_hash_num_elements(signals_hash) << " 10 0 0 0 0" << endl << endl;
+#endif
 
 		/// write class signature
 		signature[0] = 1;
@@ -775,6 +820,12 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
 			/// read slot from hashtable
 			zend_hash_get_current_key(signals_hash,&assocKey,&numKey,0);
 			zend_hash_get_current_data(signals_hash,(void**)&slotdata);
+
+#if MOC_DEBUG
+			qr->append(Z_STRVAL_PP(slotdata));
+			qr->append(" ");
+			cout << "\t" << signaturecount << "8 8 8 0x05 ::s" << endl;
+#endif
 			
 			meta_stringdata->append(Z_STRVAL_PP(slotdata));
 			meta_stringdata->append(QChar::Null);
@@ -799,10 +850,16 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
 			/// read slot from hashtable
 			zend_hash_get_current_key(slots_hash,&assocKey,&numKey,0);
 			zend_hash_get_current_data(slots_hash,(void**)&slotdata);
+
+#if MOC_DEBUG
+			qr->append(Z_STRVAL_PP(slotdata));
+			qr->append(" ");
+			cout << "\t" << signaturecount << "8 8 8 0x0a ::s" << endl;
+#endif
 	
 			meta_stringdata->append(Z_STRVAL_PP(slotdata));
 			meta_stringdata->append(QChar::Null);
-	
+
 			zend_hash_move_forward(slots_hash);
 	
 			/// write slot signature
@@ -815,6 +872,10 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
 			signaturecount += strlen(Z_STRVAL_PP(slotdata)) + 1;
 	
 		}
+#if MOC_DEBUG
+		cout << qr->toAscii().constData() << endl;
+		cout << "+== end metaobject dump ==+" << endl;
+#endif
 		return true;
 	} else {
 		return false;
@@ -855,7 +916,6 @@ phpqt_ZvalPtrExists(smokephp_object *o){
 
 char*
 phpqt_checkForOperator(const char* fname){
-#warning skip operator support
 	return (char*) fname;
 }
 

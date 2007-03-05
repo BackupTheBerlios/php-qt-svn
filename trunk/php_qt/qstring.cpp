@@ -909,6 +909,25 @@ ZEND_METHOD(QString, endsWith){
  */
 ZEND_METHOD(QString, number){
 
+	if (ZEND_NUM_ARGS() == 1){
+		/* ol public*/
+		/* int , */
+		zval *z_0; // define ZVAL
+		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
+			if(Z_TYPE_P(z_0) == IS_LONG){
+				QString *obj = (QString*) PHP_QT_FETCH();
+				QString return_object = (QString) obj->number((ulong) Z_LVAL_P(z_0));
+				zend_class_entry *ce;
+				object_init_ex(return_value, qstring_ce);     
+				zend_rsrc_list_entry le;                            
+				le.ptr = (void*) &return_object;                                       
+				phpqt_register(return_value,le);                   
+				return;                                             
+			}
+		}
+	}
+
+
 	if (ZEND_NUM_ARGS() == 2){
 		/* ol public*/
 
@@ -2586,12 +2605,16 @@ ZEND_METHOD(QString, toInt){
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
-
-
 			RETURN_LONG(obj->toInt((bool*) Z_LVAL_P(z_0) ,(int) Z_LVAL_P(z_1)));
 			}
 		}
 	}
+
+	if (ZEND_NUM_ARGS() == 0){
+	    QString *obj = (QString*) PHP_QT_FETCH();
+	    RETURN_LONG(obj->toInt());
+	}
+
 }
 
 /*********************************

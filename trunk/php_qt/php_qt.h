@@ -102,6 +102,7 @@ struct smokephp_object {
     int classId;
     void *ptr;
     zend_class_entry *ce_ptr;
+    zend_class_entry *parent_ce_ptr;
     zval *zval_ptr;
     QMetaObject* meta;
 };
@@ -133,15 +134,16 @@ extern HashTable php_qt_objptr_hash;
 
 void 				smokephp_convertArgsCxxToZend(zval*** args, int argc, Smoke::StackItem* qargs);
 bool 				smokephp_isQObject(Smoke *smoke, Smoke::Index classId);
-Smoke::Index 		smokephp_getClassId(const char* classname);
+Smoke::Index 			smokephp_getClassId(const char* classname);
 void				smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, QStack<QString*> &methodNameStack);
-Smoke::Index		smokephp_getMethod(Smoke *smoke, const char* c, const char* m, Smoke::StackItem** qargs, int argc, zval*** args);
+Smoke::Index			smokephp_getMethod(Smoke *smoke, const char* c, const char* m, Smoke::StackItem** qargs, int argc, zval*** args);
 void				smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method);
 void				smokephp_callMethod(Smoke *smoke, void *obj, Smoke::Index method, Smoke::Stack qargs);
 void				smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const Smoke::Index ret, zval* return_value);
 void				smokephp_init();
 Smoke::Index			smokephp_findConnect();
 bool				smokephp_isConnect(Smoke::Index method);
+
 
 
 class SmokeType {

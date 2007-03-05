@@ -134,7 +134,7 @@ PHP_FUNCTION(tr)
 	smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
 	o->ptr = new QString(QObject::tr(string));
 	o->smoke = qt_Smoke;
-	o->classId = qstring;
+	o->classId = 0;		// QString is not in smoke
 	o->ce_ptr = qstring_ce;
 	o->zval_ptr = return_value;
 
@@ -142,6 +142,8 @@ PHP_FUNCTION(tr)
 	zend_rsrc_list_entry le;
 	le.ptr = o;
 	phpqt_register(return_value, le);
+	phpqt_setSmokePHPObject(o);
+	phpqt_setZvalPtr(o, o->zval_ptr);
     return;
 }
 

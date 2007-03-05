@@ -1,5 +1,10 @@
 2007-003-4  Thomas Moenicke <thomas.moenicke@kdemail.net>
 
+		* Debugging for metaobject system added
+		* parent_ce_ptr
+
+2007-003-4  Thomas Moenicke <thomas.moenicke@kdemail.net>
+
 		* handling of QString - string in return and argument types
 		* more tests added
 

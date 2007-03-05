@@ -410,7 +410,6 @@ smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, Q
 			    phpqt_register(o->zval_ptr,le);
 			    phpqt_setZvalPtr(o, o->zval_ptr);
         		}
-
         		methodNameStack.top()->append("$");
 
 	    } else if (type == IS_OBJECT){
