@@ -134,7 +134,8 @@ ZEND_METHOD(QString,__toString){
 
   int l = QString_ptr->size();
 
-  char* c = (char*) (QString_ptr->toUtf8()).constData();
+//  char* c = (char*) (QString_ptr->toUtf8()).constData();
+  char* c = (char*) (QString_ptr->toAscii()).constData();
 
   RETURN_STRING(c,l);
 }
@@ -305,10 +306,11 @@ ZEND_METHOD(QString, insert){
  */
 ZEND_METHOD(QString, clear){
 	if (ZEND_NUM_ARGS() == 0){
-			QString *obj = (QString*) PHP_QT_FETCH();
-			obj->clear();
-			RETURN_NULL();
+	    QString *obj = (QString*) PHP_QT_FETCH();
+	    obj->clear();
+	    RETURN_NULL();
 	}
+	php_error(E_ERROR, "wrong argument in QString clear()");
 }
 
 /*********************************
@@ -870,12 +872,18 @@ ZEND_METHOD(QString, endsWith){
 /*
  *    function  number
  *    flags:    s
+ *
+ *	QString number ( long n, int base = 10 ) 
+ *	QString number ( ulong n, int base = 10 ) 
+ *	QString number ( int n, int base = 10 ) 
+ *	QString number ( uint n, int base = 10 ) 
+ *	QString number ( qlonglong n, int base = 10 ) 
+ *	QString number ( qulonglong n, int base = 10 ) 
+ *	QString number ( double n, char format = 'g', int precision = 6 )
  */
 ZEND_METHOD(QString, number){
 
 	if (ZEND_NUM_ARGS() == 1){
-		/* ol public*/
-		/* int , */
 		zval *z_0; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG){
@@ -884,18 +892,18 @@ ZEND_METHOD(QString, number){
 				object_init_ex(return_value, qstring_ce);
 				phpqt_createObject(return_value, (void*) s1, qstring_ce);
 				return;
+			} else if(Z_TYPE_P(z_0) == IS_DOUBLE){
+				QString obj = (QString) QString::number((double) Z_DVAL_P(z_0));
+				QString *s1 = new QString(obj);
+				object_init_ex(return_value, qstring_ce);
+				phpqt_createObject(return_value, (void*) s1, qstring_ce);
+				return;
 			}
+			
 		}
 	}
 
-
 	if (ZEND_NUM_ARGS() == 2){
-		/* ol public*/
-
-		/* unsigned long , int base,  */
-		/* ll public*/
-
-		/* int , int base,  */
 		zval *z_0; // define ZVAL
 		zval *z_1; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
@@ -927,9 +935,6 @@ ZEND_METHOD(QString, number){
 	}
 
 	if (ZEND_NUM_ARGS() == 3){
-		/* lll public*/
-
-		/* double , char f, int prec,  */
 		zval *z_0; // define ZVAL
 		zval *z_1; // define ZVAL
 		zval *z_2; // define ZVAL
@@ -948,6 +953,7 @@ ZEND_METHOD(QString, number){
 			}
 		}
 	}
+	php_error(E_ERROR, "wrong argument in QString::number()");
 }
 
 /*********************************
@@ -1523,9 +1529,10 @@ ZEND_METHOD(QString, remove){
  */
 ZEND_METHOD(QString, isEmpty){
 	if (ZEND_NUM_ARGS() == 0){
-			QString *obj = (QString*) PHP_QT_FETCH();
-			RETURN_BOOL(obj->isEmpty());
+	    QString *obj = (QString*) PHP_QT_FETCH();
+	    RETURN_BOOL(obj->isEmpty());
 	}
+	php_error(E_ERROR, "wrong argument in QString isEmpty()");
 }
 
 /*********************************
@@ -2187,17 +2194,9 @@ ZEND_METHOD(QString, detach){
 ZEND_METHOD(QString, append){
 
 	if (ZEND_NUM_ARGS() == 1){
-		/* l public*/
-
-		/* char c,  */
-		/* s public*/
-
-		/* const char* s,  */
-		/* o public*/
-
-		/* const QString& s,  */
 		zval *z_0; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
+			/* QString & append ( QChar ch ) */
 			if(Z_TYPE_P(z_0) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->append((char) Z_LVAL_P(z_0));
@@ -2208,10 +2207,9 @@ ZEND_METHOD(QString, append){
 				phpqt_register(return_value,le);                   
 				return;                                             
 			}
+			/* QString & append ( const char * str ) */
 			if(Z_TYPE_P(z_0) == IS_STRING){
-			QString *obj = (QString*) PHP_QT_FETCH();
-
-
+				QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->append( (const char*) Z_STRVAL_P(z_0));
 				zend_class_entry *ce;                                   
 				object_init_ex(return_value, qstring_ce);     
@@ -2220,11 +2218,17 @@ ZEND_METHOD(QString, append){
 				phpqt_register(return_value,le);                   
 				return;                                             
 			}
+
+			/*  QString & append ( const QLatin1String & str )
+			    QString & append ( const QByteArray & ba )
+			    QString & append ( const QString & str ) */
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
-			    QString *obj = (QString*) PHP_QT_FETCH();
+			    smokephp_object* o = phpqt_getSmokePHPObjectFromZval(getThis());
 			    QString* obj_z_0 = (QString*) phpqt_getQtObjectFromZval(z_0);
-			    obj->append((QString) *obj_z_0);
-			    RETURN_NULL();
+			    QString s = ((QString*) o->ptr)->append((QString) *obj_z_0);
+			    object_init_ex(return_value, qstring_ce);     
+			    phpqt_createObject(return_value, &s, qstring_ce);
+			    return;
 			}
 		}
 	}
@@ -2269,20 +2273,22 @@ ZEND_METHOD(QString, mid){
  */
 ZEND_METHOD(QString, toDouble){
 
+	/* double toDouble ( bool * ok = 0 ) const */
 	if (ZEND_NUM_ARGS() == 1){
-		/* l public*/
-
-		/* int* ok,  */
 		zval *z_0; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG){
-			QString *obj = (QString*) PHP_QT_FETCH();
-
-
-			RETURN_DOUBLE(obj->toDouble((bool*) Z_LVAL_P(z_0)));
+			    QString *obj = (QString*) PHP_QT_FETCH();
+			    RETURN_DOUBLE(obj->toDouble((bool*) Z_LVAL_P(z_0)));
 			}
 		}
 	}
+	if(ZEND_NUM_ARGS() == 0) {
+	    QString *obj = (QString*) PHP_QT_FETCH();
+	    RETURN_DOUBLE(obj->toDouble());
+	}
+	php_error(E_ERROR, "wrong argument in QString toDouble()");
+
 }
 
 /*********************************
