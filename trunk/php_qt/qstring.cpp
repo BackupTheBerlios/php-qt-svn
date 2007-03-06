@@ -128,7 +128,6 @@ void _register_QString(TSRMLS_D)
 
 }
 
-
 ZEND_METHOD(QString,__toString){
 
   QString *QString_ptr = (QString *) PHP_QT_FETCH();
@@ -139,7 +138,6 @@ ZEND_METHOD(QString,__toString){
 
   RETURN_STRING(c,l);
 }
-
 
 /*		public enumSectionFlag:long {
 			SectionDefault = 0x00,
@@ -625,84 +623,50 @@ ZEND_METHOD(QString, toUpper){
  */
 ZEND_METHOD(QString, __construct){
 
-	smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
-//	o->ptr = ret_val->s_voidp;
-	o->zval_ptr = getThis();
-	o->ce_ptr = qstring_ce;
-	o->classId = 0;	// QString is not in smoke
-	o->smoke = qt_Smoke;
-	phpqt_setSmokePHPObject(o);
-	// register all 
-	zend_rsrc_list_entry le;
-	le.ptr = o;
-	object_init_ex(return_value, qstring_ce);
-	phpqt_register(o->zval_ptr,le);
-	phpqt_setZvalPtr(o, o->zval_ptr);
-
 	if (ZEND_NUM_ARGS() == 0){
 	    QString *QString_ptr = new QString();
-	    o->ptr = (void*) QString_ptr;
-//	    PHP_QT_REGISTER(QString_ptr);
+	    phpqt_createObject(getThis(), (void*) QString_ptr, qstring_ce);
 	    RETURN_NULL();
 	}
 
 	if (ZEND_NUM_ARGS() == 1){
-		/* l public*/
-
-		/* char c,  */
-		/* s public*/
-
-		/* const char* ch,  */
-		/* o public*/
-
-		/* const QLatin1String& latin1,  */
 		zval *z_0; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG){
-
-
-			QString *QString_ptr = new QString((char) Z_LVAL_P(z_0));
-			o->ptr = (void*) QString_ptr;
-//				PHP_QT_REGISTER(QString_ptr);
+				QString *QString_ptr = new QString((char) Z_LVAL_P(z_0));
+				phpqt_createObject(getThis(), (void*) QString_ptr, qstring_ce);
 				RETURN_NULL();
 			}
 			if(Z_TYPE_P(z_0) == IS_STRING){
-
-			QString *QString_ptr = new QString( (const char*) Z_STRVAL_P(z_0));
-				o->ptr = (void*) QString_ptr;
-//				PHP_QT_REGISTER(QString_ptr);
+				QString *QString_ptr = new QString( (const char*) Z_STRVAL_P(z_0));
+				phpqt_createObject(getThis(), (void*) QString_ptr, qstring_ce);
 				RETURN_NULL();
 			}
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
-			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
-
-
+				smokephp_object *o = phpqt_getSmokePHPObjectFromZval(z_0);
+				if(o->ce_ptr == qstring_ce){
+				    QString *QString_ptr = new QString(*((QString*) o->ptr));
+				}
+				phpqt_createObject(getThis(), (void*) o->ptr, o->ce_ptr);
+				RETURN_NULL();
 			}
 		}
 	}
 
 	if (ZEND_NUM_ARGS() == 2){
-		/* ol public*/
-
-		/* const QChar* unicode, int size,  */
-		/* ll public*/
-
-		/* int size, char c,  */
 		zval *z_0; // define ZVAL
 		zval *z_1; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
-			QObject* obj_z_0 = (QObject*) phpqt_getQtObjectFromZval(z_0);
-
-
+			    smokephp_object* o = phpqt_getSmokePHPObjectFromZval(z_0);
+// TODO type checking
+    			    phpqt_createObject(getThis(), o->ptr, o->ce_ptr);
+			    RETURN_NULL();
 			}
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG){
-
-
-			QString *QString_ptr = new QString((int) Z_LVAL_P(z_0) ,(char) Z_LVAL_P(z_1));
-			o->ptr = (void*) QString_ptr;
-//				PHP_QT_REGISTER(QString_ptr);
-				RETURN_NULL();
+			    QString *QString_ptr = new QString((int) Z_LVAL_P(z_0) ,(char) Z_LVAL_P(z_1));
+			    phpqt_createObject(getThis(), QString_ptr, qstring_ce);
+			    RETURN_NULL();
 			}
 		}
 	}
@@ -915,14 +879,11 @@ ZEND_METHOD(QString, number){
 		zval *z_0; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z", &z_0) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_LONG){
-				QString *obj = (QString*) PHP_QT_FETCH();
-				QString return_object = (QString) obj->number((ulong) Z_LVAL_P(z_0));
-				zend_class_entry *ce;
-				object_init_ex(return_value, qstring_ce);     
-				zend_rsrc_list_entry le;                            
-				le.ptr = (void*) &return_object;                                       
-				phpqt_register(return_value,le);                   
-				return;                                             
+				QString obj = (QString) QString::number((ulong) Z_LVAL_P(z_0));
+				QString *s1 = new QString(obj);
+				object_init_ex(return_value, qstring_ce);
+				phpqt_createObject(return_value, (void*) s1, qstring_ce);
+				return;
 			}
 		}
 	}

@@ -128,6 +128,7 @@ smokephp_object* 		phpqt_getSmokePHPObjectFromZval(zval* this_ptr);
 smokephp_object*		phpqt_getSmokePHPObjectFromQt(void* QtPtr);
 void				phpqt_setSmokePHPObject(smokephp_object* o);
 bool				phpqt_SmokePHPObjectExists(void* ptr);
+void				phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce = NULL);
 
 extern int le_php_qt_hashtype;
 extern HashTable php_qt_objptr_hash;

@@ -968,3 +968,25 @@ phpqt_SmokePHPObjectExists(void* ptr){
 	return (SmokeQtObjects.find(ptr) != SmokeQtObjects.end());
 }
 
+void
+phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce){
+
+	if(!ce) {
+	    ce = Z_OBJCE_P(zval_ptr);
+	}
+
+	smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
+	o->ptr = ptr;
+	o->zval_ptr = zval_ptr;
+	o->ce_ptr = ce;
+	o->classId = 0;	// QString is not in smoke
+	o->smoke = qt_Smoke;
+	phpqt_setSmokePHPObject(o);
+	// register all 
+	zend_rsrc_list_entry le;
+	le.ptr = o;
+	object_init_ex(zval_ptr, qstring_ce);
+	phpqt_register(o->zval_ptr,le);
+	phpqt_setZvalPtr(o, o->zval_ptr);
+
+}
