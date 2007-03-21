@@ -3,10 +3,15 @@ php_qt
 Thomas Moenicke <thomas.moenicke at kdemail.net>
     main developer, maintainer
 
-Katrina Niolet  <kniolet at ildiinc.com> 
-    contributor
+contributors
+    Katrina Niolet
+    Jean-Luc Gyger
+    Ferenc Veres
 
-Jean-Luc Gyger <jean_luc.gyger at freesurf.ch>
-    developer
+parts of PHP-Qt are derived from the QtRuby sources, written by:
+	Richard Dale
 
-Thanks to Ferenc Veres for testing and suggestions.
+	which is a ruby version of the PerlQt/Smoke project, written by:
+	    Ashley Winters
+	    Germain Garand
+	    David Faure

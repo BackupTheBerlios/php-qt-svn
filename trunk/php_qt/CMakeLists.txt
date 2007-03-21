@@ -18,6 +18,8 @@ set(phpqt_LIB_SRCS
     php_qt.cpp
     smokephp.cpp
     qstring.cpp
+    marshall_types.cpp
+    handlers.cpp
     )
 
 add_library(php_qt SHARED ${phpqt_LIB_SRCS})

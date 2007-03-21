@@ -66,6 +66,10 @@ public:
 			phpqt_metacall(o, args, (QMetaObject::Call) args[1].s_enum, args[2].s_int, (void**) args[3].s_voidp);
 			return true;
 		}
+
+//		VirtualMethodCall c(smoke, method, args, obj, ...);
+//		c.next();
+
 		return false;
 
     }
@@ -112,7 +116,7 @@ smokephp_init() {
  *  @return Smoke::Index        unambiguous method ID
  */
 Smoke::Index 
-smokephp_getMethod(Smoke *smoke, const char* c, const char* m, Smoke::StackItem** qargs, int argc, zval*** args) {
+smokephp_getMethod(Smoke *smoke, const char* c, const char* m, int argc, zval*** args) {
 
     Smoke::Index method = smoke->findMethod(c, m);	// qt_Smoke->methods
     Smoke::Index i = smoke->methodMaps[method].method;
@@ -159,8 +163,16 @@ smokephp_getMethod(Smoke *smoke, const char* c, const char* m, Smoke::StackItem*
 							php_error(E_WARNING,"type enum not yet implemented\n");
 							break;
 						case Smoke::t_class:
-							if(type == IS_OBJECT)
+							if(type == IS_OBJECT){
+							    QByteArray* name = 
+							    new QByteArray(
+								qt_Smoke->types[
+								    qt_Smoke->argumentList[
+									qt_Smoke->methods[
+									    qt_Smoke->ambiguousMethodList[i]].args+k]].name);
+							    if(name->contains(Z_OBJCE((zval) **args[k])->name))
 								right = true;
+							}
 							break;
 						default:
 							php_error(E_ERROR, "unknown argument type");
@@ -292,7 +304,7 @@ int treatArray(zval **val, int num_args, va_list args, zend_hash_key *hash_key){
 
 }
 
-static 
+
 void* transformArray(zval* args){
 
 	// array informations
@@ -306,7 +318,7 @@ void* transformArray(zval* args){
 	uint type = (int) (**first_elem).type;
 	if(type < 0 || type > 9){
 		// should never happen
-		php_error(E_ERROR, "could not guess type of array");
+		php_error(E_ERROR, "Could not get type of array");
 	}
 	
 	void* e_arrayv;
@@ -333,228 +345,38 @@ void* transformArray(zval* args){
 
 	zend_hash_apply_with_arguments(((zval) *args).value.ht, (apply_func_args_t) treatArray, 3, type, e_arrayc, e_arrayv);
 
+	return e_arrayv;
+
 }
 
-void 
-smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, QStack<QString*> &methodNameStack) {
+void smokephp_prepareMethodName(zval*** args, int argc, QStack<QString*> &methodNameStack){
 
     for(int i=0;i<argc;i++){
-
 	    uint type = ((int) ((zval) **args[i]).type);
 
-		if (type == IS_RESOURCE){ // TODO
-
+	    if (type == IS_RESOURCE){ // TODO
 	    } else if (type == IS_ARRAY){
-			// TODO reference
-      	    qargs[i+1].s_voidp = transformArray(*args[i]);
-			methodNameStack.top()->append("?");
-
+		methodNameStack.top()->append("?");
 	    } else if (type == IS_BOOL){
-
-			// Reference
-	    	if((((zval) **args[i]).is_ref)){
-				qargs[i+1].s_voidp = &Z_LVAL_PP(args[i]);
-	    	} else {
-    	    	qargs[i+1].s_bool = Z_BVAL_PP(args[i]);
-    	    }
-
-            methodNameStack.top()->append("$");
-
+        	methodNameStack.top()->append("$");
 	    } else if (type == IS_LONG){
-
-	    	// Reference
-	    	if((((zval) **args[i]).is_ref)){
-				qargs[i+1].s_voidp = &Z_LVAL_PP(args[i]);
-	    	} else {
-				qargs[i+1].s_short = Z_LVAL_PP(args[i]);
-				qargs[i+1].s_ushort = Z_LVAL_PP(args[i]);
-				qargs[i+1].s_int = Z_LVAL_PP(args[i]);
-				qargs[i+1].s_uint = Z_LVAL_PP(args[i]);
-				qargs[i+1].s_long = Z_LVAL_PP(args[i]);
-				qargs[i+1].s_ulong = Z_LVAL_PP(args[i]);
-	    	}
-
-    	    methodNameStack.top()->append("$");
-
+    		methodNameStack.top()->append("$");
 	    } else if (type == IS_DOUBLE){
-
-	    	// Reference
-	    	if((((zval) **args[i]).is_ref)){
-				qargs[i+1].s_voidp = &Z_DVAL_PP(args[i]);
-	    	} else {
-    	    	qargs[i+1].s_double = Z_DVAL_PP(args[i]);
-    	    	qargs[i+1].s_float = Z_DVAL_PP(args[i]);
-    	    }
-            methodNameStack.top()->append("$");
-
+        	methodNameStack.top()->append("$");
 	    } else if (type == IS_STRING){
-
-			if((((zval) **args[i]).is_ref)){
-				qargs[i+1].s_class = phpqt_getSmokePHPObjectFromZval(*args[i])->ptr;	
-			} else {
-			    // create a new QString object
-    	    		    qargs[i+1].s_class = emalloc(sizeof(QString) + strlen(Z_STRVAL_PP(args[i]))); // important
-    	    		    qargs[i+1].s_class = new QString(Z_STRVAL_PP(args[i]));
-			    // create new smokephp_object
-			    smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
-			    o->ptr = qargs[i+1].s_class;
-			    o->zval_ptr = *args[i];
-			    o->ce_ptr = qstring_ce;
-			    o->classId = 0;	// QString is not in smoke
-			    o->smoke = qt_Smoke;
-			    phpqt_setSmokePHPObject(o);
-			    // register all 
-			    zend_rsrc_list_entry le;
-			    le.ptr = o;
-			    object_init_ex(*args[i], qstring_ce);
-			    phpqt_register(o->zval_ptr,le);
-			    phpqt_setZvalPtr(o, o->zval_ptr);
-        		}
-        		methodNameStack.top()->append("$");
-
+        	methodNameStack.top()->append("$");
 	    } else if (type == IS_OBJECT){
-			smokephp_object *o = phpqt_getSmokePHPObjectFromZval(((zval*) *args[i]));
-        		qargs[i+1].s_class = o->ptr;
-            // as default QString is not supported in Smoke
-            if(!strcmp(Z_OBJCE_P(((zval*) *args[i]))->name, "QString")){
-            	qargs[i+1].s_class = new QString(((QString*) o->ptr)->toAscii().constData());
-            	methodNameStack.top()->append("$");
-            } else {
-            	methodNameStack.top()->append("#");
-            }
-
+        	// as default QString is not supported in Smoke
+        	if(!strcmp(Z_OBJCE_P(((zval*) *args[i]))->name, "QString")){
+            	    methodNameStack.top()->append("$");
+        	} else {
+        	    methodNameStack.top()->append("#");
+        	}
 	    } else {
 	        php_error(E_ERROR,"Unknown argument or unsupported argument type %d, type %d, exit\n", i, type);
 	        exit(FAILURE);
 	    }
-
     }
-
-}
-
-void 
-smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const Smoke::Index ret, zval* return_value){
-
-    smokephp_object* o;
-
-    switch((type.flags & Smoke::tf_elem)){
-        case Smoke::t_voidp:
-	    if(!type.name){
-        	RETVAL_NULL();
-	    } else {
-		if(!strcmp(type.name, "QString")) {
-		    // create new smokephp_object
-		    smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
-		    o->ptr = ret_val->s_voidp;
-		    o->zval_ptr = return_value;
-		    o->ce_ptr = qstring_ce;
-		    o->classId = 0;	// QString is not in smoke
-		    o->smoke = qt_Smoke;
-		    phpqt_setSmokePHPObject(o);
-		    // register all 
-		    zend_rsrc_list_entry le;
-		    le.ptr = o;
-		    object_init_ex(return_value, qstring_ce);
-		    phpqt_register(o->zval_ptr,le);
-		    phpqt_setZvalPtr(o, o->zval_ptr);
-
-		} else if(!strcmp(type.name, "QString*")) {
-		    php_error(E_WARNING,"No handler for returntype %s installed!", type.name);
-		} else if(!strcmp(type.name, "QString&")) {
-		    php_error(E_WARNING,"No handler for returntype %s installed!", type.name);
-		} else {
-		    php_error(E_WARNING,"No handler for returntype %s installed!", type.name);
-		}
-	    }
-    	    break;
-        case Smoke::t_bool:
-            RETVAL_BOOL(ret_val->s_bool);
-            break;
-        case Smoke::t_char:
-            RETVAL_STRING((char*)ret_val->s_char, 1);
-            break;
-        case Smoke::t_uchar:
-            RETVAL_STRING((char*)ret_val->s_char, 1);
-            break;
-        case Smoke::t_short:
-            RETVAL_LONG(ret_val->s_short);
-            break;
-        case Smoke::t_ushort:
-            RETVAL_LONG(ret_val->s_ushort);
-            break;
-        case Smoke::t_int:
-            RETVAL_LONG(ret_val->s_int);
-            break;
-        case Smoke::t_uint:
-            RETVAL_LONG(ret_val->s_uint);
-            break;
-        case Smoke::t_long:
-            RETVAL_LONG(ret_val->s_long);
-            break;
-        case Smoke::t_ulong:
-            RETVAL_LONG(ret_val->s_ulong);
-            break;
-        case Smoke::t_float:
-            RETVAL_DOUBLE(ret_val->s_float);
-            break;
-        case Smoke::t_double:
-            RETVAL_DOUBLE(ret_val->s_double);
-            break;
-        case Smoke::t_enum:
-            php_error(E_WARNING,"type enum not implemented\n");
-            break;
-        case Smoke::t_class:
- 			o = (smokephp_object*) emalloc(sizeof(smokephp_object));
-
-			// zval already exists
-
-			    if(phpqt_SmokePHPObjectExists(ret_val->s_voidp)) {
-				smokephp_object* o = phpqt_getSmokePHPObjectFromQt(ret_val->s_voidp);
-				ZVAL_ZVAL(return_value, o->zval_ptr,0,0);
-				zend_rsrc_list_entry le;
-				le.ptr = o;
-				phpqt_register(return_value, le);
-			} else {
-				o->ptr = ret_val->s_class;
-				o->smoke = qt_Smoke;
-				if(!strcmp((char*) qt_Smoke->classes[qt_Smoke->types[ret].classId].className, "QObject")){
-					// cast from, to
-					o->ptr = o->smoke->cast(o->ptr, qt_Smoke->idClass("QObject"), qt_Smoke->types[ret].classId);
-					object_init_ex(return_value, 
-									zend_fetch_class((char*)((QObject*) o->ptr)->metaObject()->className(),
-									strlen(((QObject*) o->ptr)->metaObject()->className()), 
-									ZEND_FETCH_CLASS_AUTO TSRMLS_DC));
-				//
-				} else if (!strcmp((char*) qt_Smoke->classes[qt_Smoke->types[ret].classId].className, "QBool")) {
-            			    RETVAL_BOOL(*((QBool*) ret_val->s_class));
-            			    return;
-				// fallback, already with correct type
-				} else {
-					object_init_ex(return_value, 
-									zend_fetch_class((char*) qt_Smoke->classes[qt_Smoke->types[ret].classId].className,
-									strlen(qt_Smoke->classes[qt_Smoke->types[ret].classId].className), 
-									ZEND_FETCH_CLASS_AUTO TSRMLS_DC));
-				}
-
-				o->zval_ptr = return_value;
-				o->ce_ptr = Z_OBJCE_P(return_value);
-				o->classId = qt_Smoke->types[ret].classId;
-
-				if(!phpqt_SmokePHPObjectExists(o->ptr))
-					phpqt_setSmokePHPObject(o);
-
-				zend_rsrc_list_entry le;
-				le.ptr = o;
-				phpqt_register(return_value, le);
-
-			}
-
-            return;
-        default:
-            php_error(E_ERROR,"unknown return type\n");
-            return;
-    }
-    return;
 }
 
 void 

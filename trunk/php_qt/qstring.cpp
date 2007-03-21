@@ -2225,9 +2225,9 @@ ZEND_METHOD(QString, append){
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 			    smokephp_object* o = phpqt_getSmokePHPObjectFromZval(getThis());
 			    QString* obj_z_0 = (QString*) phpqt_getQtObjectFromZval(z_0);
-			    QString s = ((QString*) o->ptr)->append((QString) *obj_z_0);
+			    QString* s = new QString(((QString*) o->ptr)->append((QString) *obj_z_0));
 			    object_init_ex(return_value, qstring_ce);     
-			    phpqt_createObject(return_value, &s, qstring_ce);
+			    phpqt_createObject(return_value, s, qstring_ce);
 			    return;
 			}
 		}

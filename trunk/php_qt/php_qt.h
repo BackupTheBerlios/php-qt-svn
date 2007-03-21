@@ -20,7 +20,9 @@
  *
  */
 
-#define debug
+#ifndef QTPHP_H
+#define QTPHP_H
+
 #define MONITOR
 
 #define COMPILE_DL_PHP_QT
@@ -51,6 +53,7 @@ using namespace std;
 #define ZEND_MN ZEND_FN
 #endif
 
+#define Qnil (zval *) NULL
 #define QOUT()                                              \
     extern QTextStream qout(stdout, QIODevice::WriteOnly);  \
 
@@ -92,12 +95,14 @@ PHP_FUNCTION(confirm_php_qt_compiled);	/* For testing, remove later. */
 /* emulate SIGNAL(), SLOT() macros */
 PHP_FUNCTION(SIGNAL);
 PHP_FUNCTION(SLOT);
+PHP_FUNCTION(emit);
 PHP_FUNCTION(qobject_cast);
 PHP_FUNCTION(tr);
 
 PHP_FUNCTION(check_qobject);
 
 struct smokephp_object {
+    bool allocated;
     Smoke *smoke;
     int classId;
     void *ptr;
@@ -108,7 +113,7 @@ struct smokephp_object {
 };
 
 //zend_class_entry* php_qt_generic_class;
-
+void check_object(zval* zobject);
 static void 		phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc);
 
 void 				phpqt_register(zval* this_ptr, zend_rsrc_list_entry le);
@@ -127,8 +132,9 @@ void* 				phpqt_getQtObjectFromZval(zval* this_ptr);
 smokephp_object* 		phpqt_getSmokePHPObjectFromZval(zval* this_ptr);
 smokephp_object*		phpqt_getSmokePHPObjectFromQt(void* QtPtr);
 void				phpqt_setSmokePHPObject(smokephp_object* o);
+bool 				phpqt_SmokePHPObjectExists(zval* this_ptr);
 bool				phpqt_SmokePHPObjectExists(void* ptr);
-void				phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce = NULL);
+void				phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce = NULL, Smoke::Index classId = 0);
 
 extern int le_php_qt_hashtype;
 extern HashTable php_qt_objptr_hash;
@@ -136,70 +142,15 @@ extern HashTable php_qt_objptr_hash;
 void 				smokephp_convertArgsCxxToZend(zval*** args, int argc, Smoke::StackItem* qargs);
 bool 				smokephp_isQObject(Smoke *smoke, Smoke::Index classId);
 Smoke::Index 			smokephp_getClassId(const char* classname);
-void				smokephp_convertArgsZendToCxx(zval*** args, int argc, Smoke::StackItem* qargs, QStack<QString*> &methodNameStack);
-Smoke::Index			smokephp_getMethod(Smoke *smoke, const char* c, const char* m, Smoke::StackItem** qargs, int argc, zval*** args);
+void				smokephp_prepareMethodName(zval*** args, int argc, QStack<QString*> &methodNameStack);
+Smoke::Index			smokephp_getMethod(Smoke *smoke, const char* c, const char* m, int argc, zval*** args);
 void				smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method);
 void				smokephp_callMethod(Smoke *smoke, void *obj, Smoke::Index method, Smoke::Stack qargs);
-void				smokephp_convertReturn(Smoke::StackItem *ret_val, const Smoke::Type type, const Smoke::Index ret, zval* return_value);
 void				smokephp_init();
 Smoke::Index			smokephp_findConnect();
 bool				smokephp_isConnect(Smoke::Index method);
 
-
-
-class SmokeType {
-    Smoke::Type *_t;		// derived from _smoke and _id, but cached
-
-    Smoke *_smoke;
-    Smoke::Index _id;
-public:
-    SmokeType() : _t(0), _smoke(0), _id(0) {}
-    SmokeType(Smoke *s, Smoke::Index i) : _smoke(s), _id(i) {
-	if(_id < 0 || _id > _smoke->numTypes) _id = 0;
-	_t = _smoke->types + _id;
-    }
-    // default copy constructors are fine, this is a constant structure
-
-    // mutators
-    void set(Smoke *s, Smoke::Index i) {
-	_smoke = s;
-	_id = i;
-	_t = _smoke->types + _id;
-    }
-
-    // accessors
-    Smoke *smoke() const { return _smoke; }
-    Smoke::Index typeId() const { return _id; }
-    const Smoke::Type &type() const { return *_t; }
-    unsigned short flags() const { return _t->flags; }
-    unsigned short elem() const { return _t->flags & Smoke::tf_elem; }
-    const char *name() const { return _t->name; }
-    Smoke::Index classId() const { return _t->classId; }
-
-    // tests
-    bool isStack() const { return ((flags() & Smoke::tf_ref) == Smoke::tf_stack); }
-    bool isPtr() const { return ((flags() & Smoke::tf_ref) == Smoke::tf_ptr); }
-    bool isRef() const { return ((flags() & Smoke::tf_ref) == Smoke::tf_ref); }
-    bool isConst() const { return (flags() & Smoke::tf_const); }
-    bool isClass() const {
-	if(elem() == Smoke::t_class)
-	    return classId() ? true : false;
-	return false;
-    }
-
-    bool operator ==(const SmokeType &b) const {
-	const SmokeType &a = *this;
-	if(a.name() == b.name()) return true;
-	if(a.name() && b.name() && qstrcmp(a.name(), b.name()) == 0)
-	    return true;
-	return false;
-    }
-    bool operator !=(const SmokeType &b) const {
-	const SmokeType &a = *this;
-	return !(a == b);
-    }
-
-};
+void* 				transformArray(zval* args);
 
 ZEND_METHOD(QString, __toString);
 ZEND_METHOD(QString, compare);
@@ -281,3 +232,5 @@ ZEND_METHOD(QString, constBegin);
 ZEND_METHOD(QString, toLocal8Bit);
 ZEND_METHOD(QString, toInt);
 ZEND_METHOD(QString, isNull);
+
+#endif

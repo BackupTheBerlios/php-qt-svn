@@ -1,5 +1,9 @@
 2007-003-4  Thomas Moenicke <thomas.moenicke@kdemail.net>
 
+		* object oriented handlers (see QtRuby)
+
+2007-003-4  Thomas Moenicke <thomas.moenicke@kdemail.net>
+
 		* Debugging for metaobject system added
 		* parent_ce_ptr
 

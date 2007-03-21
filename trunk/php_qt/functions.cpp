@@ -98,6 +98,31 @@ PHP_FUNCTION(SLOT)
     return;
 }
 
+/*!
+ *  emits a signal
+ */
+
+PHP_FUNCTION(emit)
+{
+    const char* string;
+    int string_len;
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&string,&string_len)) {
+        return;
+    }
+
+    char* tmp = (char*) emalloc((int) string_len + 2);
+    strcpy(tmp,"1");
+
+    strncat(tmp, string, (int) string_len);
+
+    ZVAL_STRING(return_value,tmp,1);
+
+    efree(tmp);
+
+    return;
+}
+
+
 /**
  *	simply returns the first parameter because objects are casted automatically in smokephp_convertReturn(...)
  *
@@ -152,12 +177,13 @@ PHP_FUNCTION(tr)
  *
  */
 
-PHP_FUNCTION(check_qobject)
+
+void check_object(zval* zobject)
 {
-    zval* zobject;
-    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o",&zobject)) {
-        return;
-    }
+
+	if(!phpqt_SmokePHPObjectExists(zobject)) {
+	    php_error(E_ERROR,"Object is not registered.");
+	}
 
 	smokephp_object* o = phpqt_getSmokePHPObjectFromZval(zobject);
 
@@ -167,7 +193,7 @@ PHP_FUNCTION(check_qobject)
 	cout << "\tclass entry => " << Z_OBJCE_P(zobject)->name << endl;
 	cout << "\t  ref count => " << zobject->refcount << endl;
 	cout << "\t     is_ref => " << zobject->is_ref << endl;
-	cout << "\t       type => " << zobject->type << endl;
+	cout << "\t       type => " << Z_TYPE_P(zobject) << endl;
 
 	cout << endl;
 
@@ -181,4 +207,15 @@ PHP_FUNCTION(check_qobject)
 
 	cout << ")" << endl;
 
+}
+
+PHP_FUNCTION(check_qobject)
+{
+
+    zval* zobject;
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o",&zobject)) {
+        return;
+    }
+
+    check_object(zobject);
 }
