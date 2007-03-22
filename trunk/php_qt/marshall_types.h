@@ -104,7 +104,7 @@ protected:
 
 class VirtualMethodCall : public MethodCallBase {
 public:
-	VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval obj, zval ***sp);
+	VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* obj, zval ***sp);
 	~VirtualMethodCall();
 	Marshall::Action action();
 	zval* var();
@@ -113,7 +113,7 @@ public:
 	bool cleanup();
  
 private:
-	zval _obj;
+	zval* _obj;
 };
 
 
@@ -163,7 +163,7 @@ private:
 
 class SigSlotBase : public Marshall {
 public:
-	SigSlotBase(zval ***args);
+	SigSlotBase(int items, MocArgument* mocStack, zval*** sp);
 	~SigSlotBase();
 	const MocArgument &arg();
 	SmokeType type();
@@ -190,7 +190,7 @@ class EmitSignal : public SigSlotBase {
     int _id;
 	zval * _result;
  public:
-    EmitSignal(QObject *obj, int id, int items, zval*** args, zval ***sp, zval * result);
+    EmitSignal(QObject *obj, int id, int items, MocArgument* mocStack, zval ***sp, zval * result);
     Marshall::Action action();
     Smoke::StackItem &item();
 	const char *mytype();
@@ -212,13 +212,13 @@ class InvokeNativeSlot : public SigSlotBase {
 	void mainfunction();
 	bool cleanup();
 };
-/*
+
 class InvokeSlot : public SigSlotBase {
     zval _obj;
-    ID _slotname;
+    int _slotname;
     void **_o;
 public:
-    InvokeSlot(zval obj, ID slotname, zval args, void ** o);
+    InvokeSlot(zval* obj, int slotname, zval*** args, void ** o);
 	~InvokeSlot();
     Marshall::Action action();
 	const char *mytype();
@@ -227,7 +227,7 @@ public:
 	void invokeSlot(); 
 	void mainfunction();
 };
-*/
+
 
 /*
 	Converts a C++ value returned by a signal invocation to a PHP 
@@ -243,7 +243,7 @@ public:
 		_result = result;
 		_replyType = replyType;
 		_stack = new Smoke::StackItem[1];
-//		smokeStackFromQtStack(_stack, o, 1, _replyType);
+		smokeStackFromQtStack(_stack, o, 1, _replyType);
 		Marshall::HandlerFn fn = getMarshallFn(type());
 		(*fn)(this);
     }

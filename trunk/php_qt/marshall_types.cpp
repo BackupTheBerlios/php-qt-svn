@@ -21,8 +21,9 @@
 void
 smokeStackToQtStack(Smoke::Stack stack, void ** o, int items, MocArgument* args)
 {
+
 	for (int i = 0; i < items; i++) {
-		Smoke::StackItem *si = stack + i;
+		Smoke::StackItem *si = stack;
 		switch(args[i].argType) {
 		case xmoc_bool:
 			o[i] = &si->s_bool;
@@ -357,7 +358,7 @@ MethodCallBase::classname()
 }
 
 
-VirtualMethodCall::VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval obj, zval ***sp) :
+VirtualMethodCall::VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* obj, zval ***sp) :
 	MethodCallBase(smoke,meth,stack), _obj(obj)
 {		
 	_sp = sp;
@@ -460,8 +461,11 @@ MethodCall::classname()
 	return qstrcmp(MethodCallBase::classname(), "QGlobalSpace") == 0 ? "" : MethodCallBase::classname(); 
 }
 
-SigSlotBase::SigSlotBase(zval ***args) : _cur(-1), _called(false) 
+SigSlotBase::SigSlotBase(int items, MocArgument* mocStack, zval*** sp) : _cur(-1), _called(false), _sp(sp)
 { 
+	_items = items + 1;
+	_args = mocStack;
+	_stack = new Smoke::StackItem[_items -1];
 }
 
 SigSlotBase::~SigSlotBase() 
@@ -490,7 +494,7 @@ SigSlotBase::item()
 zval* 
 SigSlotBase::var() 
 { 
-	return *_sp[_cur]; 
+	return (zval*) *_sp[_cur]; 
 }
 
 Smoke *
@@ -516,7 +520,6 @@ SigSlotBase::next()
 		(*fn)(this);
 		_cur++;
 	}
-
 	mainfunction();
 	_cur = oldcur;
 }
@@ -571,11 +574,11 @@ public:
 		delete[] _stack;
 	}
 };
-/*
-InvokeSlot::InvokeSlot(zval* obj, ID slotname, zval*** args, void ** o) : SigSlotBase(args),
+
+/*InvokeSlot::InvokeSlot(zval* obj, int slotname, zval*** args, void ** o) : SigSlotBase(args),
     _obj(obj), _slotname(slotname), _o(o)
 {
-//	_sp = (zval *) ALLOC_N(VALUE, _items - 1);
+	_sp = (zval *) safe_emalloc((zval*), _items - 1, 0);
 	copyArguments();
 }
 
@@ -625,9 +628,10 @@ InvokeSlot::mainfunction()
 }
 */
 
-EmitSignal::EmitSignal(QObject *obj, int id, int items, zval*** args, zval ***sp, zval * result) : SigSlotBase(args),
+EmitSignal::EmitSignal(QObject *obj, int id, int items, MocArgument *mocStack, zval ***sp, zval * result) : SigSlotBase(items, mocStack, _sp),
     _obj(obj), _id(id)
 { 
+	_id = id;
 	_sp = sp;
 	_result = result;
 }
@@ -640,7 +644,7 @@ EmitSignal::action()
 
 Smoke::StackItem &
 EmitSignal::item() 
-{ 
+{
 	return _stack[_cur]; 
 }
 
@@ -653,15 +657,18 @@ EmitSignal::mytype()
 void 
 EmitSignal::emitSignal() 
 {
+
 	if (_called) return;
 	_called = true;
+
 	void ** o = new void*[_items];
-//	smokeStackToQtStack(_stack, o + 1, _items - 1, _args + 1);
+	smokeStackToQtStack(_stack, o + 1, _items - 1, _args + 1);
 	_obj->metaObject()->activate(_obj, _id, o);
-	
+
 	if (_args[0].argType != xmoc_void) {
-		SignalReturnValue r(o, _result, _args);
+//		SignalReturnValue r(o, _result, _args);
 	}
+
 	delete[] o;
 }
 

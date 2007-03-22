@@ -1,4 +1,8 @@
-2007-003-4  Thomas Moenicke <thomas.moenicke@kdemail.net>
+2007-003-22  Thomas Moenicke <thomas.moenicke@kdemail.net>
+
+		* signal handler added
+
+2007-003-21  Thomas Moenicke <thomas.moenicke@kdemail.net>
 
 		* object oriented handlers (see QtRuby)
 

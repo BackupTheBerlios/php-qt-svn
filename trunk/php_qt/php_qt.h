@@ -26,22 +26,25 @@
 #define MONITOR
 
 #define COMPILE_DL_PHP_QT
-#define PHPQT_CLASS_COUNT 50
+#define PHPQT_CLASS_COUNT 256
 
 #include <iostream>
 using namespace std;
 
 #include <zend_interfaces.h>
-#include "smoke.h"
+#include "php.h"
+#include "php_ini.h"
+#include "ext/standard/info.h"
 
+#include "smoke.h"
+#include "smokephp.h"
+#include <QtCore/QMetaMethod>
+#include <QtCore/QStack>
+#include <QtCore/QHash>
 #include <QtCore/QTextStream>
 #include <QtCore/QVariant>
-#include <QtCore/QStack>
 #include <QtCore/QString>
-#include <QtCore/QMetaMethod>
-#include <QtCore/QHash>
 #include <QtCore/QCoreApplication>
-
 #include <QtGui/QWidget>
 #include <QtGui/QApplication>
 #include <QtGui/QLayout>
@@ -80,9 +83,6 @@ using namespace std;
 
 #define PHP_QT_ME(classname, name, arg_info, flags)	PHP_QT_FENTRY(name, ZEND_MN(classname##_##name), arg_info, flags)
 
-#include "php.h"
-#include "php_ini.h"
-#include "ext/standard/info.h"
 
 PHP_MINIT_FUNCTION(php_qt);
 PHP_MSHUTDOWN_FUNCTION(php_qt);
@@ -91,14 +91,13 @@ PHP_RSHUTDOWN_FUNCTION(php_qt);
 PHP_MINFO_FUNCTION(php_qt);
 
 PHP_FUNCTION(confirm_php_qt_compiled);	/* For testing, remove later. */
-
 /* emulate SIGNAL(), SLOT() macros */
 PHP_FUNCTION(SIGNAL);
 PHP_FUNCTION(SLOT);
+#undef emit
 PHP_FUNCTION(emit);
 PHP_FUNCTION(qobject_cast);
 PHP_FUNCTION(tr);
-
 PHP_FUNCTION(check_qobject);
 
 struct smokephp_object {
@@ -143,6 +142,7 @@ void 				smokephp_convertArgsCxxToZend(zval*** args, int argc, Smoke::StackItem*
 bool 				smokephp_isQObject(Smoke *smoke, Smoke::Index classId);
 Smoke::Index 			smokephp_getClassId(const char* classname);
 void				smokephp_prepareMethodName(zval*** args, int argc, QStack<QString*> &methodNameStack);
+QByteArray* 			smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack);
 Smoke::Index			smokephp_getMethod(Smoke *smoke, const char* c, const char* m, int argc, zval*** args);
 void				smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method);
 void				smokephp_callMethod(Smoke *smoke, void *obj, Smoke::Index method, Smoke::Stack qargs);

@@ -109,16 +109,7 @@ PHP_FUNCTION(emit)
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&string,&string_len)) {
         return;
     }
-
-    char* tmp = (char*) emalloc((int) string_len + 2);
-    strcpy(tmp,"1");
-
-    strncat(tmp, string, (int) string_len);
-
-    ZVAL_STRING(return_value,tmp,1);
-
-    efree(tmp);
-
+    QByteArray signature(string);
     return;
 }
 

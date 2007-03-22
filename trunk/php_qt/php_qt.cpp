@@ -20,17 +20,13 @@
  *
  */
 
-// TODO		references, arrays
-// TODO		emit()
+// TODO		references
 
-
-
-#include <QtCore/qglobal.h>
 #include <zend_interfaces.h>
 #include "php_qt.h"
-
 #include "ext/standard/php_string.h"
 
+#include <QtCore/qglobal.h>
 #include "marshall.h"
 #include "php_qt.h"
 #include "smokephp.h"
@@ -115,11 +111,11 @@ static int constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
 
 }
 
-
 /*! php_qt_functions[]
  *
  * Every user visible function must have an entry in php_qt_functions[].
  */
+#undef emit
 function_entry php_qt_functions[] = {
 	PHP_FE(confirm_php_qt_compiled,	NULL)		/* For testing, remove later. */
 	PHP_FE(SIGNAL,	NULL)
@@ -153,6 +149,7 @@ zend_module_entry php_qt_module_entry = {
 #ifdef COMPILE_DL_PHP_QT
 ZEND_GET_MODULE(php_qt)
 #endif
+
 
 static QHash<smokephp_object*, zval*> smoke_x_zval;
 QHash<void*, smokephp_object*> SmokeQtObjects;
@@ -193,6 +190,7 @@ union _zend_function *proxyHandler(zval **obj_ptr, char* methodname, int methodn
 ZEND_METHOD(php_qt_generic_class, __construct);
 ZEND_METHOD(php_qt_generic_class, __destruct);
 ZEND_METHOD(php_qt_generic_class, __toString);
+ZEND_METHOD(php_qt_generic_class, emit);
 ZEND_METHOD(php_qt_generic_class, proxyMethod);
 ZEND_METHOD(php_qt_generic_class, staticProxyMethod);
 
@@ -200,11 +198,15 @@ static zend_function_entry php_qt_generic_methods[] = {
     ZEND_ME(php_qt_generic_class,__construct,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(php_qt_generic_class,__destruct,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(php_qt_generic_class,__toString,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(php_qt_generic_class,emit,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(php_qt_generic_class,proxyMethod,NULL,ZEND_ACC_PUBLIC)
     {NULL,NULL,NULL}
 };
 
 static zend_function_entry*** php_qt_static_methods;
+
+ZEND_METHOD(php_qt_generic_class, emit){
+}
 
 ZEND_METHOD(php_qt_generic_class, __toString)
 {
@@ -335,8 +337,38 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
     Smoke::Index method = smokephp_getMethod(qt_Smoke,ce->name, (methodNameStack.top())->toAscii(), argc, args);
 
     if(method <= 0) {
-	if(methodNameStack.top()->toAscii().constData()) 
+	if(methodNameStack.top()->toAscii().constData()) {
+
+	    // is it a signal?
+	    if(getThis()){
+		smokephp_object* o = phpqt_getSmokePHPObjectFromZval(getThis());
+		if(o->meta != NULL){
+		    QMetaObject* mo = (QMetaObject*) o->meta;
+		    QByteArray signalname(methodNameStack.top()->toAscii().constData());
+		    signalname.replace("$","");
+		    signalname.replace("#","");
+		    signalname.replace("?","");
+		    MocArgument *mocStack = new MocArgument[argc+1]; // first entry is return value
+		    signalname.append(smokephp_getSignature(argc, args, mocStack)->constData());
+		    // seems to be a signal
+		    int index = mo->indexOfSignal(signalname);
+		    if(index >= 0) {
+			QObject *qobj = (QObject*)o->smoke->cast(
+			    o->ptr,
+			    o->classId,
+			    o->smoke->idClass("QObject")
+			);
+			zval* result;
+			EmitSignal signal(qobj, index, argc, mocStack, args, result);
+			signal.next();
+			// TODO return value
+			RETURN_NULL();
+		    }
+		}
+	    }
+
 	    php_error(E_ERROR,"Call to undefined method %s::%s()", ce->name, methodNameStack.top()->toAscii().constData());
+	}
 	else 
 	    php_error(E_ERROR,"Call to undefined method!");
     }
@@ -414,6 +446,7 @@ PHP_MINIT_FUNCTION(php_qt)
         PHP_QT_ME(php_qt_generic_class,__construct,NULL,ZEND_ACC_PUBLIC);
         PHP_QT_ME(php_qt_generic_class,__destruct,NULL,ZEND_ACC_PUBLIC);
         PHP_QT_ME(php_qt_generic_class,__toString,NULL,ZEND_ACC_PUBLIC);
+	PHP_QT_ME(php_qt_generic_class,emit,NULL,ZEND_ACC_PUBLIC);
         PHP_QT_ME(php_qt_generic_class,proxyMethod,NULL,ZEND_ACC_PUBLIC);
 
 	QHash<const char*, bool> tmpMethodList;	// avoids doubled method names
@@ -693,7 +726,7 @@ phpqt_callMethod(zval* this_ptr, char* methodname, zend_uint param_count, zval**
     zval* retval;
     MAKE_STD_ZVAL(retval);
 
-    if(call_user_function_ex(CG(function_table),&this_ptr,function_name,&retval,param_count,args,0,NULL) == FAILURE){
+    if(call_user_function(EG(function_table),&this_ptr,function_name,retval,param_count,*args) == FAILURE){
     	php_error(E_ERROR, "PHP-Qt could not call method %s", methodname);
     }
 

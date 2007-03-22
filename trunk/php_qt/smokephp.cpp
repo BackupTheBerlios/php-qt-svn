@@ -22,6 +22,7 @@
 
 #include "php_qt.h"
 #include "smoke.h"
+#include "marshall_types.h"
 #include <QtCore/QMetaMethod>
 #include <QtCore/QHash>
 #include <QtCore/QCoreApplication>
@@ -67,9 +68,16 @@ public:
 			return true;
 		}
 
-//		VirtualMethodCall c(smoke, method, args, obj, ...);
-//		c.next();
+		if(phpqt_methodExists(o->ce_ptr, (char*) methodName)){
+/*		    zval*** sp = (zval***) malloc(sizeof(zval)*2);
+		    zval* obj;
+		    phpqt_callMethod(o->zval_ptr, (char*) methodName, 0, sp);
 
+		    VirtualMethodCall c(smoke, method, args, obj, sp);
+		    c.next();
+*/
+		}
+		
 		return false;
 
     }
@@ -170,7 +178,7 @@ smokephp_getMethod(Smoke *smoke, const char* c, const char* m, int argc, zval***
 								    qt_Smoke->argumentList[
 									qt_Smoke->methods[
 									    qt_Smoke->ambiguousMethodList[i]].args+k]].name);
-							    if(name->contains(Z_OBJCE((zval) **args[k])->name))
+							    if(name->contains(Z_OBJCE_P((zval*) *args[k])->name))
 								right = true;
 							}
 							break;
@@ -378,6 +386,65 @@ void smokephp_prepareMethodName(zval*** args, int argc, QStack<QString*> &method
 	    }
     }
 }
+
+
+static Smoke::Index getSmokeIndex(const char* name) {
+    Smoke::Type *p = qt_Smoke->types + 1;
+    Smoke::Index index = 0;
+    for(index=1;index<=qt_Smoke->numTypes;index++){
+	if(!strcmp((p++)->name, name)){
+	    return index;
+	}
+    }
+    return 0;
+}
+
+QByteArray* smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack){
+
+    mocStack[0].argType = xmoc_bool;	// return
+
+    QByteArray *signature = new QByteArray("(");// = new QByteArray();
+    for(int i=0;i<argc;i++){
+	    uint type = ((int) ((zval) **argv[i]).type);
+	    mocStack[i+1].st = SmokeType(qt_Smoke,0);
+	    if (type == IS_RESOURCE){ // TODO
+	    } else if (type == IS_ARRAY){
+		//    xmoc_ptr,
+	    } else if (type == IS_BOOL){
+		mocStack[i+1].argType = xmoc_bool;
+		mocStack[i+1].st = SmokeType(qt_Smoke,getSmokeIndex("bool"));
+		signature->append("bool");
+	    } else if (type == IS_LONG){
+		mocStack[i+1].argType = xmoc_int;
+		mocStack[i+1].st = SmokeType(qt_Smoke,getSmokeIndex("int"));
+		signature->append("int");
+	    } else if (type == IS_DOUBLE){
+		mocStack[i+1].argType = xmoc_double;
+		mocStack[i+1].st = SmokeType(qt_Smoke,getSmokeIndex("double"));
+		signature->append("double");
+	    } else if (type == IS_STRING){
+		mocStack[i+1].argType = xmoc_charstar;
+		mocStack[i+1].st = SmokeType(qt_Smoke,getSmokeIndex("char*"));
+		signature->append("string");
+	    } else if (type == IS_OBJECT){
+		if(Z_OBJCE_P(((zval*) *argv[i])) == qstring_ce)
+		    mocStack[i+1].argType = xmoc_QString;
+		else {
+		    smokephp_object *o = phpqt_getSmokePHPObjectFromZval((zval*) *argv[i]);
+		    mocStack[i+1].st = SmokeType(qt_Smoke,o->classId);
+		    mocStack[i+1].argType = xmoc_void;
+		}
+		signature->append("object");
+	    } else {
+	        php_error(E_ERROR,"Unknown argument or unsupported argument type %d, type %d, exit\n", i, type);
+	        exit(FAILURE);
+	    }
+    }
+    signature->append(")");
+    return signature;
+
+}
+
 
 void 
 smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method){
