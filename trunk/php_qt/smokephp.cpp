@@ -69,10 +69,11 @@ public:
 		}
 
 		if(phpqt_methodExists(o->ce_ptr, (char*) methodName)){
-/*		    zval*** sp = (zval***) malloc(sizeof(zval)*2);
+		    zval*** sp = (zval***) malloc(sizeof(zval)*2);
 		    zval* obj;
-		    phpqt_callMethod(o->zval_ptr, (char*) methodName, 0, sp);
 
+		    phpqt_callMethod(o->zval_ptr, (char*) methodName, 0, sp);
+/*
 		    VirtualMethodCall c(smoke, method, args, obj, sp);
 		    c.next();
 */
@@ -387,18 +388,6 @@ void smokephp_prepareMethodName(zval*** args, int argc, QStack<QString*> &method
     }
 }
 
-
-static Smoke::Index getSmokeIndex(const char* name) {
-    Smoke::Type *p = qt_Smoke->types + 1;
-    Smoke::Index index = 0;
-    for(index=1;index<=qt_Smoke->numTypes;index++){
-	if(!strcmp((p++)->name, name)){
-	    return index;
-	}
-    }
-    return 0;
-}
-
 QByteArray* smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack){
 
     mocStack[0].argType = xmoc_bool;	// return
@@ -410,21 +399,22 @@ QByteArray* smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack)
 	    if (type == IS_RESOURCE){ // TODO
 	    } else if (type == IS_ARRAY){
 		//    xmoc_ptr,
+		php_error(E_WARNING, "Array given as signal argument");
 	    } else if (type == IS_BOOL){
 		mocStack[i+1].argType = xmoc_bool;
-		mocStack[i+1].st = SmokeType(qt_Smoke,getSmokeIndex("bool"));
+		mocStack[i+1].st = SmokeType(qt_Smoke,qt_Smoke->idType("bool"));
 		signature->append("bool");
 	    } else if (type == IS_LONG){
 		mocStack[i+1].argType = xmoc_int;
-		mocStack[i+1].st = SmokeType(qt_Smoke,getSmokeIndex("int"));
+		mocStack[i+1].st = SmokeType(qt_Smoke,qt_Smoke->idType("int"));
 		signature->append("int");
 	    } else if (type == IS_DOUBLE){
 		mocStack[i+1].argType = xmoc_double;
-		mocStack[i+1].st = SmokeType(qt_Smoke,getSmokeIndex("double"));
+		mocStack[i+1].st = SmokeType(qt_Smoke,qt_Smoke->idType("double"));
 		signature->append("double");
 	    } else if (type == IS_STRING){
 		mocStack[i+1].argType = xmoc_charstar;
-		mocStack[i+1].st = SmokeType(qt_Smoke,getSmokeIndex("char*"));
+		mocStack[i+1].st = SmokeType(qt_Smoke,qt_Smoke->idType("char*"));
 		signature->append("string");
 	    } else if (type == IS_OBJECT){
 		if(Z_OBJCE_P(((zval*) *argv[i])) == qstring_ce)

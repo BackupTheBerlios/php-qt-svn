@@ -150,7 +150,6 @@ zend_module_entry php_qt_module_entry = {
 ZEND_GET_MODULE(php_qt)
 #endif
 
-
 static QHash<smokephp_object*, zval*> smoke_x_zval;
 QHash<void*, smokephp_object*> SmokeQtObjects;
 QStack<QString*> methodNameStack;
@@ -167,15 +166,29 @@ extern void 	_register_QString();
  *	proxy handler
  */
 
-union _zend_function *proxyHandler(zval **obj_ptr, char* methodname, int methodname_len TSRMLS_DC){
+union _zend_function *proxyHandler(zval **obj_ptr, char* methodName, int methodName_len TSRMLS_DC){
 
     union _zend_function *fbc;
 
+    // overwritten protected Qt methods wont work until we cheat here
+    int method_len = strlen(methodName);
+    char* lc_method_name = (char*) do_alloca(method_len+1);
+    zend_str_tolower_copy(lc_method_name, methodName, method_len);
+    // get the zend object and the function pointer
+    zend_object *zobj = zend_objects_get_address(*obj_ptr TSRMLS_CC);
+    if (zend_hash_find(&zobj->ce->function_table, lc_method_name, method_len+1, (void **)&fbc) != FAILURE) {
+	if(fbc->common.fn_flags & ZEND_ACC_PROTECTED){
+	    if(qt_Smoke->idMethodName(methodName) > 0){
+		fbc->common.fn_flags = ZEND_ACC_PUBLIC;
+	    }
+	}
+    }
+
     // a try for non-Qt objects
-    fbc = zend_orig_handler.get_method(obj_ptr, methodname, methodname_len);
+    fbc = zend_orig_handler.get_method(obj_ptr, methodName, methodName_len);
 
     if(!fbc) {    // maybe a Qt object
-        methodNameStack.push(new QString(methodname));
+        methodNameStack.push(new QString(methodName));
 	    // call proxy
 	    fbc = zend_orig_handler.get_method(obj_ptr, "proxyMethod", 11);
     }
@@ -394,7 +407,6 @@ PHP_MINIT_FUNCTION(php_qt)
 
 	// object list
 	le_php_qt_hashtype = zend_register_list_destructors_ex(phpqt_destroyHashtable, NULL, "PHP-Qt object list", module_number);
-	// FIXME: 50 is fix
 	zend_hash_init_ex(&php_qt_objptr_hash, PHPQT_CLASS_COUNT, NULL, NULL, 1, 0);
 
 	// overwrite method handler
@@ -712,7 +724,7 @@ phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname)
 }
 
 zval* 
-phpqt_callMethod(zval* this_ptr, char* methodname, zend_uint param_count, zval** args[])
+phpqt_callMethod(zval* this_ptr, char* methodName, zend_uint param_count, zval** args[])
 {
 
 	if(this_ptr == NULL){
@@ -721,13 +733,13 @@ phpqt_callMethod(zval* this_ptr, char* methodname, zend_uint param_count, zval**
 
     zval *function_name;
     MAKE_STD_ZVAL(function_name);
-    ZVAL_STRING(function_name,methodname,1);
+    ZVAL_STRING(function_name,methodName,1);
 
     zval* retval;
     MAKE_STD_ZVAL(retval);
 
     if(call_user_function(EG(function_table),&this_ptr,function_name,retval,param_count,*args) == FAILURE){
-    	php_error(E_ERROR, "PHP-Qt could not call method %s", methodname);
+    	php_error(E_ERROR, "PHP-Qt could not call method %s", methodName);
     }
 
     return retval;
