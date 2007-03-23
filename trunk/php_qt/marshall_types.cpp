@@ -359,8 +359,8 @@ MethodCallBase::classname()
 
 
 VirtualMethodCall::VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* obj, zval ***sp) :
-	MethodCallBase(smoke,meth,stack), _obj(obj)
-{		
+	MethodCallBase(smoke,meth,stack), _obj(obj), _sp(sp)
+{
 	_sp = sp;
 	_args = _smoke->argumentList + method().args;
 }
@@ -378,9 +378,12 @@ VirtualMethodCall::action()
 zval*
 VirtualMethodCall::var() 
 { 
-	return (zval*) _sp[_cur]; 
+    if(*_sp[_cur] == NULL) {
+	MAKE_STD_ZVAL(*_sp[_cur]);
+    }
+    return (zval*) *_sp[_cur]; 
 }
-	
+
 int 
 VirtualMethodCall::items() 
 { 
@@ -393,8 +396,8 @@ VirtualMethodCall::callMethod()
 	if (_called) return;
 	_called = true;
 
-//	zval* _retval = callMethod(_obj, _smoke->methodNames[method().name],
-//		method().numArgs,	_sp );
+	phpqt_callMethod(_obj, (char*) _smoke->methodNames[method().name], method().numArgs, _sp);
+
 	zval _retval;
 	VirtualMethodReturnValue r(_smoke, _method, _stack, _retval);
 }

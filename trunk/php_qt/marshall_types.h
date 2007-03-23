@@ -114,6 +114,7 @@ public:
  
 private:
 	zval* _obj;
+	zval ***_sp;
 };
 
 

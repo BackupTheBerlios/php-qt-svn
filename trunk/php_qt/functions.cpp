@@ -138,7 +138,7 @@ PHP_FUNCTION(qobject_cast){
  *	tr() returns QObject::tr()
  *
  */
-
+extern zval* zstringFromQString(QString* s);
 PHP_FUNCTION(tr)
 {
     const char* string;

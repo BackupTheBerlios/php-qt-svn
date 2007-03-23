@@ -69,14 +69,11 @@ public:
 		}
 
 		if(phpqt_methodExists(o->ce_ptr, (char*) methodName)){
-		    zval*** sp = (zval***) malloc(sizeof(zval)*2);
-		    zval* obj;
+		    Smoke::Method & meth = smoke->methods[method];
+		    zval*** sp = (zval ***) safe_emalloc((int) meth.numArgs, sizeof(zval **), 0);
 
-		    phpqt_callMethod(o->zval_ptr, (char*) methodName, 0, sp);
-/*
-		    VirtualMethodCall c(smoke, method, args, obj, sp);
+		    VirtualMethodCall c(smoke, method, args, o->zval_ptr, sp);
 		    c.next();
-*/
 		}
 		
 		return false;
