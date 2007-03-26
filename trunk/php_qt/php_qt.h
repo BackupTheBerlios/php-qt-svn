@@ -59,17 +59,6 @@ using namespace std;
 #endif
 
 #define Qnil (zval *) NULL
-#define QOUT()                                              \
-    extern QTextStream qout(stdout, QIODevice::WriteOnly);  \
-
-#ifndef NOT_YET_IMPLEMENTED
-#define NOT_YET_IMPLEMENTED { php_printf("%s(): functionality not yet implemented\n",get_active_function_name(TSRMLS_C));} 
-#endif
-
-#define PHP_QT_REGISTER(object)     \
-    zend_rsrc_list_entry le;        \
-    le.ptr = object;                \
-    phpqt_register(getThis(),le);  \
 
 #define PHP_QT_FETCH()  \
 	phpqt_getQtObjectFromZval(getThis()) \
