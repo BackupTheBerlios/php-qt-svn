@@ -102,10 +102,10 @@ public:
 void 
 smokephp_init() {
 
-/*    if (qt_Smoke != 0L) {
+    if (qt_Smoke != 0L) {
 	php_error(E_ERROR,"could not initialize smoke");
     }
-*/
+
     init_qt_Smoke();
 
     if(PQ::smoke()->numClasses <= 0){
@@ -417,53 +417,6 @@ smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const S
 
 }
 
-Smoke::Index
-smokephp_findConnect(){
-
-	for(int i=0;i<10000;i++){
-		if(PQ::smoke()->methodMaps[i].name == PQ::smoke()->idMethodName("connect#$#$")){
-			connect1 = PQ::smoke()->methodMaps[i].method;
-		}
-		if(PQ::smoke()->methodMaps[i].name == PQ::smoke()->idMethodName("connect#$#$$")){
-			connect2 = PQ::smoke()->methodMaps[i].method;
-		}
-		if(PQ::smoke()->methodMaps[i].name == PQ::smoke()->idMethodName("connect")){
-			connect3 = PQ::smoke()->methodMaps[i].method;
-		}
-		// these are ambiguous methods
-		if(PQ::smoke()->methodMaps[i].name == PQ::smoke()->idMethodName("connect#$$")){
-			connect4 = PQ::smoke()->methodMaps[i].method;
-		}
-		if(PQ::smoke()->methodMaps[i].name == PQ::smoke()->idMethodName("connect#$$$")){
-			connect5 = PQ::smoke()->methodMaps[i].method;
-		}
-	}
-}
-
-/**
- *	returns the related classId
- *	@todo	caching, SmokeType
- *	@param	char*	classname
- *	@return Smoke::Index
- */
-
-Smoke::Index 
-smokephp_getClassId(const char* classname){
-
-	Smoke::Index classId = 0;
-	Smoke::Class *p = PQ::smoke()->classes;
-	while(p++ != PQ::smoke()->classes+PQ::smoke()->numClasses){
-		classId++;
-		if(!strcmp(p->className,classname)){
-			return classId;
-		}
-	}
-	// should never happen
-	php_error(E_ERROR,"fatal: QObject not found\n");
-	return 0;
-
-}
-
 bool 
 smokephp_isQObject(Smoke::Index classId) {
 	if(strcmp(PQ::smoke()->classes[classId].className, "QObject") == 0)
@@ -474,17 +427,4 @@ smokephp_isQObject(Smoke::Index classId) {
 			return true;
     }
     return false;
-}
-
-bool
-smokephp_isConnect(Smoke::Index method){
-
-	if(
-		method == connect1
-		|| method == connect2
-		|| method == connect3
-		|| method == connect4
-		|| method == connect5
-	) return true; else return false;
-
 }

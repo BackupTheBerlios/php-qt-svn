@@ -101,6 +101,7 @@ PHP_FUNCTION(emit);
 PHP_FUNCTION(qobject_cast);
 PHP_FUNCTION(tr);
 PHP_FUNCTION(check_qobject);
+void check_object(zval* zobject);
 
 struct smokephp_object {
     bool allocated;
@@ -113,12 +114,11 @@ struct smokephp_object {
     QMetaObject* meta;
 };
 
-//zend_class_entry* php_qt_generic_class;
-void check_object(zval* zobject);
-static void 		phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc);
+
+static void 			phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc);
 
 void 				phpqt_register(zval* this_ptr, zend_rsrc_list_entry le);
-zval* 				phpqt_callMethod(zval* zend_ptr, char* methodname, zend_uint param_count, zval** params[]);
+zval* 				phpqt_callPHPMethod(zval* zend_ptr, char* methodname, zend_uint param_count, zval** params[]);
 bool 				phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname);
 bool 				phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, QMetaObject* metachar, QString* meta_stringdata, uint* signature);
 int				phpqt_metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a);
@@ -147,17 +147,13 @@ public:
 extern int le_php_qt_hashtype;
 extern HashTable php_qt_objptr_hash;
 
-void 				smokephp_convertArgsCxxToZend(zval*** args, int argc, Smoke::StackItem* qargs);
 bool 				smokephp_isQObject(Smoke::Index classId);
-Smoke::Index 			smokephp_getClassId(const char* classname);
 void				smokephp_prepareMethodName(zval*** args, int argc, QStack<QByteArray*> &methodNameStack);
 QByteArray* 			smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack);
 Smoke::Index			smokephp_getMethod(const char* c, const char* m, int argc, zval*** args);
 void				smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method);
 void				smokephp_callMethod(void *obj, Smoke::Index method, Smoke::Stack qargs);
 void				smokephp_init();
-Smoke::Index			smokephp_findConnect();
-bool				smokephp_isConnect(Smoke::Index method);
 
 void* 				transformArray(zval* args);
 

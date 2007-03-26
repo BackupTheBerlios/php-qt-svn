@@ -427,10 +427,7 @@ PHP_MINIT_FUNCTION(php_qt)
 
 	smokephp_init();
 
-// TODO		QObject Nummer suchen, nachher vergleichen
-	smokephp_findConnect();
-
-	Smoke::Index qobject = smokephp_getClassId("QObject");
+	Smoke::Index qobject = PQ::smoke()->idClass("QObject");
 
 	php_qt_static_methods = (zend_function_entry***) safe_emalloc((PQ::smoke()->numClasses), sizeof(zend_function_entry **), 0);
 
@@ -665,7 +662,7 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
     cout << "\tcall PHP method " << so->ce_ptr->name << "::" << method_name << endl;
 #endif
 
-        phpqt_callMethod(so->zval_ptr, method_name, j, args);
+        phpqt_callPHPMethod(so->zval_ptr, method_name, j, args);
 
     // is a signal
     } else {
@@ -730,7 +727,7 @@ phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname)
 }
 
 zval* 
-phpqt_callMethod(zval* this_ptr, char* methodName, zend_uint param_count, zval** args[])
+phpqt_callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zval** args[])
 {
 
 	if(this_ptr == NULL){

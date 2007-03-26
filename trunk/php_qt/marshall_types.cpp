@@ -397,7 +397,7 @@ VirtualMethodCall::callMethod()
 	if (_called) return;
 	_called = true;
 
-	phpqt_callMethod(_obj, (char*) _smoke->methodNames[method().name], method().numArgs, _sp);
+	phpqt_callPHPMethod(_obj, (char*) _smoke->methodNames[method().name], method().numArgs, _sp);
 
 	zval _retval;
 	VirtualMethodReturnValue r(_smoke, _method, _stack, _retval);
