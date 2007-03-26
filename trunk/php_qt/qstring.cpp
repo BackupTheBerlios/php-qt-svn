@@ -2116,24 +2116,11 @@ ZEND_METHOD(QString, replace){
 ZEND_METHOD(QString, fromUtf8){
 
 	if (ZEND_NUM_ARGS() == 2){
-		/* sl public*/
-
-		/* const char* , int size,  */
 		zval *z_0; // define ZVAL
 		zval *z_1; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_STRING && Z_TYPE_P(z_1) == IS_LONG){
   			    if(getThis() == NULL){
-
-//		    		QString *obj = (QString*) PHP_QT_FETCH();
-//				*return_object = (QString) obj->fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
-/*			  zend_class_entry *ce;                                   
-			  object_init_ex(return_value, qstring_ce);
-			  zend_rsrc_list_entry le;                            
-			  le.ptr = return_object;
-			  phpqt_register(return_value,le);
-*/
-
 				QString obj = (QString) QString::fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
 				QString *s1 = new QString(obj);
 				object_init_ex(return_value, qstring_ce);
