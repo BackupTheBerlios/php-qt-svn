@@ -367,6 +367,7 @@ VirtualMethodCall::VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Sta
 
 VirtualMethodCall::~VirtualMethodCall() 
 {
+//    delete[] _stack;
 }
 
 Marshall::Action 

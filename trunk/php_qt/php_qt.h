@@ -135,17 +135,29 @@ bool 				phpqt_SmokePHPObjectExists(zval* this_ptr);
 bool				phpqt_SmokePHPObjectExists(void* ptr);
 void				phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce = NULL, Smoke::Index classId = 0);
 
+extern Smoke* qt_Smoke;
+class PQ
+{
+private:
+    PQ();
+    PQ(const PQ& cc){}
+
+public:
+    ~PQ();
+    static inline Smoke* smoke() { return qt_Smoke; }
+};
+
 extern int le_php_qt_hashtype;
 extern HashTable php_qt_objptr_hash;
 
 void 				smokephp_convertArgsCxxToZend(zval*** args, int argc, Smoke::StackItem* qargs);
-bool 				smokephp_isQObject(Smoke *smoke, Smoke::Index classId);
+bool 				smokephp_isQObject(Smoke::Index classId);
 Smoke::Index 			smokephp_getClassId(const char* classname);
 void				smokephp_prepareMethodName(zval*** args, int argc, QStack<QString*> &methodNameStack);
 QByteArray* 			smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack);
-Smoke::Index			smokephp_getMethod(Smoke *smoke, const char* c, const char* m, int argc, zval*** args);
+Smoke::Index			smokephp_getMethod(const char* c, const char* m, int argc, zval*** args);
 void				smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method);
-void				smokephp_callMethod(Smoke *smoke, void *obj, Smoke::Index method, Smoke::Stack qargs);
+void				smokephp_callMethod(void *obj, Smoke::Index method, Smoke::Stack qargs);
 void				smokephp_init();
 Smoke::Index			smokephp_findConnect();
 bool				smokephp_isConnect(Smoke::Index method);

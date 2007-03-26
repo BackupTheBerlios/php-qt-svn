@@ -172,11 +172,12 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 	    phpqt_register(obj, le);
 	    phpqt_setZvalPtr(o, obj);
 
-	    const char * classname = o->ce_ptr->name;
+
 //	    if(m->type().isConst() && m->type().isRef()) {
 	    if(m->type().isRef()) {
 		p = construct_copy( o );
 #ifdef DEBUG
+			const char * classname = o->ce_ptr->name;
 			php_error(E_WARNING, "copying %s %p to %p\n", classname, o->ptr, p);
 #endif
 
