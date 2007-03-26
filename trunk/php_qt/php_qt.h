@@ -92,6 +92,9 @@ PHP_FUNCTION(tr);
 PHP_FUNCTION(check_qobject);
 void check_object(zval* zobject);
 
+void init_codec();
+zval* zstringFromQString(QString * s);
+
 struct smokephp_object {
     bool allocated;
     Smoke *smoke;

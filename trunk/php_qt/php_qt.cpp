@@ -48,6 +48,10 @@ HashTable php_qt_objptr_hash;
 static zend_object_handlers php_qt_handler;
 static zend_object_handlers zend_orig_handler;
 
+PHP_INI_BEGIN()
+    PHP_INI_ENTRY("qt.codec", "UTF8", PHP_INI_ALL, NULL)
+PHP_INI_END()
+
 // opcode handler
 #define PHPQT_OPHANDLER_COUNT				((25 * 151) + 1)
 #define EX__(element) execute_data->element
@@ -224,14 +228,7 @@ ZEND_METHOD(php_qt_generic_class, emit){
 
 ZEND_METHOD(php_qt_generic_class, __toString)
 {
-	if(!strcmp(Z_OBJCE_P(getThis())->name,"QString")){
-		smokephp_object* o = phpqt_getSmokePHPObjectFromZval(getThis());
-		RETVAL_STRING((char*)((QString*) o->ptr)->toAscii().constData(), 1);
-//		RETVAL_STRING((char*)((QString*) o->ptr)->toLocal8Bit().constData(), 1);
-	} else {
-		RETVAL_STRING("", 1);
-	}
-	return;
+	RETURN_STRING("", 1);
 }
 
 ZEND_METHOD(php_qt_generic_class, __destruct)
@@ -408,6 +405,9 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
 PHP_MINIT_FUNCTION(php_qt)
 {
 
+	REGISTER_INI_ENTRIES();
+	init_codec();
+
         install_handlers(Qt_handlers);
 
 	// object list
@@ -555,9 +555,7 @@ PHP_MINFO_FUNCTION(php_qt)
 	php_info_print_table_header(2, "PHP-Qt support", "enabled");
 	php_info_print_table_end();
 
-	/* Remove comments if you have entries in php.ini
 	DISPLAY_INI_ENTRIES();
-	*/
 }
 
 /*!

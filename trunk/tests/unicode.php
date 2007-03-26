@@ -45,7 +45,7 @@
 
 	}
 
-    $app = new QApplication(&$argc,$argv);
+    $app = new QApplication($argc,$argv);
 	$widget = new TestButtons();
 	$widget->show();
 	$app->exec();

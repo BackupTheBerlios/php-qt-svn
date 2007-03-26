@@ -183,18 +183,21 @@ void marshall_ucharP(Marshall *m) {
   marshall_it<unsigned char *>(m);
 }
 
-static const char * KCODE = "NONE";
+static const char * KCODE = 0;
 static QTextCodec *codec = 0;
 
-static void 
+void 
 init_codec() {
-//	zval* temp = read from php.ini
-//	KCODE = temp->value.str.val;
+
+	KCODE = INI_ORIG_STR("qt.codec");
 
 	if (qstrcmp(KCODE, "EUC") == 0) {
 		codec = QTextCodec::codecForName("eucJP");
 	} else if (qstrcmp(KCODE, "SJIS") == 0) {
 		codec = QTextCodec::codecForName("Shift-JIS");
+	} else if ((qstrcmp(KCODE, "UTF8") != 0) && (qstrcmp(KCODE,"Latin1") != 0)) {
+	    php_error(E_WARNING, "unknown text codec, set to local8Bit");
+	    KCODE="";
 	}
 }
 
@@ -211,7 +214,7 @@ qstringFromZString(zval* zstring) {
 		return new QString(codec->toUnicode(zstring->value.str.val));
 	else if (qstrcmp(KCODE, "SJIS") == 0)
 		return new QString(codec->toUnicode(zstring->value.str.val));
-	else if(qstrcmp(KCODE, "NONE") == 0)
+	else if(qstrcmp(KCODE, "Latin1") == 0)
 		return new QString(QString::fromLatin1(zstring->value.str.val));
 
 	return new QString(QString::fromLocal8Bit(zstring->value.str.val, zstring->value.str.len));
@@ -219,6 +222,7 @@ qstringFromZString(zval* zstring) {
 
 zval* 
 zstringFromQString(QString * s) {
+
 	if (KCODE == 0) {
 		init_codec();
 	}
@@ -230,7 +234,7 @@ zstringFromQString(QString * s) {
 		ZVAL_STRING(return_value, (char*) codec->fromUnicode(*s).constData(), /* duplicate */ 1);
 	} else if (qstrcmp(KCODE, "SJIS") == 0) {
 		ZVAL_STRING(return_value, (char*) codec->fromUnicode(*s).constData(), /* duplicate */ 1);
-	} else if (qstrcmp(KCODE, "NONE") == 0) {
+	} else if (qstrcmp(KCODE, "Latin1") == 0) {
 		ZVAL_STRING(return_value, (char*) s->toLatin1().constData(), /* duplicate */ 1);
 	} else {
 		ZVAL_STRING(return_value, (char*) s->toUtf8().constData(), /* duplicate */ 1);

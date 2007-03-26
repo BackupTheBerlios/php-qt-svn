@@ -132,12 +132,12 @@ ZEND_METHOD(QString,__toString){
 
   QString *QString_ptr = (QString *) PHP_QT_FETCH();
 
-  int l = QString_ptr->size();
+  zval* z = zstringFromQString(QString_ptr);
+  ZVAL_ZVAL(return_value, z,1,0);
+  efree(z);
 
-//  char* c = (char*) (QString_ptr->toUtf8()).constData();
-  char* c = (char*) (QString_ptr->toAscii()).constData();
+  return;
 
-  RETURN_STRING(c,l);
 }
 
 /*		public enumSectionFlag:long {
@@ -2123,25 +2123,26 @@ ZEND_METHOD(QString, fromUtf8){
 		zval *z_1; // define ZVAL
 		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz", &z_0, &z_1) == SUCCESS) {
 			if(Z_TYPE_P(z_0) == IS_STRING && Z_TYPE_P(z_1) == IS_LONG){
+  			    if(getThis() == NULL){
 
-// wichtig: Speicher auf dem Heap alloziieren
-			  QString *return_object = new QString;
-  			  if(getThis() != NULL){
-		        QString *obj = (QString*) PHP_QT_FETCH();
-// hier einfach überschreiben
-      			*return_object = (QString) obj->fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
-// static
-		      } else {
-		        *return_object = (QString) QString::fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
-
-		      }		
-			  zend_class_entry *ce;                                   
+//		    		QString *obj = (QString*) PHP_QT_FETCH();
+//				*return_object = (QString) obj->fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
+/*			  zend_class_entry *ce;                                   
 			  object_init_ex(return_value, qstring_ce);
 			  zend_rsrc_list_entry le;                            
 			  le.ptr = return_object;
 			  phpqt_register(return_value,le);
-			  return;
+*/
+
+				QString obj = (QString) QString::fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
+				QString *s1 = new QString(obj);
+				object_init_ex(return_value, qstring_ce);
+				phpqt_createObject(return_value, (void*) s1, qstring_ce);
+				return;
+
+			    }
 			}
+
 		}
 	}
 }
