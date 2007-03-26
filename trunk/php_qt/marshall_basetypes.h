@@ -170,8 +170,6 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 	    zend_rsrc_list_entry le;
 	    le.ptr = o;
 	    phpqt_register(obj, le);
-	    phpqt_setZvalPtr(o, obj);
-
 
 //	    if(m->type().isConst() && m->type().isRef()) {
 	    if(m->type().isRef()) {

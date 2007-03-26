@@ -23,6 +23,8 @@
 #ifndef QTPHP_H
 #define QTPHP_H
 
+#define PHPQT_VERSION "0.0.4"
+
 #define MONITOR
 
 #define COMPILE_DL_PHP_QT
@@ -122,11 +124,6 @@ bool 				phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* su
 int				phpqt_metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a);
 char*				phpqt_checkForOperator(const char* fname);
 
-void 				phpqt_setZvalPtr(smokephp_object *o, zval* z);
-void 				phpqt_removeZvalPtr(smokephp_object *o);
-zval* 				phpqt_fetchZvalPtr(smokephp_object *o);
-bool				phpqt_ZvalPtrExists(smokephp_object *o);
-
 void* 				phpqt_getQtObjectFromZval(zval* this_ptr);
 smokephp_object* 		phpqt_getSmokePHPObjectFromZval(zval* this_ptr);
 smokephp_object*		phpqt_getSmokePHPObjectFromQt(void* QtPtr);
@@ -153,7 +150,7 @@ extern HashTable php_qt_objptr_hash;
 void 				smokephp_convertArgsCxxToZend(zval*** args, int argc, Smoke::StackItem* qargs);
 bool 				smokephp_isQObject(Smoke::Index classId);
 Smoke::Index 			smokephp_getClassId(const char* classname);
-void				smokephp_prepareMethodName(zval*** args, int argc, QStack<QString*> &methodNameStack);
+void				smokephp_prepareMethodName(zval*** args, int argc, QStack<QByteArray*> &methodNameStack);
 QByteArray* 			smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack);
 Smoke::Index			smokephp_getMethod(const char* c, const char* m, int argc, zval*** args);
 void				smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method);

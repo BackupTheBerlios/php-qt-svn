@@ -73,6 +73,7 @@ public:
 
 		    VirtualMethodCall c(smoke, method, args, o->zval_ptr, sp);
 //		    c.next();
+		    efree(sp);
 		}
 		
 		return false;
@@ -321,7 +322,7 @@ void* transformArray(zval* args){
 
 }
 
-void smokephp_prepareMethodName(zval*** args, int argc, QStack<QString*> &methodNameStack){
+void smokephp_prepareMethodName(zval*** args, int argc, QStack<QByteArray*> &methodNameStack){
 
     for(int i=0;i<argc;i++){
 	    uint type = ((int) ((zval) **args[i]).type);

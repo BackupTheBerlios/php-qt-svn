@@ -159,7 +159,6 @@ PHP_FUNCTION(tr)
 	le.ptr = o;
 	phpqt_register(return_value, le);
 	phpqt_setSmokePHPObject(o);
-	phpqt_setZvalPtr(o, o->zval_ptr);
     return;
 }
 

@@ -20,8 +20,6 @@
  *
  */
 
-// TODO		references
-
 #include <zend_interfaces.h>
 #include "php_qt.h"
 #include "ext/standard/php_string.h"
@@ -40,7 +38,6 @@ extern void init_qt_Smoke();
 extern TypeHandler Qt_handlers[];
 void install_handlers(TypeHandler *);
 
-/* True global resources - no need for thread safety here */
 static int le_php_qt;
 
 // object list
@@ -57,6 +54,61 @@ static zend_object_handlers zend_orig_handler;
 #define EX_T(offset) (*(temp_variable *)((char *) EX__(Ts) + offset))
 static opcode_handler_t *phpqt_original_opcode_handlers;
 static opcode_handler_t phpqt_opcode_handlers[PHPQT_OPHANDLER_COUNT];
+
+
+/*! php_qt_functions[]
+ *
+ * Every user visible function must have an entry in php_qt_functions[].
+ */
+#undef emit
+function_entry php_qt_functions[] = {
+	PHP_FE(confirm_php_qt_compiled,	NULL)		/* For testing, remove later. */
+	PHP_FE(SIGNAL,	NULL)
+	PHP_FE(SLOT,	NULL)	
+	PHP_FE(emit,	NULL)	
+	PHP_FE(qobject_cast,	NULL)
+	PHP_FE(tr,	NULL)
+	PHP_FE(check_qobject,	NULL)
+	{NULL, NULL, NULL}	/* Must be the last line in php_qt_functions[] */
+};
+
+/*! php_qt_module_entry
+ */
+zend_module_entry php_qt_module_entry = {
+#if ZEND_MODULE_API_NO >= 20010901
+	STANDARD_MODULE_HEADER,
+#endif
+	"php_qt",
+	php_qt_functions,
+	PHP_MINIT(php_qt),
+	PHP_MSHUTDOWN(php_qt),
+	PHP_RINIT(php_qt),		/* Replace with NULL if there's nothing to do at request start */
+	PHP_RSHUTDOWN(php_qt),	/* Replace with NULL if there's nothing to do at request end */
+	PHP_MINFO(php_qt),
+#if ZEND_MODULE_API_NO >= 20010901
+	PHPQT_VERSION,
+#endif
+	STANDARD_MODULE_PROPERTIES
+};
+
+#ifdef COMPILE_DL_PHP_QT
+ZEND_GET_MODULE(php_qt)
+#endif
+
+QHash<void*, smokephp_object*> SmokeQtObjects;
+QStack<QByteArray*> methodNameStack;
+
+// cached
+Smoke::Index qbool;
+Smoke::Index qstring;
+Smoke::Index qobject;
+zend_class_entry* qobject_ce;
+extern zend_class_entry* qstring_ce;
+extern void 	_register_QString();
+
+/*
+ *	constants handler
+ */
 
 static int constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
 
@@ -110,56 +162,6 @@ static int constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
 
 }
 
-/*! php_qt_functions[]
- *
- * Every user visible function must have an entry in php_qt_functions[].
- */
-#undef emit
-function_entry php_qt_functions[] = {
-	PHP_FE(confirm_php_qt_compiled,	NULL)		/* For testing, remove later. */
-	PHP_FE(SIGNAL,	NULL)
-	PHP_FE(SLOT,	NULL)	
-	PHP_FE(emit,	NULL)	
-	PHP_FE(qobject_cast,	NULL)
-	PHP_FE(tr,	NULL)
-	PHP_FE(check_qobject,	NULL)
-	{NULL, NULL, NULL}	/* Must be the last line in php_qt_functions[] */
-};
-
-/*! php_qt_module_entry
- */
-zend_module_entry php_qt_module_entry = {
-#if ZEND_MODULE_API_NO >= 20010901
-	STANDARD_MODULE_HEADER,
-#endif
-	"php_qt",
-	php_qt_functions,
-	PHP_MINIT(php_qt),
-	PHP_MSHUTDOWN(php_qt),
-	PHP_RINIT(php_qt),		/* Replace with NULL if there's nothing to do at request start */
-	PHP_RSHUTDOWN(php_qt),	/* Replace with NULL if there's nothing to do at request end */
-	PHP_MINFO(php_qt),
-#if ZEND_MODULE_API_NO >= 20010901
-	"0.0.4", /* Replace with version number for your extension */
-#endif
-	STANDARD_MODULE_PROPERTIES
-};
-
-#ifdef COMPILE_DL_PHP_QT
-ZEND_GET_MODULE(php_qt)
-#endif
-
-static QHash<smokephp_object*, zval*> smoke_x_zval;
-QHash<void*, smokephp_object*> SmokeQtObjects;
-QStack<QString*> methodNameStack;
-
-// cached
-Smoke::Index qbool;
-Smoke::Index qstring;
-Smoke::Index qobject;
-zend_class_entry* qobject_ce;
-extern zend_class_entry* qstring_ce;
-extern void 	_register_QString();
 
 /**
  *	proxy handler
@@ -187,7 +189,7 @@ union _zend_function *proxyHandler(zval **obj_ptr, char* methodName, int methodN
     fbc = zend_orig_handler.get_method(obj_ptr, methodName, methodName_len);
 
     if(!fbc) {    // maybe a Qt object
-        methodNameStack.push(new QString(methodName));
+        methodNameStack.push(new QByteArray(methodName));
 	    // call proxy
 	    fbc = zend_orig_handler.get_method(obj_ptr, "proxyMethod", 11);
     }
@@ -236,7 +238,6 @@ ZEND_METHOD(php_qt_generic_class, __destruct)
 {
     if(phpqt_SmokePHPObjectExists(getThis())) {
 	smokephp_object *o = phpqt_getSmokePHPObjectFromZval(getThis());
-	phpqt_removeZvalPtr(o);
 	SmokeQtObjects.remove(o->ptr);
 
 	efree(o->zval_ptr);
@@ -266,9 +267,9 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 	    WRONG_PARAM_COUNT;
     }
 
-    methodNameStack.push(new QString(ce->name));
-    smokephp_prepareMethodName(args, argc, methodNameStack);
-    Smoke::Index method = smokephp_getMethod(ce->name, (methodNameStack.top())->toAscii(), ZEND_NUM_ARGS(), args);
+    methodNameStack.push(new QByteArray(ce->name));
+    smokephp_prepareMethodName(args, argc, methodNameStack);	// #, $, ?
+    Smoke::Index method = smokephp_getMethod(ce->name, methodNameStack.top()->constData(), ZEND_NUM_ARGS(), args);
     MethodCall c(PQ::smoke(), method, getThis(), args, argc-1, getThis());
     c.next();
 
@@ -334,7 +335,7 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
         char* class_name = get_active_class_name(&space);
         char* method_name = get_active_function_name();
         ce = zend_fetch_class(class_name,strlen(class_name), ZEND_FETCH_CLASS_AUTO TSRMLS_DC);
-        methodNameStack.push(new QString(method_name));
+        methodNameStack.push(new QByteArray(method_name));
     }
 
     // find parents
@@ -351,17 +352,17 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
     }
 
     smokephp_prepareMethodName(args, argc, methodNameStack);
-    Smoke::Index method = smokephp_getMethod(ce->name, (methodNameStack.top())->toAscii(), argc, args);
+    Smoke::Index method = smokephp_getMethod(ce->name, methodNameStack.top()->constData(), argc, args);
 
     if(method <= 0) {
-	if(methodNameStack.top()->toAscii().constData()) {
+	if(methodNameStack.top()->constData()) {
 
 	    // is it a signal?
 	    if(getThis()){
 		smokephp_object* o = phpqt_getSmokePHPObjectFromZval(getThis());
 		if(o->meta != NULL){
 		    QMetaObject* mo = (QMetaObject*) o->meta;
-		    QByteArray signalname(methodNameStack.top()->toAscii().constData());
+		    QByteArray signalname(methodNameStack.top()->constData());
 		    signalname.replace("$","");
 		    signalname.replace("#","");
 		    signalname.replace("?","");
@@ -384,7 +385,7 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
 		}
 	    }
 
-	    php_error(E_ERROR,"Call to undefined method %s::%s()", ce->name, methodNameStack.top()->toAscii().constData());
+	    php_error(E_ERROR,"Call to undefined method %s::%s()", ce->name, methodNameStack.top()->constData());
 	}
 	else 
 	    php_error(E_ERROR,"Call to undefined method!");
@@ -878,38 +879,6 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
   	}
 }
 
-/*!
- *	fetchs the zval-ptr from hashtable
- *	@param	QObject*
- *	@return	zval*
- */
-
-
-void
-phpqt_setZvalPtr(smokephp_object *o, zval* z) {
-	smoke_x_zval.insert(o,z);
-}
-
-void
-phpqt_removeZvalPtr(smokephp_object *o) {
-	smoke_x_zval.remove(o);
-}
-
-zval* 
-phpqt_fetchZvalPtr(smokephp_object *o){
-	return smoke_x_zval.value(o);
-}
-
-bool
-phpqt_ZvalPtrExists(smokephp_object *o){
-	return (smoke_x_zval.find(o) != smoke_x_zval.end());
-}
-
-/**
- *	maps method names to the related names of operator-extension
- *	@param	const char*		fname		function name
- */
-
 char*
 phpqt_checkForOperator(const char* fname){
 	return (char*) fname;
@@ -1006,6 +975,5 @@ phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce, Smoke::Index
 	le.ptr = o;
 	object_init_ex(zval_ptr, ce);
 	phpqt_register(o->zval_ptr,le);
-	phpqt_setZvalPtr(o, o->zval_ptr);
 
 }
