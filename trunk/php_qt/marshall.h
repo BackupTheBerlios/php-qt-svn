@@ -41,15 +41,11 @@ public:
      */
     virtual bool cleanup() = 0;
 
-    zval* retval() {return _retval;};
-    zval* setRetval(zval* retval) {_retval = retval;};
-
     virtual ~Marshall() {}
 
-protected:
-    zval* _retval;
+	const char* identifier;
 
-};    
+};
 
 class SmokeEnumWrapper {
 public:

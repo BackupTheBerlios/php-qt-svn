@@ -11,7 +11,7 @@
 
     class Button extends QToolButton {
 
-        function __construct($text, &$color)
+        function __construct($text, $color)
         {
             parent::__construct();
 
@@ -19,7 +19,7 @@
             $this->setText($text);
 
     	    $newPalette = new QPalette();
-            $newPalette->setColor(QPalette::Button, &$color);
+            $newPalette->setColor(QPalette::Button, $color);
             $this->setPalette($newPalette);
         }
     }

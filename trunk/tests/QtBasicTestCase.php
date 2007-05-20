@@ -175,6 +175,13 @@
 	    echo " passed";
 	}
 
+	function testTr(){
+	    echo "\ntesting tr()";
+	    $s = tr("hello world");
+	    $this->assertEquals($s->__toString(), "hello world", "tr() doesnt work!");
+	    echo " passed";
+	}
+
     }    
     
 ?>

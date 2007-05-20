@@ -62,14 +62,15 @@ PHP_FUNCTION(SIGNAL)
         return;
     }
 
-    char* tmp = (char*) emalloc((int) string_len + 2);
-    strcpy(tmp,"2");
+//     char* tmp = (char*) emalloc((int) string_len + 2);
+//     strcpy(tmp,"2");
+//     strncat(tmp, string, (int) string_len);
 
-    strncat(tmp, string, (int) string_len);
+	QString *qstring = new QString(string);
+	qstring->prepend("2");
+    ZVAL_STRING(return_value,(char*) qstring->toLatin1().constData(),1);
 
-    ZVAL_STRING(return_value,tmp,1);
-
-    efree(tmp);
+//     efree(tmp);
 
     return;
 }
@@ -86,14 +87,15 @@ PHP_FUNCTION(SLOT)
         return;
     }
 
-    char* tmp = (char*) emalloc((int) string_len + 2);
-    strcpy(tmp,"1");
+//     char* tmp = (char*) emalloc((int) string_len + 2);
+//     strcpy(tmp,"1");
+//     strncat(tmp, string, (int) string_len);
 
-    strncat(tmp, string, (int) string_len);
+	QString *qstring = new QString(string);
+	qstring->prepend("1");
+    ZVAL_STRING(return_value,(char*) qstring->toLatin1().constData(),1);
 
-    ZVAL_STRING(return_value,tmp,1);
-
-    efree(tmp);
+//     efree(tmp);
 
     return;
 }
@@ -117,6 +119,7 @@ PHP_FUNCTION(emit)
 /**
  *	simply returns the first parameter because objects are casted automatically in smokephp_convertReturn(...)
  *
+ *	function defined for compatibility
  */
 
 PHP_FUNCTION(qobject_cast){
@@ -129,7 +132,10 @@ PHP_FUNCTION(qobject_cast){
         return; 
     }
 
-	ZVAL_ZVAL(return_value, obj, 0, 0);
+	// just return the first argument
+	// see marshall_basetypes.h, marshall_to_php<SmokeClassWrapper>
+ 	zval_ptr_dtor(return_value_ptr);
+ 	*(return_value_ptr) = obj;
     return;
 
 }
@@ -147,18 +153,9 @@ PHP_FUNCTION(tr)
         return;
     }
 
-	smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
-	o->ptr = new QString(QObject::tr(string));
-	o->smoke = qt_Smoke;
-	o->classId = 0;		// QString is not in smoke
-	o->ce_ptr = qstring_ce;
-	o->zval_ptr = return_value;
+	QString *ptr = new QString(QObject::tr(string));
+	phpqt_createObject(return_value, ptr, qstring_ce, QSTRING_CLASSID);
 
-	object_init_ex(return_value, qstring_ce);
-	zend_rsrc_list_entry le;
-	le.ptr = o;
-	phpqt_register(return_value, le);
-	phpqt_setSmokePHPObject(o);
     return;
 }
 
@@ -168,44 +165,84 @@ PHP_FUNCTION(tr)
  */
 
 
-void check_object(zval* zobject)
+void check_qobject(zval* zobject)
 {
 
 	if(!phpqt_SmokePHPObjectExists(zobject)) {
-	    php_error(E_ERROR,"Object is not registered.");
+
+		cout << "PHP Object \n(" << endl;
+
+		cout << "\t       zval => " << zobject << endl;
+// 		cout << "\tclass entry => " << Z_OBJCE_P(zobject)->name << endl;
+		cout << "\t  ref count => " << zobject->refcount << endl;
+		cout << "\t     is_ref => " << (int) zobject->is_ref << endl;
+		cout << "\t       type => " << printType(Z_TYPE_P(zobject)) << endl;
+
+		if(Z_TYPE_P(zobject) == 5)
+		{
+		 cout <<"\t obj-handle => " << zobject->value.obj.handle << endl;
+		}
+
+		cout << ")" << endl;
+
+	} else {
+
+		smokephp_object* o = phpqt_getSmokePHPObjectFromZval(zobject);
+
+		cout << "PHP-Qt object \n(" << endl;
+
+		cout << "\t       zval => " << zobject << endl;
+	// 	cout << "\tclass entry => " << Z_OBJCE_P(zobject)->name << endl;
+		cout << "\tclass entry => " << o->ce_ptr->name << endl;
+		cout << "\t  ref count => " << zobject->refcount << endl;
+		cout << "\t     is_ref => " << (int) zobject->is_ref << endl;
+		cout << "\t       type => " << printType(Z_TYPE_P(zobject)) << endl;
+
+		if(Z_TYPE_P(zobject) == 5)
+		{
+		 cout <<"\t obj-handle => " << zobject->value.obj.handle << endl;
+		}
+
+		cout << endl;
+
+		cout << "\t      smokeobj => " << o << endl;
+		cout << "\t         Smoke => " << o->smoke << endl;
+		cout << "\t       classId => " << o->classId << endl;
+		cout << "\t        Qt ptr => " << o->ptr << endl;
+		cout << "\t        ce_ptr => " << o->ce_ptr << endl;
+		cout << "\t      zval_ptr => " << o->zval_ptr << endl;
+		cout << "\t  QMetaObject* => " << o->meta << endl;
+
+		cout << ")" << endl;
 	}
-
-	smokephp_object* o = phpqt_getSmokePHPObjectFromZval(zobject);
-
-	cout << "PHP-Qt object \n(" << endl;
-
-	cout << "\t       zval => " << zobject << endl;
-	cout << "\tclass entry => " << Z_OBJCE_P(zobject)->name << endl;
-	cout << "\t  ref count => " << zobject->refcount << endl;
-	cout << "\t     is_ref => " << zobject->is_ref << endl;
-	cout << "\t       type => " << Z_TYPE_P(zobject) << endl;
-
-	cout << endl;
-
-	cout << "\t      smokeobj => " << o << endl;
-	cout << "\t         Smoke => " << o->smoke << endl;
-	cout << "\t       classId => " << o->classId << endl;
-	cout << "\t        Qt ptr => " << o->ptr << endl;
-	cout << "\t        ce_ptr => " << o->ce_ptr << endl;
-	cout << "\t      zval_ptr => " << o->zval_ptr << endl;
-	cout << "\t  QMetaObject* => " << o->meta << endl;
-
-	cout << ")" << endl;
-
 }
 
 PHP_FUNCTION(check_qobject)
 {
 
     zval* zobject;
-    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"o",&zobject)) {
+    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z",&zobject)) {
         return;
     }
 
-    check_object(zobject);
+    check_qobject(zobject);
 }
+
+
+const char* printType(int type)
+{
+ switch(type){
+	case IS_NULL:	return "IS_NULL"; break; // 0
+	case IS_LONG:	return "IS_LONG"; break; // 1
+	case IS_DOUBLE: return "IS_DOUBLE"; break;	//2
+	case IS_BOOL: return "IS_BOOL"; break; //	3
+	case IS_ARRAY: return "IS_ARRAY"; break; // 4
+	case IS_OBJECT: return "IS_OBJECT"; break; //	5
+	case IS_STRING: return "IS_STRING"; break; // 6
+	case IS_RESOURCE: return "IS_RESOURCE"; break; // 7
+	case IS_CONSTANT: return "IS_CONSTANT"; break; // 8
+	case IS_CONSTANT_ARRAY: return "IS_CONSTANT_ARRAY"; break; //	9
+ }
+ return "unknown";
+}
+

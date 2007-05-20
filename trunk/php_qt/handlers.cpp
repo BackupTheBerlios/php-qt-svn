@@ -31,46 +31,57 @@ matches_arg(Smoke *smoke, Smoke::Index meth, Smoke::Index argidx, const char *ar
 void*
 construct_copy(smokephp_object *o)
 {
-    const char *className = o->smoke->className(o->classId);
+	const char *className;
+	if(o->classId > 0)
+	{
+		className = o->smoke->className(o->classId);
+	} else {
+		// must be a qstring
+		return o->ptr;
+	}
+
     int classNameLen = strlen(className);
+
     char *ccSig = new char[classNameLen + 2];       // copy constructor signature
     strcpy(ccSig, className);
     strcat(ccSig, "#");
     Smoke::Index ccId = o->smoke->idMethodName(ccSig);
     delete[] ccSig;
-
     char *ccArg = new char[classNameLen + 8];
     sprintf(ccArg, "const %s&", className);
 
     Smoke::Index ccMeth = o->smoke->findMethod(o->classId, ccId);
 
     if(!ccMeth) {
-	delete[] ccArg;
-	return 0;
+		delete[] ccArg;
+		return 0;
     }
 
     Smoke::Index method = o->smoke->methodMaps[ccMeth].method;
-    if(method > 0) {
-	// Make sure it's a copy constructor
-	if(!matches_arg(o->smoke, method, 0, ccArg)) {
-            delete[] ccArg;
-	    return 0;
-        }
-        delete[] ccArg;
-        ccMeth = method;
+    if(method > 0)
+    {
+		// Make sure it's a copy constructor
+		if(!matches_arg(o->smoke, method, 0, ccArg)) {
+				delete[] ccArg;
+			return 0;
+		}
+		delete[] ccArg;
+		ccMeth = method;
     } else {
         // ambiguous method, pick the copy constructor
-	Smoke::Index i = -method;
-	while(o->smoke->ambiguousMethodList[i]) {
-	    if(matches_arg(o->smoke, o->smoke->ambiguousMethodList[i], 0, ccArg))
-		break;
-            i++;
-	}
+		Smoke::Index i = -method;
+		while(o->smoke->ambiguousMethodList[i]) {
+			if(matches_arg(o->smoke, o->smoke->ambiguousMethodList[i], 0, ccArg))
+			break;
+				i++;
+		}
         delete[] ccArg;
-	ccMeth = o->smoke->ambiguousMethodList[i];
-	if(!ccMeth)
-	    return 0;
-    }
+		ccMeth = o->smoke->ambiguousMethodList[i];
+		if(!ccMeth)
+		{
+			return 0;
+		}
+	}
 
     // Okay, ccMeth is the copy constructor. Time to call it.
     Smoke::StackItem args[2];
@@ -226,7 +237,6 @@ zstringFromQString(QString * s) {
 	if (KCODE == 0) {
 		init_codec();
 	}
-
 	zval* return_value = (zval*) emalloc(sizeof(zval));
 	if (qstrcmp(KCODE, "UTF8") == 0) {
 		ZVAL_STRING(return_value, (char*) s->toUtf8().constData(), /* duplicate */ 1);
@@ -278,14 +288,19 @@ static void marshall_QString(Marshall *m) {
 		case Marshall::ToZVAL:
 		{
 			QString* s = (QString*) m->item().s_voidp;
-			phpqt_createObject(m->retval(), (void*) s, qstring_ce);
+			zval* obj = m->var();
+// 			object_init_ex(obj, qstring_ce);
+
+			phpqt_createObject(obj, (void*) s, qstring_ce, -1);
 
 			if(s) {
 				if (s->isNull()) {
-					m->setRetval(Qnil);
+// 					m->setRetval(Qnil);
+					*(m->var()) = *Qnil;
 				}
 			} else {
-				m->setRetval(Qnil);
+// 				m->setRetval(Qnil);
+				*(m->var()) = *Qnil;
 			}
 		}
 		break;

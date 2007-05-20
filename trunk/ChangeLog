@@ -1,3 +1,6 @@
+
+		* mapping of zend object instead of zval
+
 2007-003-22  Thomas Moenicke <thomas.moenicke@kdemail.net>
 
 		* call of virtual methods

@@ -34,6 +34,10 @@ Marshall::HandlerFn getMarshallFn(const SmokeType &type);
 extern void smokeStackToQtStack(Smoke::Stack stack, void ** o, int items, MocArgument* args);
 extern void smokeStackFromQtStack(Smoke::Stack stack, void ** _o, int items, MocArgument* args);
 
+/**
+ *	MethodReturnValueBase
+ */
+
 class MethodReturnValueBase : public Marshall 
 {
 public:
@@ -46,16 +50,21 @@ public:
 	bool cleanup();
 	void unsupported();
 	zval* var();
+	void setVar(zval* zobj);
 
 protected:
 	Smoke *_smoke;
 	Smoke::Index _method;
 	Smoke::Stack _stack;
 	SmokeType _st;
+	zval* _retval;
 
 	virtual const char *classname();
 };
 
+/**
+ *	VirtualMethodReturnValue
+ */
 
 class VirtualMethodReturnValue : public MethodReturnValueBase {
 public:
@@ -66,15 +75,24 @@ private:
 	zval _retval2;
 };
 
+/**
+ *	MethodReturnValue
+ */
 
 class MethodReturnValue : public MethodReturnValueBase {
 public:
-	MethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval *retval);
+	MethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval *retval, zval** return_value_ptr);
     Marshall::Action action();
+	zval** retval_ptr();
 
 private:
+	zval **_return_value_ptr;
 	const char *classname();
 };
+
+/**
+ *	MethodCallBase
+ */
 
 class MethodCallBase : public Marshall
 {
@@ -101,6 +119,9 @@ protected:
 	virtual const char* classname();
 };
 
+/**
+ *	VirtualMethodCall
+ */
 
 class VirtualMethodCall : public MethodCallBase {
 public:
@@ -117,10 +138,13 @@ private:
 	zval ***_sp;
 };
 
+/**
+ *	MethodCall
+ */
 
 class MethodCall : public MethodCallBase {
 public:
-	MethodCall(Smoke *smoke, Smoke::Index method, zval* target, zval ***sp, int items, zval *retval);
+	MethodCall(Smoke *smoke, Smoke::Index method, zval* target, zval ***sp, int items, zval *retval, zval** return_value_ptr);
 	~MethodCall();
 	Marshall::Action action();
 	zval* var();
@@ -130,7 +154,7 @@ public:
 
 		QString className(_smoke->className(method().classId));
 
-		if (	! className.endsWith(_smoke->methodNames[method().name])
+		if (! className.endsWith(_smoke->methodNames[method().name])
 			&& Z_TYPE_P(_target) == IS_NULL
 			&& !(method().flags & Smoke::mf_static) ) 
 		{
@@ -146,25 +170,31 @@ public:
 		void *ptr = _smoke->cast(_current_object, _current_object_class, method().classId);
 		_items = -1;
 		(*fn)(method().method, ptr, _stack);
-		MethodReturnValue r(_smoke, _method, _stack, _retval);
+		MethodReturnValue r(_smoke, _method, _stack, _retval, _return_value_ptr);
 	}
 
 	int items();
 	bool cleanup();
+
 private:
 	zval* _target;
 	void *_current_object;
 	Smoke::Index _current_object_class;
 	zval ***_sp;
 	int _items;
+	zval *_retval;
+	zval **_return_value_ptr;
 
 	const char *classname();
 };
 
+/**
+ *	SigSlotBase
+ */
 
 class SigSlotBase : public Marshall {
 public:
-	SigSlotBase(int items, MocArgument* mocStack, zval*** sp);
+	SigSlotBase(zval*** sp);
 	~SigSlotBase();
 	const MocArgument &arg();
 	SmokeType type();
@@ -186,7 +216,8 @@ protected:
 };
 
 
-class EmitSignal : public SigSlotBase {
+
+class EmitSignal : public Marshall {
     QObject *_obj;
     int _id;
 	zval * _result;
@@ -198,6 +229,19 @@ class EmitSignal : public SigSlotBase {
 	void emitSignal();
 	void mainfunction();
 	bool cleanup();
+	void next(); 
+	SmokeType type();
+	zval* var();
+	void unsupported();
+	Smoke* smoke();
+	const MocArgument &arg();
+ protected:
+	MocArgument *_args;
+	int _cur;
+	bool _called;
+	Smoke::Stack _stack;
+	int _items;
+	zval ***_sp;
 };
 
 class InvokeNativeSlot : public SigSlotBase {
@@ -215,7 +259,7 @@ class InvokeNativeSlot : public SigSlotBase {
 };
 
 class InvokeSlot : public SigSlotBase {
-    zval _obj;
+    zval* _obj;
     int _slotname;
     void **_o;
 public:
@@ -230,10 +274,12 @@ public:
 };
 
 
-/*
-	Converts a C++ value returned by a signal invocation to a PHP 
-	reply type
-*/
+/**
+ *	SignalReturnValue
+ *
+ *	Converts a C++ value returned by a signal invocation to a PHP 
+ *	reply type
+ */
 class SignalReturnValue : public Marshall {
     MocArgument *	_replyType;
     Smoke::Stack _stack;

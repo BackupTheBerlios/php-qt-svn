@@ -196,9 +196,14 @@ smokeStackFromQtStack(Smoke::Stack stack, void ** _o, int items, MocArgument* ar
 	}
 }
 
+/**
+ *	MethodReturnValueBase
+ */
+
 MethodReturnValueBase::MethodReturnValueBase(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack) :
 	_smoke(smoke), _method(meth), _stack(stack)
-{ 
+{
+	identifier = "MethodReturnValueBase";
 	_st.set(_smoke, method().ret);
 }
 
@@ -210,8 +215,8 @@ MethodReturnValueBase::method()
 
 Smoke::StackItem&
 MethodReturnValueBase::item() 
-{ 
-	return _stack[0]; 
+{
+	return _stack[0];
 }
 
 Smoke *
@@ -247,7 +252,13 @@ MethodReturnValueBase::unsupported()
 zval* 
 MethodReturnValueBase::var() 
 { 
-	return _retval; 
+	return _retval;
+}
+
+void
+MethodReturnValueBase::setVar(zval* zobj)
+{
+	_retval = zobj;
 }
 
 const char *
@@ -256,10 +267,14 @@ MethodReturnValueBase::classname()
 	return _smoke->className(method().classId); 
 }
 
+/**
+ *	VirtualMethodReturnValue
+ */
 
 VirtualMethodReturnValue::VirtualMethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval retval) :
 	MethodReturnValueBase(smoke,meth,stack), _retval2(retval) 
 {
+	identifier = "VirtualMethodReturnValue";
 	_retval = &_retval2;
 	Marshall::HandlerFn fn = getMarshallFn(type());
 	(*fn)(this);
@@ -271,11 +286,15 @@ VirtualMethodReturnValue::action()
 	return Marshall::FromZVAL; 
 }
 
-MethodReturnValue::MethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* retval) :
-	MethodReturnValueBase(smoke,meth,stack) 
-{
-	_retval = retval;
+/**
+ *	MethodReturnValue
+ */
 
+MethodReturnValue::MethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* retval, zval** return_value_ptr) :
+	MethodReturnValueBase(smoke,meth,stack), _return_value_ptr(return_value_ptr)
+{
+	identifier = "MethodReturnValue";
+	_retval = retval;
 	Marshall::HandlerFn fn = getMarshallFn(type());
 	(*fn)(this);
 }
@@ -292,6 +311,12 @@ MethodReturnValue::classname()
 	return qstrcmp(MethodReturnValueBase::classname(), "QGlobalSpace") == 0 ? "" : MethodReturnValueBase::classname(); 
 }
 
+zval**
+MethodReturnValue::retval_ptr(){ return _return_value_ptr; }
+
+/**
+ *	MethodCallBase
+ */
 
 MethodCallBase::MethodCallBase(Smoke *smoke, Smoke::Index meth) :
 	_smoke(smoke), _method(meth), _cur(-1), _called(false), _sp(0)  
@@ -357,10 +382,14 @@ MethodCallBase::classname()
 	return _smoke->className(method().classId); 
 }
 
+/**
+ *	VirtualMethodCall
+ */
 
 VirtualMethodCall::VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* obj, zval ***sp) :
 	MethodCallBase(smoke,meth,stack), _obj(obj), _sp(sp)
 {
+	identifier = "VirtualMethodCall";
 	_sp = sp;
 	_args = _smoke->argumentList + method().args;
 }
@@ -409,24 +438,31 @@ VirtualMethodCall::cleanup()
 	return false; 
 }
 
-MethodCall::MethodCall(Smoke *smoke, Smoke::Index method, zval* target, zval ***sp, int items, zval *retval) :
-	MethodCallBase(smoke,method), _target(target), _current_object(0), _sp(sp), _items(items)
-{
+/**
+ *	MethodCall
+ */
 
-    if(target != NULL) {
-	if (phpqt_SmokePHPObjectExists(_target)) {
-		smokephp_object *o = phpqt_getSmokePHPObjectFromZval(_target);
-		if (o && o->ptr) {
-			_current_object = o->ptr;
-			_current_object_class = o->classId;
+MethodCall::MethodCall(Smoke *smoke, Smoke::Index method, zval* target, zval ***sp, int items, zval *retval, zval** return_value_ptr) :
+	MethodCallBase(smoke,method), _target(target), _current_object(0), _sp(sp), _items(items), _retval(retval), _return_value_ptr(return_value_ptr)
+{
+	identifier = "MethodCall";
+    if(target != NULL)
+    {
+		if (phpqt_SmokePHPObjectExists(_target))
+		{
+			smokephp_object *o = phpqt_getSmokePHPObjectFromZval(_target);
+			if (o && o->ptr)
+			{
+				_current_object = o->ptr;
+				_current_object_class = o->classId;
+			}
 		}
-	}
-    } else {_target = new zval;}
+	} else {_target = (zval*) emalloc(sizeof(zval));}
 
     _args = _smoke->argumentList + _smoke->methods[_method].args;
     _items = _smoke->methods[_method].numArgs;
     _stack = new Smoke::StackItem[items + 1];
-    _retval = retval;
+// 	_retval = retval;
 }
 
 MethodCall::~MethodCall() 
@@ -465,10 +501,13 @@ MethodCall::classname()
 	return qstrcmp(MethodCallBase::classname(), "QGlobalSpace") == 0 ? "" : MethodCallBase::classname(); 
 }
 
-SigSlotBase::SigSlotBase(int items, MocArgument* mocStack, zval*** sp) : _cur(-1), _called(false), _sp(sp)
+/**
+ *	SigSlotBase
+ */
+
+SigSlotBase::SigSlotBase(zval*** sp) : _cur(-1), _called(false), _sp(sp)
 { 
-	_items = items + 1;
-	_args = mocStack;
+	identifier = "SigSlotBase";
 	_stack = new Smoke::StackItem[_items -1];
 }
 
@@ -528,10 +567,13 @@ SigSlotBase::next()
 	_cur = oldcur;
 }
 
-/*
-	Converts a zval* returned by a slot invocation to a Qt slot 
-	reply type
-*/
+/**
+ *	SlotReturnValue
+ *
+ *	Converts a zval* returned by a slot invocation to a Qt slot 
+ *	reply type
+ */
+
 class SlotReturnValue : public Marshall {
     MocArgument *	_replyType;
     Smoke::Stack _stack;
@@ -579,16 +621,23 @@ public:
 	}
 };
 
-/*InvokeSlot::InvokeSlot(zval* obj, int slotname, zval*** args, void ** o) : SigSlotBase(args),
+/**
+ *	InvokeSlot
+ *	TODO
+ */
+
+InvokeSlot::InvokeSlot(zval* obj, int slotname, zval*** args, void ** o) : SigSlotBase(args),
     _obj(obj), _slotname(slotname), _o(o)
 {
-	_sp = (zval *) safe_emalloc((zval*), _items - 1, 0);
+	identifier = "InvokeSlot";
+	_sp = (zval ***) safe_emalloc(sizeof(zval), _items - 1, 0);
+	_sp = args;
 	copyArguments();
 }
 
 InvokeSlot::~InvokeSlot() 
 { 
-	xfree(_sp);	
+	free(_sp);	
 }
 
 Marshall::Action 
@@ -620,8 +669,9 @@ InvokeSlot::invokeSlot()
 {
 	if (_called) return;
 	_called = true;
+	zval* result = phpqt_callPHPMethod(_obj, (char*) PQ::smoke()->methodNames[PQ::smoke()->methods[_slotname].name], _items - 1, _sp);
 	if (_args[0].argType != xmoc_void) {
-		SlotReturnValue r(_o, &result, _args);
+		SlotReturnValue r(_o, result, _args);
 	}
 }
 
@@ -630,11 +680,17 @@ InvokeSlot::mainfunction()
 { 
 	invokeSlot(); 
 }
-*/
 
-EmitSignal::EmitSignal(QObject *obj, int id, int items, MocArgument *mocStack, zval ***sp, zval * result) : SigSlotBase(items, mocStack, _sp),
+/**
+ *	EmitSignal
+ */
+
+EmitSignal::EmitSignal(QObject *obj, int id, int items, MocArgument *mocStack, zval ***sp, zval * result) :
     _obj(obj), _id(id)
-{ 
+{
+	identifier = "EmitSignal";
+	_items = items + 1;
+	_args = mocStack;
 	_id = id;
 	_sp = sp;
 	_result = result;
@@ -686,5 +742,50 @@ bool
 EmitSignal::cleanup() 
 { 
 	return true; 
+}
+
+SmokeType 
+EmitSignal::type() 
+{ 
+	return arg().st; 
+}
+
+zval* 
+EmitSignal::var() 
+{ 
+	return (zval*) *_sp[_cur]; 
+}
+
+Smoke *
+EmitSignal::smoke() 
+{ 
+	return type().smoke(); 
+}
+
+void 
+EmitSignal::unsupported() 
+{
+	php_error(E_ERROR, "Cannot handle '%s' as %s argument\n", type().name(), mytype() );
+}
+
+const MocArgument &
+EmitSignal::arg() 
+{ 
+	return _args[_cur + 1]; 
+}
+
+void
+EmitSignal::next() 
+{
+	int oldcur = _cur;
+	_cur++;
+
+	while(!_called && _cur < _items - 1) {
+		Marshall::HandlerFn fn = getMarshallFn(type());
+		(*fn)(this);
+		_cur++;
+	}
+	mainfunction();
+	_cur = oldcur;
 }
 

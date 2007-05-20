@@ -29,6 +29,7 @@
 
 #define COMPILE_DL_PHP_QT
 #define PHPQT_CLASS_COUNT 256
+#define QSTRING_CLASSID -1
 
 #include <iostream>
 using namespace std;
@@ -52,6 +53,7 @@ using namespace std;
 #include <QtGui/QLayout>
 #include <QtGui/QLCDNumber>
 #include <QtGui/QFont>
+#include <QtCore/QDebug>
 
 // for older php versions
 #ifndef ZEND_MN
@@ -74,6 +76,12 @@ using namespace std;
 
 #define PHP_QT_ME(classname, name, arg_info, flags)	PHP_QT_FENTRY(name, ZEND_MN(classname##_##name), arg_info, flags)
 
+// this is needed for override return_value, see qobject_cast
+#if(PHP_MAJOR_VERSION > 5) || (PHP_MAJOR_VERSION == 5 && PHP_MINOR_VERSION > 0)
+static
+	ZEND_BEGIN_ARG_INFO_EX(phpqt_cast_arginfo, 0, 1, 0)
+	ZEND_END_ARG_INFO();
+#endif
 
 PHP_MINIT_FUNCTION(php_qt);
 PHP_MSHUTDOWN_FUNCTION(php_qt);
@@ -90,7 +98,7 @@ PHP_FUNCTION(emit);
 PHP_FUNCTION(qobject_cast);
 PHP_FUNCTION(tr);
 PHP_FUNCTION(check_qobject);
-void check_object(zval* zobject);
+void check_qobject(zval* zobject);
 
 void init_codec();
 zval* zstringFromQString(QString * s);
@@ -109,20 +117,26 @@ struct smokephp_object {
 
 static void 			phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc);
 
-void 				phpqt_register(zval* this_ptr, zend_rsrc_list_entry le);
+// void 				phpqt_register(zval* this_ptr, zend_rsrc_list_entry le);
 zval* 				phpqt_callPHPMethod(zval* zend_ptr, char* methodname, zend_uint param_count, zval** params[]);
 bool 				phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname);
 bool 				phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, QMetaObject* metachar, QString* meta_stringdata, uint* signature);
-int				phpqt_metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a);
+int					phpqt_metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a);
 char*				phpqt_checkForOperator(const char* fname);
 
 void* 				phpqt_getQtObjectFromZval(zval* this_ptr);
-smokephp_object* 		phpqt_getSmokePHPObjectFromZval(zval* this_ptr);
-smokephp_object*		phpqt_getSmokePHPObjectFromQt(void* QtPtr);
+smokephp_object* 	phpqt_getSmokePHPObjectFromZval(zval* this_ptr);
+smokephp_object*	phpqt_getSmokePHPObjectFromQt(void* QtPtr);
 void				phpqt_setSmokePHPObject(smokephp_object* o);
 bool 				phpqt_SmokePHPObjectExists(zval* this_ptr);
 bool				phpqt_SmokePHPObjectExists(void* ptr);
-void				phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce = NULL, Smoke::Index classId = 0);
+
+bool				phpqt_unmapSmokePHPObject(zval* o);
+
+smokephp_object*	phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce = NULL, Smoke::Index classId = 0);
+smokephp_object*	phpqt_createOriginal(zval* zval_ptr, void* ptr);
+
+const char* 		printType(int type);
 
 extern Smoke* qt_Smoke;
 class PQ

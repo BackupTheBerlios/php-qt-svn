@@ -7,6 +7,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "marshall_types.h"
+#include <QtCore/QHash>
+// extern QHash<zval*, smokephp_object*> zval_x_smokephp;
+
 template <class T> T* smoke_ptr(Marshall *m) { return (T*) m->item().s_voidp; }
 
 template<> bool* smoke_ptr<bool>(Marshall *m) { return &m->item().s_bool; }
@@ -28,14 +32,14 @@ template <class T> zval* primitive_to_php(T, zval* return_value);
 template <class T> 
 static void marshall_from_php(Marshall *m) 
 {
-	zval* obj = m->var();
-	(*smoke_ptr<T>(m)) = php_to_primitive<T>(obj);
+	zval* zobj = m->var();
+	(*smoke_ptr<T>(m)) = php_to_primitive<T>(zobj);
 }
 
 template <class T>
 static void marshall_to_php(Marshall *m)
 {
-	m->setRetval(primitive_to_php<T>( *smoke_ptr<T>(m) , m->retval()));
+	*(m->var()) = *primitive_to_php<T>( *smoke_ptr<T>(m) , m->var());
 }
 
 #include "marshall_primitives.h"
@@ -46,8 +50,8 @@ static void marshall_to_php(Marshall *m)
 template <> 
 static void marshall_from_php<char *>(Marshall *m) 
 {
-	zval* obj = m->var();
-	m->item().s_voidp = php_to_primitive<char*>(obj);
+	zval* zobj = m->var();
+	m->item().s_voidp = php_to_primitive<char*>(zobj);
 }
 
 template <>
@@ -69,6 +73,7 @@ static void marshall_to_php<SmokeEnumWrapper>(Marshall *m)
 	long val = m->item().s_enum;
 }
 
+// m = MethodCall
 template <>
 static void marshall_from_php<SmokeClassWrapper>(Marshall *m)
 {
@@ -79,8 +84,10 @@ static void marshall_from_php<SmokeClassWrapper>(Marshall *m)
 		return;
 	}
 
-	if(!phpqt_SmokePHPObjectExists(v)) {
-		php_error(E_ERROR, "Invalid type, expecting %s, %s given\n", m->type().name(), zend_zval_type_name(v));
+	if(!/*phpqt_SmokePHPObjectExists*/(v)) {
+		check_qobject(v);
+// 		php_error(E_ERROR, "Invalid type, expecting %s, %s given\n", m->type().name(), zend_zval_type_name(v));
+		php_error(E_ERROR, "Invalid type, expecting %s, %s given (probably PHP-Qt lost the Qt object)\n", m->type().name(), Z_OBJCE_P(v)->name);
 		return;
 	}
 
@@ -120,96 +127,91 @@ static void marshall_from_php<SmokeClassWrapper>(Marshall *m)
 template <>
 static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 {
-
 	if(m->item().s_voidp == 0) {
-		m->setRetval(Qnil);
+		qWarning("Qt Object doesnt exist!");
+		*(m->var()) = *(Qnil);
 		return;
 	}
 	void *p = m->item().s_voidp;
 
-	smokephp_object* o = (smokephp_object*) emalloc(sizeof(smokephp_object));
-	zval* obj = m->var();
-
+	// return the original
 	if(phpqt_SmokePHPObjectExists(p)) {
-	    smokephp_object* o = phpqt_getSmokePHPObjectFromQt(p);
-	    ZVAL_ZVAL(obj, o->zval_ptr,0,0);
-	    zend_rsrc_list_entry le;
-	    le.ptr = o;
-	    phpqt_register(obj, le);
-	// create a new object
-	} else {
-	    o->ptr = m->item().s_class;
-	    o->smoke = m->smoke();
+		if(((MethodReturnValue*) m)->retval_ptr()){
+			// destroys the return_value initialized by ZE, we creare our own:
+			zval_ptr_dtor(((MethodReturnValue*) m)->retval_ptr());
+			// prepare the return value
+			smokephp_object* o = phpqt_createOriginal(m->var(), p);
+			// overwrite the old one:
+			*(((MethodReturnValue*) m)->retval_ptr()) = o->zval_ptr;
+		}
+		return;
 
-	    if (Z_TYPE_P(m->var()) == IS_OBJECT) {
-		// do nothing
-	    } else if(!strcmp((char*) m->smoke()->classes[m->type().classId()].className, "QObject")){
-		// cast from, to
-		o->ptr = o->smoke->cast(o->ptr, m->smoke()->idClass("QObject"), m->type().classId());
-		object_init_ex(obj, 
-			    zend_fetch_class((char*)((QObject*) o->ptr)->metaObject()->className(),
-			    strlen(((QObject*) o->ptr)->metaObject()->className()), 
-			    ZEND_FETCH_CLASS_AUTO TSRMLS_DC));
+	//create a new PHP obnject (return_value):
+	} else {
+		void* __p = m->item().s_class;
+	    QObject* __qo = ((QObject*) __p);
+		char* __className = (char*) m->smoke()->classes[m->type().classId()].className; // name of the class
+		int __strLenClassName = strlen(m->smoke()->classes[m->type().classId()].className);
+
+		zend_class_entry *_ce;
+	    if (Z_TYPE_P(m->var()) == IS_OBJECT)
+	    {
+	    	_ce = Z_OBJCE_P(m->var());
+		// object has to be casted
+	    } else if(!strcmp(__className, "QObject")) { // classname == QObject
+			// cast the Qt object: from, to
+			__p = m->smoke()->cast(__p, m->smoke()->idClass("QObject"), m->type().classId());
+			// cast the php one
+			_ce = zend_fetch_class((char*) __qo->metaObject()->className(), strlen(__qo->metaObject()->className()), ZEND_FETCH_CLASS_AUTO TSRMLS_DC);
+
 	    // fallback, already with correct type
 	    } else {
-		object_init_ex(obj, 
-		zend_fetch_class((char*) m->smoke()->classes[m->type().classId()].className,
-				strlen(m->smoke()->classes[m->type().classId()].className), 
-				ZEND_FETCH_CLASS_AUTO TSRMLS_DC));
+			_ce = zend_fetch_class(__className, __strLenClassName, ZEND_FETCH_CLASS_AUTO TSRMLS_DC);
 	    }
 
-	    Z_TYPE_P(m->var()) = IS_OBJECT;
-	    o->zval_ptr = obj;
-	    o->ce_ptr = Z_OBJCE_P(obj);
-	    o->parent_ce_ptr = o->ce_ptr;
-	    o->classId = m->type().classId();
-
-	    if(!phpqt_SmokePHPObjectExists(o->ptr))
-		phpqt_setSmokePHPObject(o);
-
-	    zend_rsrc_list_entry le;
-	    le.ptr = o;
-	    phpqt_register(obj, le);
+// #warning parent_ce in createObject
+		smokephp_object *o = phpqt_createObject(m->var(), __p, _ce, m->type().classId());
 
 //	    if(m->type().isConst() && m->type().isRef()) {
-	    if(m->type().isRef()) {
-		p = construct_copy( o );
+	    if(m->type().isRef()) 
+	    {
+			p = construct_copy( o );
 #ifdef DEBUG
 			const char * classname = o->ce_ptr->name;
 			php_error(E_WARNING, "copying %s %p to %p\n", classname, o->ptr, p);
 #endif
-
-		if(p) {
-			o->ptr = p;
-			o->allocated = true;
+			if(p) {
+				o->ptr = p;
+				o->allocated = true;
+			}
 		}
-	}
 
 #ifdef DEBUG
-		php_error(E_WARNING, "allocating %s %p -> %p\n", classname, o->ptr, (void*)obj);
+		php_error(E_WARNING, "allocating %s %p -> %p\n", __className, o->ptr, (void*)m->var());
 #endif
 
-	if(m->type().isStack()) {
-		o->allocated = true;
-	}
+		if(m->type().isStack()) {
+			o->allocated = true;
+		}
 
-	}
-}
+	} // smokephp_object p doesn't exist
+} // marshall_to_php
 
 template <>
 static void marshall_to_php<char *>(Marshall *m)
 {
 	char *sv = (char*)m->item().s_voidp;
-	zval* obj;
+	zval* zobj;
 	if(sv) {
-	    ZVAL_STRING(obj,sv,/*duplicate*/ 1);
+	    ZVAL_STRING(zobj,sv,/*duplicate*/ 1);
 	} else {
-	    obj = Qnil;
+	    zobj = Qnil;
 	}
 	if(m->cleanup())
 		delete[] sv;
 
-	m->setRetval(obj);
+	*(m->var()) = *zobj;
+// 	m->setRetval(zobj);
 }
 
 template <>

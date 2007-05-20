@@ -111,7 +111,7 @@
             $this->reciprocalButton = $this->createButton(tr("1/x"), $operatorColor, SLOT('unaryOperatorClicked()'));
             $this->equalButton = $this->createButton(tr("="), $operatorColor, SLOT('equalClicked()'));
 
-            $this->mainLayout = &new QGridLayout($this);
+            $this->mainLayout = new QGridLayout($this);
             $this->mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
             $this->mainLayout->addWidget($this->display, 0, 0, 1, 6);
@@ -156,7 +156,7 @@
                     || $event->type() == QEvent::MouseButtonRelease
                     || $event->type() == QEvent::ContextMenu) {
 
-                    $mouseEvent = &$event;
+                    $mouseEvent = $event;
                     if ($mouseEvent->buttons() & Qt::LeftButton) {
                         $newPalette = $this->palette();
                         $newPalette->setColor(QPalette::Base,
@@ -376,9 +376,9 @@
             $this->sumInMemory += $this->display->text()->toDouble();
         }
 
-        function createButton($text, &$color, $member)
+        function createButton($text, $color, $member)
         {
-            $button = new Button($text, &$color);
+            $button = new Button($text, $color);
             $this->connect($button, SIGNAL('clicked()'), $this, $member);
             return $button;
         }

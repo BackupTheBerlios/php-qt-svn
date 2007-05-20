@@ -37,13 +37,25 @@ Smoke::Index connect3;
 Smoke::Index connect4;
 Smoke::Index connect5;
 
+extern QHash<void*, smokephp_object*> SmokeQtObjects;
+
 class PHPQtSmokeBinding : public SmokeBinding {
 
 public:
     PHPQtSmokeBinding(Smoke *s) : SmokeBinding(s) {}
 
-    virtual void deleted(Smoke::Index, void*) {
-            // ignore object deletion
+    virtual void deleted(Smoke::Index classId, void* ptr) {
+        qDebug("deleted");
+        if(phpqt_SmokePHPObjectExists(ptr)){
+			smokephp_object *o = (smokephp_object*) phpqt_getSmokePHPObjectFromQt(ptr);
+			if(!o->allocated){
+				delete (QObject*) ptr;
+				efree(o);
+			} else {
+				o->ptr = 0;
+			}
+			SmokeQtObjects.remove(o->ptr);
+		}
     }
     virtual bool callMethod(Smoke::Index method, void* QtPtr, Smoke::Stack args, bool /*isAbstract*/) {
 
@@ -77,17 +89,16 @@ public:
 		}
 		
 		return false;
-
     }
 
     virtual char *className(Smoke::Index classId) {
-	// return a new[] copy of the language-specific name of this Smoke class
-	// poorly designed function, but oh well. Sorry.
+		// return a new[] copy of the language-specific name of this Smoke class
+		// poorly designed function, but oh well. Sorry.
 
-	const char *className = smoke->className(classId);
-	char *buf = new char[strlen(className) + 1];
-	strcpy(buf, className);
-	return buf;
+		const char *className = smoke->className(classId);
+		char *buf = new char[strlen(className) + 1];
+		strcpy(buf, className);
+		return buf;
     }
     virtual ~PHPQtSmokeBinding() {}
 };
@@ -122,12 +133,14 @@ smokephp_init() {
  *  @return Smoke::Index        unambiguous method ID
  */
 Smoke::Index 
-smokephp_getMethod(const char* c, const char* m, int argc, zval*** args) {
+smokephp_getMethod(const char* c, const char* m, int argc, zval*** args)
+{
 
     Smoke::Index method = PQ::smoke()->findMethod(c, m);	// qt_Smoke->methods
     Smoke::Index i = PQ::smoke()->methodMaps[method].method;
 
-    if(i <= 0) {
+    if(i <= 0)
+    {
 	    i = -i;		// turn into ambiguousMethodList index
 	    while(PQ::smoke()->ambiguousMethodList[i]) {
 
@@ -346,8 +359,8 @@ void smokephp_prepareMethodName(zval*** args, int argc, QStack<QByteArray*> &met
         	    methodNameStack.top()->append("#");
         	}
 	    } else {
-	        php_error(E_ERROR,"Unknown argument or unsupported argument type %d, type %d, exit\n", i, type);
-	        exit(FAILURE);
+	        php_error(E_ERROR,"Unknown argument or unsupported type %d at argument %d, cannot prepare method call\n", type, i);
+// 	        exit(FAILURE);
 	    }
     }
 }
