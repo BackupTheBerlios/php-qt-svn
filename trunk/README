@@ -1,68 +1,91 @@
-PHP-Qt - an extension for PHP5 that aims to write software with the Qt Toolkit.
+PHP-Qt - an extension for PHP5 that enables the writing of PHP software using 
+the Qt Toolkit.
 ================================================================================
 
-PHP-Qt is an extension for PHP5 that aims to write software with the Qt Toolkit. 
-It provides an object-oriented interface to the Qt4 Framework and allowes 
-to write Qt applications in the PHP language.
+PHP-Qt is an extension for PHP5 that provides an object-oriented interface to 
+the Qt4 Framework and allows 
+one to write Qt applications in the PHP language.
 
 Requirements
 ============
 
-PHP-Qt requires PHP 5.1 or greater, the Qt4 header files and CMake.
+PHP 5.1 or greater
+PHP header files and the development scripts
+(package may be called php-devel)
 
-PHP5: You should have a the header files and the development scripts.
-Qt4: You should have the header files.
+Qt4 header files
+(package may be called qt4-devel)
 
-Note: at this time compilation is only tested in a Unix environment.
+CMake
+
+Note: at this time compilation has only been tested in a Unix environment.
 
 Compiling and installation
 ==========================
 
-short:
+Both of these methods will compile and install PHP-Qt as a module.
+
+The quick and easy way:
 
 cmake /path/to/php_qt
 make
 make install
 
-more detailed:
 
-You have cmake installed and the path to your PHP5 header files. After 
-downloading or checking out from SVN the easiest way is to create a build 
-directory in your copy of PHP-Qt. The extension will be built out-of-source 
-which allows you to have a clean copy of PHP-Qt without any files of the build 
-system.
+The more detailed way:
 
-PHP-Qt will be compiled as module! 
+First make sure CMake, your PHP header files, and your Qt header files are 
+installed.
+Then, get PHP-Qt either by downloading or checking out from SVN and placing it 
+into
+its own directory.
 
-At first it is neccessary to create your build environment for compiling.
-To do that just change into the 'php_qt/build' directory and run cmake:
+Next it is neccessary to create your build environment for compiling.
+To do this, just change into the directory where you placed PHP-Qt and run 
+cmake:
 
-cmake ..
+cmake
 
-You can give arguments to cmake via the -D option:
-  -DQT_INCLUDE_DIR=/usr/lib/qt4/include \
-  -DQT_LIBRARY_DIR=/usr/lib/qt4
+If needed you can give arguments to CMake via the -D option, such as:
+  -DQT_INCLUDE_DIR=/usr/lib/qt4/include
+  -DQT_LIBRARY_DIR=/usr/lib/qt4
+  -DQT_QMAKE_EXECUTABLE=/usr/lib/qt4/bin/qmake
+  
+If no arguments are given, CMake will try to find the Qt4 and PHP5 files in 
+the default or standard 
+paths such as /usr/include, /usr/local/include etc.
 
-If no argument is given cmake will try to find the Qt4 and PHP5 files in the default or standard 
-pathes as /usr/include, /usr/local/include etc.
-
-Finally, run 
+Finally, run:
 
 make
 
-to build the extension. If the compilation is successful run 
+to build the extension. If the compilation is successful run:
 
 make install
 
-to copy 'php_qt.so' into php's extension directory. If it fails please check if you have 
-permissions and all related pathes on your system are correct.
+to copy 'php_qt.so' into php's extension directory. If it fails please check 
+if you have 
+permissions and all related paths on your system are correct.
 
-To remove old objectfiles run 
+To remove old objectfiles run:
 
 make clean
 
-To test it, simply run one of the test scripts in the php_qt/test/ subdirectory.
-To get a clean build system just remove all files in the build/ directory.
+To test it, simply run one of the test scripts in the php_qt/test/ 
+subdirectory.
+
+Troubleshooting
+===================================
+
+If you get the following error:
+CMake Error: Could NOT find QtCore. Check CMakeFiles/CMakeError.log for more 
+details.
+
+Try running cmake as:
+cmake /path/to/php-qt  -DQT_QMAKE_EXECUTABLE=/usr/lib/qt4/bin/qmake
+(you may need to replace the /usr/lib/qt4/bin/qmake if yours is in another 
+place)
+
 
 Mailing lists
 =============
@@ -71,17 +94,18 @@ user discussion
 -----------------
 users mailing list
 
-address:        php-qt-users@lists.sourceforge.net
-Subscription:   https://lists.sourceforge.net/lists/listinfo/php-qt-users
-Archive:        http://sourceforge.net/mailarchive/forum.php?forum=php-qt-users
+address:        php-qt-users@lists.sourceforge.net
+Subscription:   https://lists.sourceforge.net/lists/listinfo/php-qt-users
+Archive:        
+http://sourceforge.net/mailarchive/forum.php?forum=php-qt-users
 
 Subversion commits
 --------------------
 The list for svn commits. Readonly!
 
-address:        php-qt-svn@lists.berlios.de.
-Subscription:   https://lists.berlios.de/mailman/listinfo/php-qt-svn
-Archive:        https://lists.berlios.de/pipermail/php-qt-svn/
+address:        php-qt-svn@lists.berlios.de.
+Subscription:   https://lists.berlios.de/mailman/listinfo/php-qt-svn
+Archive:        https://lists.berlios.de/pipermail/php-qt-svn/
 
 
 Website
@@ -89,6 +113,4 @@ Website
 
 The website for the project:
 
-    http://www.php-qt.org
-
-
+    http://www.php-qt.org
