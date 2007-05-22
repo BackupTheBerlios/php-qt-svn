@@ -14,7 +14,7 @@ static bool php_to_primitive<bool>(zval* v)
 		// A Qt::Boolean has been passed as a value
 		php_error(E_WARNING,"A Qt::Boolean has been passed as a value");
 	} else {
-		return ZEND_NORMALIZE_BOOL(v);
+		return Z_BVAL_P(v);
 	}
 }
 
