@@ -81,11 +81,12 @@ public:
 
 		if(phpqt_methodExists(o->ce_ptr, (char*) methodName)){
 		    Smoke::Method & meth = smoke->methods[method];
-		    zval*** sp = (zval ***) safe_emalloc((int) meth.numArgs, sizeof(zval **), 0);
+		    zval*** sp = (zval ***) safe_emalloc((int) meth.numArgs, sizeof(zval), 0);
 
 		    VirtualMethodCall c(smoke, method, args, o->zval_ptr, sp);
-//		    c.next();
-		    efree(sp);
+		    c.next();
+
+  		    efree(sp);
 		}
 		
 		return false;

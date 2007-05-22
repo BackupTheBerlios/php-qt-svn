@@ -97,7 +97,7 @@ static void marshall_from_php<SmokeClassWrapper>(Marshall *m)
 			php_error(E_WARNING, "References can't be nil\n");
 			m->unsupported();
 		}
-					
+
 		m->item().s_class = 0;
 		return;
 	}
@@ -119,8 +119,9 @@ static void marshall_from_php<SmokeClassWrapper>(Marshall *m)
 		o->classId,			// from
 		o->smoke->idClass(cl.className)	// to
 		);
-
+	
 	m->item().s_class = ptr;
+
 	return;
 }
 
@@ -146,7 +147,7 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 		}
 		return;
 
-	//create a new PHP obnject (return_value):
+	//create a new PHP object (return_value):
 	} else {
 		void* __p = m->item().s_class;
 	    QObject* __qo = ((QObject*) __p);

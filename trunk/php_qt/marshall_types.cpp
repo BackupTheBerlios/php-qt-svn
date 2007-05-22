@@ -387,16 +387,16 @@ MethodCallBase::classname()
  */
 
 VirtualMethodCall::VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* obj, zval ***sp) :
-	MethodCallBase(smoke,meth,stack), _obj(obj), _sp(sp)
+	MethodCallBase(smoke,meth,stack), _obj(obj)
 {
 	identifier = "VirtualMethodCall";
-	_sp = sp;
-	_args = _smoke->argumentList + method().args;
+ 	_sp = sp;
+  	_args = _smoke->argumentList + method().args;
 }
 
 VirtualMethodCall::~VirtualMethodCall() 
 {
-//    delete[] _stack;
+    delete[] _stack;
 }
 
 Marshall::Action 
@@ -407,11 +407,9 @@ VirtualMethodCall::action()
 
 zval*
 VirtualMethodCall::var() 
-{ 
-    if(*_sp[_cur] == NULL) {
-	MAKE_STD_ZVAL(*_sp[_cur]);
-    }
-    return (zval*) *_sp[_cur]; 
+{
+	*_sp[_cur] = (zval*) emalloc(sizeof(zval));
+    return (zval*) *_sp[_cur];
 }
 
 int 
@@ -426,10 +424,10 @@ VirtualMethodCall::callMethod()
 	if (_called) return;
 	_called = true;
 
-	phpqt_callPHPMethod(_obj, (char*) _smoke->methodNames[method().name], method().numArgs, _sp);
+	phpqt_callPHPMethod(_obj, (char*) _smoke->methodNames[method().name], items(), _sp);
 
 	zval _retval;
-	VirtualMethodReturnValue r(_smoke, _method, _stack, _retval);
+ 	VirtualMethodReturnValue r(_smoke, _method, _stack, _retval);
 }
 
 bool 
@@ -445,6 +443,7 @@ VirtualMethodCall::cleanup()
 MethodCall::MethodCall(Smoke *smoke, Smoke::Index method, zval* target, zval ***sp, int items, zval *retval, zval** return_value_ptr) :
 	MethodCallBase(smoke,method), _target(target), _current_object(0), _sp(sp), _items(items), _retval(retval), _return_value_ptr(return_value_ptr)
 {
+
 	identifier = "MethodCall";
     if(target != NULL)
     {

@@ -173,12 +173,13 @@ void check_qobject(zval* zobject)
 		cout << "PHP Object \n(" << endl;
 
 		cout << "\t       zval => " << zobject << endl;
-// 		cout << "\tclass entry => " << Z_OBJCE_P(zobject)->name << endl;
+		if(Z_TYPE_P(zobject) == IS_OBJECT)
+			cout << "\tclass entry => " << Z_OBJCE_P(zobject)->name << endl;
 		cout << "\t  ref count => " << zobject->refcount << endl;
 		cout << "\t     is_ref => " << (int) zobject->is_ref << endl;
 		cout << "\t       type => " << printType(Z_TYPE_P(zobject)) << endl;
 
-		if(Z_TYPE_P(zobject) == 5)
+		if(Z_TYPE_P(zobject) == IS_OBJECT)
 		{
 		 cout <<"\t obj-handle => " << zobject->value.obj.handle << endl;
 		}
@@ -192,7 +193,7 @@ void check_qobject(zval* zobject)
 		cout << "PHP-Qt object \n(" << endl;
 
 		cout << "\t       zval => " << zobject << endl;
-	// 	cout << "\tclass entry => " << Z_OBJCE_P(zobject)->name << endl;
+// 		cout << "\tclass entry => " << Z_OBJCE_P(zobject)->name << endl;
 		cout << "\tclass entry => " << o->ce_ptr->name << endl;
 		cout << "\t  ref count => " << zobject->refcount << endl;
 		cout << "\t     is_ref => " << (int) zobject->is_ref << endl;

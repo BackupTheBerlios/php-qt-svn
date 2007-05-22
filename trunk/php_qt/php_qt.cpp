@@ -282,11 +282,11 @@ ZEND_METHOD(php_qt_generic_class, __construct)
     smokephp_prepareMethodName(args, argc, methodNameStack);	// #, $, ?
     Smoke::Index method = smokephp_getMethod(ce->name, methodNameStack.top()->constData(), ZEND_NUM_ARGS(), args);
 
-	MethodCall c(PQ::smoke(), method, getThis(), args, argc-1, getThis(), return_value_ptr);
+ 	MethodCall c(PQ::smoke(), method, getThis(), args, argc-1, getThis(), return_value_ptr);
     c.next();
 
 	// smokephp_object is created above in c.next()
-     smokephp_object* o = phpqt_getSmokePHPObjectFromZval(getThis());
+    smokephp_object* o = phpqt_getSmokePHPObjectFromZval(getThis());
     o->parent_ce_ptr = ce_parent; // = ce if no parent
 
 	// if QObject
