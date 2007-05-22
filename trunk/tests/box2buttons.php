@@ -1,4 +1,4 @@
-<?
+<?php
 	if(!extension_loaded('php_qt')) {
 		dl('php_qt.' . PHP_SHLIB_SUFFIX);
 	}
@@ -10,19 +10,23 @@
 		public $button2;
 	
 		function __construct() {
-			$this->mainWidget = new QWidget();
-			parent::__construct(QBoxLayout::TopToBottom,$this->mainWidget);
+
+			$mainWidget = new QWidget();
+			parent::__construct(QBoxLayout::TopToBottom,$mainWidget);
+			$this->mainWidget = $mainWidget;
+
 			$this->button1 = new QPushButton("About Qt!");
 			$this->button2 = new QPushButton("Quit");
 			$this->addWidget($this->button1);
 			$this->addWidget($this->button2);
-			
+
 		}
+
 		function __destruct()
 		{
-     		$this->button1 = 0;
-     		$this->button2 = 0;	
-			$this->mainWidget = 0;
+     		    $this->button1 = 0;
+     		    $this->button2 = 0;	
+	 	    $this->mainWidget = 0;
 		}
 		
 		function show()
@@ -32,7 +36,7 @@
 	}
 	
 	
-	$app = new QApplication(&$argc,$argv);
+	$app = new QApplication($argc,$argv);
 
 	$box = new Box();
 	$box->show();
