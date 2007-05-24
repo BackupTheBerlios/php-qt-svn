@@ -254,6 +254,7 @@ zstringFromQString(QString * s) {
 
 
 static void marshall_QString(Marshall *m) {
+
 	switch(m->action()) {
 		case Marshall::FromZVAL:
 		{
@@ -287,21 +288,9 @@ static void marshall_QString(Marshall *m) {
 
 		case Marshall::ToZVAL:
 		{
-			QString* s = (QString*) m->item().s_voidp;
-			zval* obj = m->var();
-// 			object_init_ex(obj, qstring_ce);
-
-			phpqt_createObject(obj, (void*) s, qstring_ce, -1);
-
-			if(s) {
-				if (s->isNull()) {
-// 					m->setRetval(Qnil);
-					*(m->var()) = *Qnil;
-				}
-			} else {
-// 				m->setRetval(Qnil);
-				*(m->var()) = *Qnil;
-			}
+			QString* s = static_cast<QString*>(m->item().s_voidp);
+// 			zval* obj = m->var();
+			phpqt_createObject(m->var(), (void*) s, qstring_ce, -1);
 		}
 		break;
  
