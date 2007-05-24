@@ -81,7 +81,14 @@ static int php_to_primitive<int>(zval* v)
 	if (v->type == IS_OBJECT) {
 	    php_error(E_WARNING,"An integer has been passed as an object");
 	} else {
-	    return Z_LVAL_P(v);
+		if(v->type == IS_LONG) {
+	    	return Z_LVAL_P(v);
+		// e.g. date() gives a string, so we try to convert it
+		} else if (v->type == IS_STRING) {
+			return QString(Z_STRVAL_P(v)).toLong();
+		} else {
+			php_error(E_ERROR,"wrong type, num expected");
+		}
 	}
 }
 
