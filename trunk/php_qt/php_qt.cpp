@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2006 
  * Thomas Moenicke <thomas.moenicke at kdemail.net>
+ * Katrina Niolet <katrina at niolet.name>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -70,7 +71,17 @@ function_entry php_qt_functions[] = {
 	PHP_FE(confirm_php_qt_compiled,	NULL)		/* For testing, remove later. */
 	PHP_FE(SIGNAL,	NULL)
 	PHP_FE(SLOT,	NULL)	
-	PHP_FE(emit,	NULL)	
+	PHP_FE(emit,	NULL)
+	PHP_FE(qDebug,	NULL)
+	PHP_FE(qWarning,	NULL)
+	PHP_FE(qCritical,	NULL)
+	PHP_FE(qAbs, 		NULL)
+	PHP_FE(qRound,		NULL)
+	PHP_FE(qRound64,	NULL)
+	PHP_FE(qMin,		NULL)
+	PHP_FE(qMax,		NULL)
+	PHP_FE(qBound,		NULL)
+	PHP_FE(qPrintable,	NULL)
 	PHP_FE(qobject_cast,	phpqt_cast_arginfo)
 	PHP_FE(tr,	NULL)
 	PHP_FE(check_qobject,	NULL)

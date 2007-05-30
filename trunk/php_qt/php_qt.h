@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2006 
  * Thomas Moenicke <thomas.moenicke at kdemail.net>
+ * Katrina Niolet <katrina at niolet.name>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -95,6 +96,16 @@ PHP_FUNCTION(SIGNAL);
 PHP_FUNCTION(SLOT);
 #undef emit
 PHP_FUNCTION(emit);
+PHP_FUNCTION(qDebug);
+PHP_FUNCTION(qWarning);
+PHP_FUNCTION(qCritical);
+PHP_FUNCTION(qAbs);
+PHP_FUNCTION(qRound);
+PHP_FUNCTION(qRound64);
+PHP_FUNCTION(qMin);
+PHP_FUNCTION(qMax);
+PHP_FUNCTION(qBound);
+PHP_FUNCTION(qPrintable);
 PHP_FUNCTION(qobject_cast);
 PHP_FUNCTION(tr);
 PHP_FUNCTION(check_qobject);
