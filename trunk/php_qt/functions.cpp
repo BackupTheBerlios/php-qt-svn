@@ -510,15 +510,84 @@ PHP_FUNCTION(qMemCopy) {
 	if(src_orig_type==IS_STRING || dest_orig_type==IS_STRING)
 		RETURN_TRUE;
 	if(src_orig_type==IS_DOUBLE || dest_orig_type==IS_DOUBLE) {
-		convert_to_double(dest);
 		RETURN_TRUE;
 	}
-	if(src_orig_type==IS_LONG || dest_orig_type==IS_LONG) {
+	if(src_orig_type==IS_LONG && dest_orig_type==IS_LONG) {
 		convert_to_long(dest);
 		RETURN_TRUE;
 	}
 }
 
+PHP_FUNCTION(qt_noop) {}
+
+PHP_FUNCTION(qt_assert) {
+	
+	char* msg;
+	int msglen;
+	char* file;
+	int filelen;
+	int line;
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s|sl",&msg,&msglen,&file,&filelen,&line)==FAILURE)
+		return;
+	php_error(E_ERROR,msg);
+}
+
+PHP_FUNCTION(qt_assert_x) {
+	
+	char* msg;
+	int msglen;
+	char* file;
+	int filelen;
+	char* where;
+	int wherelen;
+	char* what;
+	int whatlen;
+	int line;
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s|sssl",&msg,&msglen,&where,&wherelen,&what,&whatlen,&file,&filelen,&line)==FAILURE)
+		return;
+	php_error(E_ERROR,msg);
+}
+
+
+PHP_FUNCTION(Q_ASSERT) {
+	
+	bool cond;
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&cond)==FAILURE)
+		return;
+	if(!cond)
+		php_error(E_ERROR,"Assertion failed");
+}
+
+PHP_FUNCTION(Q_ASSERT_X) {
+	
+	bool cond;
+	char* where="";
+	int wherelen;
+	char* what="";
+	int whatlen;
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b|ss",&cond,&where,&wherelen,&what,&whatlen)==FAILURE) {
+		return;
+	}
+	if(!cond) {
+		php_error(E_ERROR,"Assertion failed: %s, %s",what,where);
+	}
+}
+
+PHP_FUNCTION(qt_check_pointer) {
+
+	char* file;
+	int line;
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"|sl",&file,&line)==FAILURE)
+		return;
+	php_error(E_WARNING,"Out of memory");
+}
+		
+	
 /*!
  *	tr() returns QObject::tr()
  *

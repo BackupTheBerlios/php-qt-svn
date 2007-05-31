@@ -97,8 +97,27 @@ $b = 222.56;
 qMemCopy($b,$a,2);
 echo $b."\n";
 
+echo "\nTesting qt_noop:";
+qt_noop();
+echo "done\n";
 
-/*echo "\nTesting qDebug:\n";
+echo "\nTesting Q_ASSERT:\n";
+echo "Q_ASSERT(5==5): ";
+Q_ASSERT(5==5);
+echo "done\n";
+//echo "Q_ASSERT(6==5): ";
+//Q_ASSERT(6==5);
+//echo "done\n";
+
+echo "\nTesting Q_ASSERT_X:\n";
+echo "Q_ASSERT(5==5,'in our test file', 'oh no! it failed!'): ";
+Q_ASSERT_X(5==5,'in our test file','oh no! it failed!');
+echo "done\n";
+//echo "Q_ASSERT(6==5,'in our test file', 'oh no! it worked!'): ";
+//Q_ASSERT_X(6==5,'in our test file','oh no! it worked!');
+//echo "done\n";
+
+echo "\nTesting qDebug:\n";
 qDebug("This is a debug message");
 
 echo "Testing qWarning:\n";
@@ -106,5 +125,7 @@ qWarning("This is a warning message");
 
 echo "Testing qCritical:\n";
 qCritical("This is a fatal error");
- */
+
+echo "We shouldn't see this\n";
+
 ?>
