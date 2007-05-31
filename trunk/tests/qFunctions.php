@@ -40,7 +40,65 @@ echo 'qPrintable(45) = '.qPrintable(45)."\n";
 class test {}
 echo "qPrintable(new test) = ".qPrintable(new test)."\n";
 
-echo "\nTesting qDebug:\n";
+echo "\nTesting qFuzzyCompare:\n";
+echo "qFuzzyCompare(4.0000000000001,4) = ";
+if(qFuzzyCompare(4.0000000000001,4))
+	echo "TRUE\n";
+else
+	echo "FALSE\n";
+echo "qFuzzyCompare(4.1,4) = ";
+if(qFuzzyCompare(4.1,4))
+	        echo "TRUE\n";
+else
+	        echo "FALSE\n";
+
+echo "\nTesting qVersion:\n";
+echo "qVersion() = ".qVersion()."\n";
+
+echo "\nTesting PHPQtVersion:\n";
+echo "PHPQtVersion() = ".PHPQtVersion()."\n";
+
+echo "\nTesting QiDiVersion:\n";
+echo "QiDiVersion() = ".QiDiVersion()."\n";
+
+echo "\nTesting qMalloc:\n";
+print_r(var_dump(qMalloc(10)));
+echo "\n";
+
+echo "\nTesting qFree:\n";
+echo "a = 5...";
+$a = 5;
+qFree($a);
+if(isset($a))
+	echo "qFree failed\n";
+else
+	echo "a succsessfully freed\n";
+
+echo "\nTesting qMemCopy:\n";
+echo "a='abcdefg'\n";
+echo "b=222.34\n";
+echo 'qMemCopy($b,$a,2)=';
+$a = "abcdefg";
+$b = 222.34;
+qMemCopy($b,$a,2);
+echo $b."\n";
+echo "a=333333\n";
+echo "b=222\n";
+echo 'qMemCopy($b,$a,2)=';
+$a = 333333;
+$b = 222;
+qMemCopy($b,$a,2);
+echo $b."\n";
+echo "a=3.33333\n";
+echo "b=222.56\n";
+echo 'qMemCopy($b,$a,2)=';
+$a = 3.33333;
+$b = 222.56;
+qMemCopy($b,$a,2);
+echo $b."\n";
+
+
+/*echo "\nTesting qDebug:\n";
 qDebug("This is a debug message");
 
 echo "Testing qWarning:\n";
@@ -48,5 +106,5 @@ qWarning("This is a warning message");
 
 echo "Testing qCritical:\n";
 qCritical("This is a fatal error");
-
+ */
 ?>

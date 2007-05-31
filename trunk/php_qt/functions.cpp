@@ -330,6 +330,195 @@ PHP_FUNCTION(qPrintable) {
 			break;
 	}
 }
+
+/**
+ * Returns true if x-y is between 0.0 and 0.00000000001
+ */
+PHP_FUNCTION(qFuzzyCompare) {
+	double x;
+	double y;
+	double ret;
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"dd",&x,&y)==FAILURE) {
+		php_error(E_PARSE,"wrong parameters for qFuzzyCompare");
+		return;
+	}
+	//Just so happens the Qt version does just what we need for this one
+	RETURN_BOOL(qFuzzyCompare(x,y));
+}
+		
+/**
+ * Returns true if variable is NULL or a numeric 0
+ * This varies slightly from the Qt implementation which tests
+ * a double or float for a NULL value only.
+ */
+PHP_FUNCTION(qIsNull) {
+	zval *var;
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z",&var)==FAILURE) {
+		php_error(E_PARSE,"wrong parameters for qIsNull");
+		return;
+	}
+	if(Z_TYPE_P(var)==IS_NULL)
+		RETURN_BOOL(true);
+	if(Z_TYPE_P(var)==IS_LONG) {
+		if(Z_LVAL_P(var) == 0)
+			RETURN_BOOL(true);
+	}
+	if(Z_TYPE_P(var)==IS_DOUBLE) {
+		if(Z_DVAL_P(var) == 0.0)
+			RETURN_BOOL(true);
+	}
+	RETURN_BOOL(false);
+}
+
+/**
+ * Cast a variable to an integer. NULL casts to 0 Resources and Arrays return false.
+ * Objects will call the __toInt() method if available, otherwise will return false.
+ * This differs from the Qt version which can only convert a float or double to an int
+ * TODO: implement __toInt() functionality
+ */
+PHP_FUNCTION(qIntCast) {
+	zval *var;
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z",&var)==FAILURE)
+		return;
+	switch(Z_TYPE_P(var)) {
+		case IS_NULL:
+			RETURN_LONG(0);
+			break;
+		case IS_LONG:
+			RETURN_LONG(Z_LVAL_P(var));
+			break;
+		case IS_DOUBLE:
+			RETURN_LONG((long)Z_DVAL_P(var));
+			break;
+		case IS_RESOURCE:
+			RETURN_BOOL(false);
+			break;
+		case IS_ARRAY:
+			RETURN_BOOL(false);
+			break;
+		case IS_OBJECT:
+			RETURN_BOOL(false);
+			break;
+	}
+}
+
+/**
+ * Return the version of Qt being used
+ */
+PHP_FUNCTION(qVersion) {
+	RETURN_STRING(QT_VERSION_STR,1);
+}
+
+/**
+ * Return the version of PHP-Qt being used
+ */
+PHP_FUNCTION(PHPQtVersion) {
+	RETURN_STRING(PHPQT_VERSION,1);
+}
+
+/**
+ * Return the version of QiDi that this release complies with
+ */
+PHP_FUNCTION(QiDiVersion) {
+	RETURN_STRING(QIDI_VERSION,1);
+}
+
+PHP_FUNCTION(qSharedBuild) {
+	RETURN_BOOL(qSharedBuild);
+}
+
+/**
+ * We don't REALLY need to allocate memory in PHP, this is just here for ease of
+ * porting code from C++
+ * This doesn't ACTUALLY return a pointer to allocated memory exactly,
+ * it creates a space of allocated memory and assigns to it a null string
+ * then returns a pointer to this null string.
+ */
+PHP_FUNCTION(qMalloc) {
+	long size;
+	char *tmp;
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"l",&size)==FAILURE)
+		return;
+	tmp = (char *)emalloc(size);
+	qMemCopy(&tmp[0],"\0",1);
+	RETURN_STRING(tmp,0);
+}
+
+/**
+ * Simulate freeing the memory used by a variable by setting it to NULL
+ */
+PHP_FUNCTION(qFree) {
+	zval* var;
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z",&var)==FAILURE)
+		return;
+	convert_to_null(var);
+}
+
+/**
+ * We don't REALLY need to allocate memory in PHP, this is just here for ease of
+ * porting code from C++
+ */
+PHP_FUNCTION(qRealloc) {
+	zval *val;
+	double size;
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zd",&val,&size)==FAILURE)
+		return;
+	RETURN_BOOL(true);
+}
+
+/**
+ * Copy the contents of one pointer to another pointer
+ * This is reasonably zval safe, but note the destination must already exist.
+ * Additionally, the destination will automatically grow if the
+ * size of the coppied data is to large
+ * Currently this only supports string, int and float types
+ * TODO: add support for array, objects, bool
+ */
+PHP_FUNCTION(qMemCopy) {
+	zval* dest;
+	zval* src;
+	
+	long size;
+	int src_orig_type;
+	int dest_orig_type;
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzl",&dest,&src,&size)==FAILURE)
+		return;
+
+	src_orig_type = Z_TYPE_P(src);
+	dest_orig_type = Z_TYPE_P(dest);
+	
+	switch(Z_TYPE_P(src)) {
+		case IS_STRING:
+		case IS_LONG:
+		case IS_DOUBLE:
+			convert_to_string(src);
+			convert_to_string(dest);
+			if(dest->value.str.len < size) {
+				dest->value.str.val = (char*)emalloc((size_t)size);
+				dest->value.str.len = size;
+			}
+			qMemCopy(dest->value.str.val,src->value.str.val,(size_t)size);
+			break;
+		default:
+			RETURN_FALSE;
+	}
+	if(src_orig_type==IS_STRING || dest_orig_type==IS_STRING)
+		RETURN_TRUE;
+	if(src_orig_type==IS_DOUBLE || dest_orig_type==IS_DOUBLE) {
+		convert_to_double(dest);
+		RETURN_TRUE;
+	}
+	if(src_orig_type==IS_LONG || dest_orig_type==IS_LONG) {
+		convert_to_long(dest);
+		RETURN_TRUE;
+	}
+}
+
 /*!
  *	tr() returns QObject::tr()
  *

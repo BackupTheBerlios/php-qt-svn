@@ -25,6 +25,7 @@
 #define QTPHP_H
 
 #define PHPQT_VERSION "0.0.4"
+#define QIDI_VERSION "1.0"
 
 #define MONITOR
 
@@ -106,6 +107,17 @@ PHP_FUNCTION(qMin);
 PHP_FUNCTION(qMax);
 PHP_FUNCTION(qBound);
 PHP_FUNCTION(qPrintable);
+PHP_FUNCTION(qFuzzyCompare);
+PHP_FUNCTION(qIsNull);
+PHP_FUNCTION(qIntCast);
+PHP_FUNCTION(qVersion);
+PHP_FUNCTION(PHPQtVersion);
+PHP_FUNCTION(QiDiVersion);
+PHP_FUNCTION(qSharedBuild);
+PHP_FUNCTION(qMalloc);
+PHP_FUNCTION(qFree);
+PHP_FUNCTION(qRealloc);
+PHP_FUNCTION(qMemCopy);
 PHP_FUNCTION(qobject_cast);
 PHP_FUNCTION(tr);
 PHP_FUNCTION(check_qobject);
