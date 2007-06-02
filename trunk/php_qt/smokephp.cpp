@@ -28,6 +28,8 @@
 #include <QtCore/QCoreApplication>
 #include <QtGui/QApplication>
 
+#define ALLOCA_N(type,n) (type*)alloca(sizeof(type)*(n))
+
 extern void init_qt_Smoke();
 extern zend_class_entry* qstring_ce;
 
@@ -80,13 +82,9 @@ public:
 		}
 
 		if(phpqt_methodExists(o->ce_ptr, (char*) methodName)){
-		    Smoke::Method & meth = smoke->methods[method];
-		    zval*** sp = (zval ***) safe_emalloc((int) meth.numArgs, sizeof(zval), 0);
-
-		    VirtualMethodCall c(smoke, method, args, o->zval_ptr, sp);
+			zval* zmem = ALLOCA_N(zval, smoke->methods[method].numArgs);
+		    VirtualMethodCall c(smoke, method, args, o->zval_ptr, &zmem, &o->zval_ptr);
 		    c.next();
-
-  		    efree(sp);
 		}
 		
 		return false;

@@ -200,7 +200,7 @@ static int constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
  *	proxy handler
  */
 
-union _zend_function *proxyHandler(zval **obj_ptr, char* methodName, int methodName_len TSRMLS_DC)
+union _zend_function* proxyHandler(zval **obj_ptr, char* methodName, int methodName_len TSRMLS_DC)
 {
     union _zend_function *fbc;
 
@@ -294,7 +294,7 @@ ZEND_METHOD(php_qt_generic_class, __construct)
     zend_class_entry *ce_parent = Z_OBJCE_P(getThis());
 
     while (PQ::smoke()->idClass(ce->name) <= 0) {
-	    ce_parent = ce->parent;
+// 	    ce_parent = ce->parent;
 	    ce = ce->parent; // orig
     }
 
@@ -704,7 +704,7 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
     cout << "\tcall PHP method " << so->ce_ptr->name << "::" << method_name << endl;
 #endif
 
-        phpqt_callPHPMethod(so->zval_ptr, method_name, j, args);
+         phpqt_callPHPMethod(so->zval_ptr, method_name, j, *args);
 
     // is a signal
     } else {
@@ -744,8 +744,9 @@ phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname)
 
 }
 
+
 zval* 
-phpqt_callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zval** args[])
+phpqt_callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zval** args)
 {
 
 	if(this_ptr == NULL){
@@ -759,7 +760,7 @@ phpqt_callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zva
     zval* retval;
     MAKE_STD_ZVAL(retval);
 
-    if(call_user_function(EG(function_table),&this_ptr,function_name,retval,param_count,*args) == FAILURE){
+    if(call_user_function(EG(function_table),&this_ptr,function_name,retval,param_count,args) == FAILURE){
     	smokephp_object* o = phpqt_getSmokePHPObjectFromZval(this_ptr);
     	php_error(E_ERROR, "PHP-Qt could not call method %s::%s", o->ce_ptr->name, methodName);
     }
@@ -1000,6 +1001,7 @@ phpqt_createOriginal(zval* zval_ptr, void* ptr)
 // 		zval_ptr->is_ref = 1;
 		Z_OBJ_HT_P(zval_ptr) = &php_qt_handler;
 		zval_x_smokephp.insert(zval_ptr, o);*/
+	Z_OBJ_HT_P(zval_ptr) = &php_qt_handler;
 	zval_ptr = o->zval_ptr;
 	zval_add_ref(&zval_ptr);
 	return o;

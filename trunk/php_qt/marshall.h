@@ -43,6 +43,11 @@ public:
 
     virtual ~Marshall() {}
 
+	/** returns a pointer to the return value pointer, we need that for
+	 *	overriding the return value defined by ZEND
+	 */
+	virtual zval** return_value_ptr() = 0;
+
 	const char* identifier;
 
 };

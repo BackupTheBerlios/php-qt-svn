@@ -147,7 +147,7 @@ struct smokephp_object {
 static void 			phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc);
 
 // void 				phpqt_register(zval* this_ptr, zend_rsrc_list_entry le);
-zval* 				phpqt_callPHPMethod(zval* zend_ptr, char* methodname, zend_uint param_count, zval** params[]);
+zval* 				phpqt_callPHPMethod(zval* zend_ptr, char* methodname, zend_uint param_count, zval** params);
 bool 				phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname);
 bool 				phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, QMetaObject* metachar, QString* meta_stringdata, uint* signature);
 int					phpqt_metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a);

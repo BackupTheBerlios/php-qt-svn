@@ -7,6 +7,8 @@
  *                                                                         *
  ***************************************************************************/
 
+// TODO catch more types, see php_to_primitive<long>
+
 template <>
 static bool php_to_primitive<bool>(zval* v)
 {

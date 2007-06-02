@@ -218,7 +218,6 @@ qstringFromZString(zval* zstring) {
 	if (KCODE == 0) {
 		init_codec();
 	}
-
 	if (qstrcmp(KCODE, "UTF8") == 0)
 		return new QString(QString::fromUtf8(zstring->value.str.val, zstring->value.str.len));
 	else if (qstrcmp(KCODE, "EUC") == 0)

@@ -119,7 +119,7 @@ static void marshall_from_php<SmokeClassWrapper>(Marshall *m)
 		o->classId,			// from
 		o->smoke->idClass(cl.className)	// to
 		);
-	
+
 	m->item().s_class = ptr;
 
 	return;
@@ -137,13 +137,14 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 
 	// return the original
 	if(phpqt_SmokePHPObjectExists(p)) {
-		if(((MethodReturnValue*) m)->retval_ptr()){
+		if(m->return_value_ptr()){
 			// destroys the return_value initialized by ZE, we creare our own:
-			zval_ptr_dtor(((MethodReturnValue*) m)->retval_ptr());
+			zval_ptr_dtor(m->return_value_ptr());
 			// prepare the return value
 			smokephp_object* o = phpqt_createOriginal(m->var(), p);
 			// overwrite the old one:
-			*(((MethodReturnValue*) m)->retval_ptr()) = o->zval_ptr;
+			*(m->return_value_ptr()) = o->zval_ptr;
+			*(m->var()) = *o->zval_ptr;
 		}
 		return;
 

@@ -41,7 +41,7 @@ extern void smokeStackFromQtStack(Smoke::Stack stack, void ** _o, int items, Moc
 class MethodReturnValueBase : public Marshall 
 {
 public:
-	MethodReturnValueBase(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack);
+	MethodReturnValueBase(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval** return_value_ptr);
 	const Smoke::Method &method();
 	Smoke::StackItem &item();
 	Smoke *smoke();
@@ -51,6 +51,7 @@ public:
 	void unsupported();
 	zval* var();
 	void setVar(zval* zobj);
+	zval** return_value_ptr();
 
 protected:
 	Smoke *_smoke;
@@ -58,6 +59,7 @@ protected:
 	Smoke::Stack _stack;
 	SmokeType _st;
 	zval* _retval;
+	zval **_return_value_ptr;
 
 	virtual const char *classname();
 };
@@ -83,10 +85,8 @@ class MethodReturnValue : public MethodReturnValueBase {
 public:
 	MethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval *retval, zval** return_value_ptr);
     Marshall::Action action();
-	zval** retval_ptr();
 
 private:
-	zval **_return_value_ptr;
 	const char *classname();
 };
 
@@ -97,8 +97,8 @@ private:
 class MethodCallBase : public Marshall
 {
 public:
-	MethodCallBase(Smoke *smoke, Smoke::Index meth);
-	MethodCallBase(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack);
+	MethodCallBase(Smoke *smoke, Smoke::Index meth,zval** return_value_ptr);
+	MethodCallBase(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval** return_value_ptr);
 	Smoke *smoke();
 	SmokeType type();
 	Smoke::StackItem &item();
@@ -107,6 +107,7 @@ public:
 	virtual void callMethod() = 0;	
 	void next();
 	void unsupported();
+	zval** return_value_ptr();
 
 protected:
 	Smoke *_smoke;
@@ -117,6 +118,8 @@ protected:
 	bool _called;
 	zval ***_sp;
 	virtual const char* classname();
+	zval** _return_value_ptr;
+
 };
 
 /**
@@ -125,7 +128,7 @@ protected:
 
 class VirtualMethodCall : public MethodCallBase {
 public:
-	VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* obj, zval ***sp);
+	VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* obj, zval **sp, zval** return_value_ptr);
 	~VirtualMethodCall();
 	Marshall::Action action();
 	zval* var();
@@ -135,7 +138,8 @@ public:
  
 private:
 	zval* _obj;
-	zval ***_sp;
+ 	zval **__sp;
+
 };
 
 /**
@@ -169,6 +173,7 @@ public:
 		Smoke::ClassFn fn = _smoke->classes[method().classId].classFn;
 		void *ptr = _smoke->cast(_current_object, _current_object_class, method().classId);
 		_items = -1;
+
 		(*fn)(method().method, ptr, _stack);
 		MethodReturnValue r(_smoke, _method, _stack, _retval, _return_value_ptr);
 	}
@@ -183,7 +188,6 @@ private:
 	zval ***_sp;
 	int _items;
 	zval *_retval;
-	zval **_return_value_ptr;
 
 	const char *classname();
 };
@@ -235,6 +239,8 @@ class EmitSignal : public Marshall {
 	void unsupported();
 	Smoke* smoke();
 	const MocArgument &arg();
+	zval** return_value_ptr(){};
+
  protected:
 	MocArgument *_args;
 	int _cur;
