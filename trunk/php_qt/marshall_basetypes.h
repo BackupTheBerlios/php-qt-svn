@@ -144,7 +144,7 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 			smokephp_object* o = phpqt_createOriginal(m->var(), p);
 			// overwrite the old one:
 			*(m->return_value_ptr()) = o->zval_ptr;
-			*(m->var()) = *o->zval_ptr;
+// 			*(m->var()) = *o->zval_ptr;
 		}
 		return;
 
