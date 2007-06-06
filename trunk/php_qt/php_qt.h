@@ -47,16 +47,8 @@ using namespace std;
 
 #include <QtCore/QStack>
 #include <QtCore/QHash>
-#include <QtCore/QTextStream>
-#include <QtCore/QVariant>
 #include <QtCore/QString>
-#include <QtCore/QCoreApplication>
-#include <QtGui/QWidget>
-#include <QtGui/QApplication>
-#include <QtGui/QLayout>
-#include <QtGui/QLCDNumber>
-#include <QtGui/QFont>
-#include <QtCore/QDebug>
+#include <QtCore/QMetaObject>
 
 // for older php versions
 #ifndef ZEND_MN

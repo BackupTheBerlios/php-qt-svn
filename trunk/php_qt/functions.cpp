@@ -24,6 +24,8 @@
 #include "php_qt.h"
 #include "phpqt_internals.h"
 
+#include <QtCore/QObject>
+
 extern Smoke *qt_Smoke;
 extern Smoke::Index qstring;
 extern zend_class_entry* qstring_ce;

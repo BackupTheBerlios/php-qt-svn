@@ -7,6 +7,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QtGui/QWidget>
 #include <QtCore/qprocess.h>
 #include <QtCore/qtextcodec.h>
 
