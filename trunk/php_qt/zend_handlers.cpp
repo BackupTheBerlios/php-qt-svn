@@ -26,13 +26,15 @@
 #include "php_qt.h"
 #include "ext/standard/php_string.h"
 
-extern zend_object_handlers php_qt_handler;
-extern zend_object_handlers zend_orig_handler;
 extern QStack<QByteArray*> methodNameStack;
-extern opcode_handler_t *phpqt_original_opcode_handlers;
-extern opcode_handler_t phpqt_opcode_handlers[PHPQT_OPHANDLER_COUNT];
 extern zend_class_entry* activeCe;
-extern int (*originalConstantMethodHandler)(ZEND_OPCODE_HANDLER_ARGS);
+
+zend_object_handlers php_qt_handler;
+zend_object_handlers zend_orig_handler;
+int (*originalConstantMethodHandler)(ZEND_OPCODE_HANDLER_ARGS);
+opcode_handler_t *phpqt_original_opcode_handlers;
+opcode_handler_t phpqt_opcode_handlers[PHPQT_OPHANDLER_COUNT];
+
 
 /**
  *	proxy handler

@@ -48,17 +48,11 @@ int le_php_qt_hashtype;
 HashTable php_qt_objptr_hash;
 
 // object handler
-zend_object_handlers php_qt_handler;
-zend_object_handlers zend_orig_handler;
+extern zend_object_handlers php_qt_handler;
 
 PHP_INI_BEGIN()
     PHP_INI_ENTRY("qt.codec", "UTF8", PHP_INI_ALL, NULL)
 PHP_INI_END()
-
-int (*originalConstantMethodHandler)(ZEND_OPCODE_HANDLER_ARGS);
-
-opcode_handler_t *phpqt_original_opcode_handlers;
-opcode_handler_t phpqt_opcode_handlers[PHPQT_OPHANDLER_COUNT];
 
 /*! php_qt_functions[]
  *
