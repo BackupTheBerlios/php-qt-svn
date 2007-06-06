@@ -1,7 +1,7 @@
 /*!
  * PHP-Qt - The PHP language bindings for Qt
  *
- * Copyright (C) 2006 
+ * Copyright (C) 2006
  * Thomas Moenicke <thomas.moenicke at kdemail.net>
  * Katrina Niolet <katrina at niolet.name>
  *
@@ -22,6 +22,7 @@
  */
 
 #include "php_qt.h"
+#include "phpqt_internals.h"
 
 extern Smoke *qt_Smoke;
 extern Smoke::Index qstring;
@@ -130,7 +131,7 @@ PHP_FUNCTION(qobject_cast){
 
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zz|", &obj, &cast_type) == FAILURE) {
         php_error(E_WARNING,"error while casting object, wrong parameters");
-        return; 
+        return;
     }
 
 	// just return the first argument
@@ -147,7 +148,7 @@ PHP_FUNCTION(qobject_cast){
 PHP_FUNCTION(qDebug) {
 	const char* msg;
 	int msglen;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&msg,&msglen)==FAILURE) {
 		php_error(E_PARSE,"wrong parameters for qDebug");
 		return;
@@ -162,7 +163,7 @@ PHP_FUNCTION(qDebug) {
 PHP_FUNCTION(qWarning) {
 	const char* msg;
 	int msglen;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&msg,&msglen)==FAILURE) {
 		php_error(E_PARSE,"wrong parameters for qWarning");
 		return;
@@ -177,7 +178,7 @@ PHP_FUNCTION(qWarning) {
 PHP_FUNCTION(qCritical) {
 	const char* msg;
 	int msglen;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s",&msg,&msglen)==FAILURE) {
 		php_error(E_PARSE,"wrong parameters for qCritical");
 		return;
@@ -191,21 +192,21 @@ PHP_FUNCTION(qCritical) {
  */
 PHP_FUNCTION(qAbs) {
 	double x;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"d",&x)==FAILURE) {
 		php_error(E_PARSE,"wrong parameters for qAbs");
 		return;
 	}
 	RETURN_DOUBLE(0.0 >= x ? -x : x);
 }
-	
+
 /**
  * Returns this number rounded to the nearest integer
  * if decimal is greater than .5 it rounds up, otherwise it rounds down
  */
 PHP_FUNCTION(qRound) {
 	double x;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"d",&x)==FAILURE) {
 		php_error(E_PARSE,"wrong parameters for qRound");
 		return;
@@ -219,7 +220,7 @@ PHP_FUNCTION(qRound) {
  */
 PHP_FUNCTION(qRound64) {
 	double x;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"d",&x)==FAILURE) {
 		php_error(E_PARSE,"wrong parameters for qRound");
 		return;
@@ -234,7 +235,7 @@ PHP_FUNCTION(qRound64) {
 PHP_FUNCTION(qMin) {
 	double x;
 	double y;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"dd",&x,&y)==FAILURE) {
 		php_error(E_PARSE,"wrong paramters for qMin");
 		return;
@@ -251,7 +252,7 @@ PHP_FUNCTION(qMin) {
 PHP_FUNCTION(qMax) {
 	double x;
 	double y;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"dd",&x,&y)==FAILURE) {
 		php_error(E_PARSE,"wrong parameters for qMax");
 		return;
@@ -269,7 +270,7 @@ PHP_FUNCTION(qBound) {
 	double min;
 	double val;
 	double max;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ddd",&min,&val,&max)==FAILURE) {
 		php_error(E_PARSE,"wrong parameters for qBound");
 		return;
@@ -338,7 +339,7 @@ PHP_FUNCTION(qFuzzyCompare) {
 	double x;
 	double y;
 	double ret;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"dd",&x,&y)==FAILURE) {
 		php_error(E_PARSE,"wrong parameters for qFuzzyCompare");
 		return;
@@ -346,7 +347,7 @@ PHP_FUNCTION(qFuzzyCompare) {
 	//Just so happens the Qt version does just what we need for this one
 	RETURN_BOOL(qFuzzyCompare(x,y));
 }
-		
+
 /**
  * Returns true if variable is NULL or a numeric 0
  * This varies slightly from the Qt implementation which tests
@@ -354,7 +355,7 @@ PHP_FUNCTION(qFuzzyCompare) {
  */
 PHP_FUNCTION(qIsNull) {
 	zval *var;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z",&var)==FAILURE) {
 		php_error(E_PARSE,"wrong parameters for qIsNull");
 		return;
@@ -380,7 +381,7 @@ PHP_FUNCTION(qIsNull) {
  */
 PHP_FUNCTION(qIntCast) {
 	zval *var;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z",&var)==FAILURE)
 		return;
 	switch(Z_TYPE_P(var)) {
@@ -452,7 +453,7 @@ PHP_FUNCTION(qMalloc) {
  */
 PHP_FUNCTION(qFree) {
 	zval* var;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"z",&var)==FAILURE)
 		return;
 	convert_to_null(var);
@@ -481,17 +482,17 @@ PHP_FUNCTION(qRealloc) {
 PHP_FUNCTION(qMemCopy) {
 	zval* dest;
 	zval* src;
-	
+
 	long size;
 	int src_orig_type;
 	int dest_orig_type;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzl",&dest,&src,&size)==FAILURE)
 		return;
 
 	src_orig_type = Z_TYPE_P(src);
 	dest_orig_type = Z_TYPE_P(dest);
-	
+
 	switch(Z_TYPE_P(src)) {
 		case IS_STRING:
 		case IS_LONG:
@@ -521,20 +522,20 @@ PHP_FUNCTION(qMemCopy) {
 PHP_FUNCTION(qt_noop) {}
 
 PHP_FUNCTION(qt_assert) {
-	
+
 	char* msg;
 	int msglen;
 	char* file;
 	int filelen;
 	int line;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s|sl",&msg,&msglen,&file,&filelen,&line)==FAILURE)
 		return;
 	php_error(E_ERROR,msg);
 }
 
 PHP_FUNCTION(qt_assert_x) {
-	
+
 	char* msg;
 	int msglen;
 	char* file;
@@ -544,7 +545,7 @@ PHP_FUNCTION(qt_assert_x) {
 	char* what;
 	int whatlen;
 	int line;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"s|sssl",&msg,&msglen,&where,&wherelen,&what,&whatlen,&file,&filelen,&line)==FAILURE)
 		return;
 	php_error(E_ERROR,msg);
@@ -552,9 +553,9 @@ PHP_FUNCTION(qt_assert_x) {
 
 
 PHP_FUNCTION(Q_ASSERT) {
-	
+
 	bool cond;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b",&cond)==FAILURE)
 		return;
 	if(!cond)
@@ -562,13 +563,13 @@ PHP_FUNCTION(Q_ASSERT) {
 }
 
 PHP_FUNCTION(Q_ASSERT_X) {
-	
+
 	bool cond;
 	char* where="";
 	int wherelen;
 	char* what="";
 	int whatlen;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"b|ss",&cond,&where,&wherelen,&what,&whatlen)==FAILURE) {
 		return;
 	}
@@ -581,13 +582,13 @@ PHP_FUNCTION(qt_check_pointer) {
 
 	char* file;
 	int line;
-	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"|sl",&file,&line)==FAILURE)
 		return;
 	php_error(E_WARNING,"Out of memory");
 }
-		
-	
+
+
 /*!
  *	tr() returns QObject::tr()
  *

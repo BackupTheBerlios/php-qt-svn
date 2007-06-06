@@ -30,7 +30,9 @@ using namespace std;
 
 #include <QtCore/QString>
 #include <zend_interfaces.h>
+
 #include "php_qt.h"
+#include "phpqt_internals.h"
 
 zend_class_entry* qstring_ce;
 extern Smoke* qt_Smoke;
@@ -243,7 +245,7 @@ ZEND_METHOD(QString, constData){
  *    class     QString */
 /*
  *    function  insert
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, insert){
 
@@ -260,7 +262,7 @@ ZEND_METHOD(QString, insert){
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->insert((int) Z_LVAL_P(z_0) ,(char) Z_LVAL_P(z_1));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
@@ -295,7 +297,7 @@ ZEND_METHOD(QString, insert){
  *    class     QString */
 /*
  *    function  clear
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, clear){
 	if (ZEND_NUM_ARGS() == 0){
@@ -310,7 +312,7 @@ ZEND_METHOD(QString, clear){
  *    class     QString */
 /*
  *    function  setUtf16
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, setUtf16){
 
@@ -324,7 +326,7 @@ ZEND_METHOD(QString, setUtf16){
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->setUtf16((const ushort*) Z_LVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
@@ -336,7 +338,7 @@ ZEND_METHOD(QString, setUtf16){
  *    class     QString */
 /*
  *    function  prepend
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, prepend){
 
@@ -355,14 +357,14 @@ ZEND_METHOD(QString, prepend){
 			if(Z_TYPE_P(z_0) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->prepend((char) Z_LVAL_P(z_0));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
 			if(Z_TYPE_P(z_0) == IS_STRING){
 			QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->prepend( (const char*) Z_STRVAL_P(z_0));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
@@ -395,7 +397,7 @@ ZEND_METHOD(QString, trimmed){
  *    class     QString */
 /*
  *    function  chop
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, chop){
 
@@ -446,7 +448,7 @@ ZEND_METHOD(QString, leftJustified){
  *    class     QString */
 /*
  *    function  squeeze
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, squeeze){
 	if (ZEND_NUM_ARGS() == 0){
@@ -579,7 +581,7 @@ ZEND_METHOD(QString, toUpper){
  *    class     QString */
 /*
  *    function  QString
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, __construct){
 
@@ -717,7 +719,7 @@ ZEND_METHOD(QString, isRightToLeft){
  *    class     QString */
 /*
  *    function  setNum
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, setNum){
 
@@ -731,7 +733,7 @@ ZEND_METHOD(QString, setNum){
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->setNum((short) Z_LVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
@@ -752,14 +754,14 @@ ZEND_METHOD(QString, setNum){
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->setNum((float) Z_LVAL_P(z_0) ,(char) Z_LVAL_P(z_1) ,(int) Z_LVAL_P(z_2));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->setNum((double) Z_LVAL_P(z_0) ,(char) Z_LVAL_P(z_1) ,(int) Z_LVAL_P(z_2));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
@@ -798,12 +800,12 @@ ZEND_METHOD(QString, endsWith){
  *    function  number
  *    flags:    s
  *
- *	QString number ( long n, int base = 10 ) 
- *	QString number ( ulong n, int base = 10 ) 
- *	QString number ( int n, int base = 10 ) 
- *	QString number ( uint n, int base = 10 ) 
- *	QString number ( qlonglong n, int base = 10 ) 
- *	QString number ( qulonglong n, int base = 10 ) 
+ *	QString number ( long n, int base = 10 )
+ *	QString number ( ulong n, int base = 10 )
+ *	QString number ( int n, int base = 10 )
+ *	QString number ( uint n, int base = 10 )
+ *	QString number ( qlonglong n, int base = 10 )
+ *	QString number ( qulonglong n, int base = 10 )
  *	QString number ( double n, char format = 'g', int precision = 6 )
  */
 ZEND_METHOD(QString, number){
@@ -814,17 +816,17 @@ ZEND_METHOD(QString, number){
 			if(Z_TYPE_P(z_0) == IS_LONG){
 				QString obj = (QString) QString::number((ulong) Z_LVAL_P(z_0));
 				QString *s1 = new QString(obj);
-				
+
 				phpqt_createObject(return_value, (void*) s1, qstring_ce, QSTRING_CLASSID);
 				return;
 			} else if(Z_TYPE_P(z_0) == IS_DOUBLE){
 				QString obj = (QString) QString::number((double) Z_DVAL_P(z_0));
 				QString *s1 = new QString(obj);
-				
+
 				phpqt_createObject(return_value, (void*) s1, qstring_ce, QSTRING_CLASSID);
 				return;
 			}
-			
+
 		}
 	}
 
@@ -1035,7 +1037,7 @@ ZEND_METHOD(QString, toUShort){
  *    class     QString */
 /*
  *    function  truncate
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, truncate){
 
@@ -1112,7 +1114,7 @@ ZEND_METHOD(QString, right){
  *    class     QString */
 /*
  *    function  push_front
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, push_front){
 
@@ -1349,7 +1351,7 @@ ZEND_METHOD(QString, startsWith){
  *    class     QString */
 /*
  *    function  remove
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, remove){
 
@@ -1387,7 +1389,7 @@ ZEND_METHOD(QString, remove){
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG){
 			QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->remove((int) Z_LVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
@@ -1535,7 +1537,7 @@ ZEND_METHOD(QString, arg){
  *    class     QString */
 /*
  *    function  vsprintf
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, vsprintf){
 
@@ -1597,7 +1599,7 @@ ZEND_METHOD(QString, isDetached){
  *    class     QString */
 /*
  *    function  reserve
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, reserve){
 
@@ -1714,7 +1716,7 @@ ZEND_METHOD(QString, split){
  *    class     QString */
 /*
  *    function  setUnicode
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, setUnicode){
 
@@ -1764,7 +1766,7 @@ ZEND_METHOD(QString, fromLatin1){
  *    class     QString */
 /*
  *    function  data
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, data){
 	if (ZEND_NUM_ARGS() == 0){
@@ -1792,7 +1794,7 @@ ZEND_METHOD(QString, toLatin1){
  *    class     QString */
 /*
  *    function  end
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, end){
 	if (ZEND_NUM_ARGS() == 0){
@@ -1855,7 +1857,7 @@ ZEND_METHOD(QString, contains){
  *    class     QString */
 /*
  *    function  resize
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, resize){
 
@@ -1880,7 +1882,7 @@ ZEND_METHOD(QString, resize){
  *    class     QString */
 /*
  *    function  replace
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, replace){
 
@@ -1933,7 +1935,7 @@ ZEND_METHOD(QString, replace){
 			{
 				QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->replace((int) Z_LVAL_P(z_0) ,(int) Z_LVAL_P(z_1) ,(char) Z_LVAL_P(z_2));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
@@ -1979,7 +1981,7 @@ ZEND_METHOD(QString, fromUtf8){
   			    if(getThis() == NULL){
 				QString obj = (QString) QString::fromUtf8( (const char*) Z_STRVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
 				QString *s1 = new QString(obj);
-				
+
 				phpqt_createObject(return_value, (void*) s1, qstring_ce, QSTRING_CLASSID);
 				return;
 
@@ -2019,7 +2021,7 @@ ZEND_METHOD(QString, toLong){
  *    class     QString */
 /*
  *    function  detach
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, detach){
 	if (ZEND_NUM_ARGS() == 0){
@@ -2033,7 +2035,7 @@ ZEND_METHOD(QString, detach){
  *    class     QString */
 /*
  *    function  append
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, append){
 
@@ -2045,7 +2047,7 @@ ZEND_METHOD(QString, append){
 			{
 				QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->append((char) Z_LVAL_P(z_0));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
@@ -2129,7 +2131,7 @@ ZEND_METHOD(QString, toDouble){
  *    class     QString */
 /*
  *    function  fill
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, fill){
 
@@ -2144,7 +2146,7 @@ ZEND_METHOD(QString, fill){
 			{
 				QString *obj = (QString*) PHP_QT_FETCH();
 				QString & return_object = (QString &) obj->fill((char) Z_LVAL_P(z_0) ,(int) Z_LVAL_P(z_1));
-				return_value = (zval*) emalloc(sizeof(zval));				
+				return_value = (zval*) emalloc(sizeof(zval));
 				phpqt_createObject(return_value,(void*) &return_object,qstring_ce, QSTRING_CLASSID);
 				return;
 			}
@@ -2167,7 +2169,7 @@ ZEND_METHOD(QString, rightJustified){
 		zval *z_0; // define ZVAL
 		zval *z_1; // define ZVAL
 		zval *z_2; // define ZVAL
-		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzz", &z_0, &z_1, &z_2) == SUCCESS) 
+		if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"zzz", &z_0, &z_1, &z_2) == SUCCESS)
 		{
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG && Z_TYPE_P(z_2) == IS_LONG)
 			{
@@ -2294,7 +2296,7 @@ ZEND_METHOD(QString, at){
  *    class     QString */
 /*
  *    function  begin
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, begin){
 	if (ZEND_NUM_ARGS() == 0){
@@ -2307,7 +2309,7 @@ ZEND_METHOD(QString, begin){
  *    class     QString */
 /*
  *    function  push_back
- *    flags:    
+ *    flags:
  */
 ZEND_METHOD(QString, push_back){
 

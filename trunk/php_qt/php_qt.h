@@ -44,7 +44,7 @@ using namespace std;
 
 #include "smoke.h"
 #include "smokephp.h"
-#include <QtCore/QMetaMethod>
+
 #include <QtCore/QStack>
 #include <QtCore/QHash>
 #include <QtCore/QTextStream>
@@ -143,28 +143,6 @@ struct smokephp_object {
     zval *zval_ptr;
     QMetaObject* meta;
 };
-
-
-static void 			phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc);
-
-// void 				phpqt_register(zval* this_ptr, zend_rsrc_list_entry le);
-zval* 				phpqt_callPHPMethod(zval* zend_ptr, char* methodname, zend_uint param_count, zval** params);
-bool 				phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname);
-bool 				phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, QMetaObject* metachar, QString* meta_stringdata, uint* signature);
-int					phpqt_metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a);
-char*				phpqt_checkForOperator(const char* fname);
-
-void* 				phpqt_getQtObjectFromZval(zval* this_ptr);
-smokephp_object* 	phpqt_getSmokePHPObjectFromZval(zval* this_ptr);
-smokephp_object*	phpqt_getSmokePHPObjectFromQt(void* QtPtr);
-void				phpqt_setSmokePHPObject(smokephp_object* o);
-bool 				phpqt_SmokePHPObjectExists(zval* this_ptr);
-bool				phpqt_SmokePHPObjectExists(void* ptr);
-
-bool				phpqt_unmapSmokePHPObject(zval* o);
-
-smokephp_object*	phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce = NULL, Smoke::Index classId = 0);
-smokephp_object*	phpqt_createOriginal(zval* zval_ptr, void* ptr);
 
 const char* 		printType(int type);
 

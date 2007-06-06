@@ -23,6 +23,8 @@
 #include "php_qt.h"
 #include "smoke.h"
 #include "marshall_types.h"
+#include "phpqt_internals.h"
+
 #include <QtCore/QMetaMethod>
 #include <QtCore/QHash>
 #include <QtCore/QCoreApplication>

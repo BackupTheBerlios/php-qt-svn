@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "marshall_types.h"
+#include "phpqt_internals.h"
 
 void
 smokeStackToQtStack(Smoke::Stack stack, void ** o, int items, MocArgument* args)

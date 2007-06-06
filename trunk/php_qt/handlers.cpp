@@ -14,6 +14,7 @@
 #include "marshall.h"
 #include "php_qt.h"
 #include "smokephp.h"
+#include "phpqt_internals.h"
 
 extern zend_class_entry* qstring_ce;
 
@@ -101,11 +102,11 @@ static void marshall_it(Marshall *m)
 		case Marshall::FromZVAL:
 			marshall_from_php<T>(m);
 		break;
- 
+
 		case Marshall::ToZVAL:
 			marshall_to_php<T>( m );
 		break;
-				
+
 		default:
 			m->unsupported();
 		break;
@@ -124,15 +125,15 @@ marshall_basetype(Marshall *m)
 		case Smoke::t_char:
 			marshall_it<signed char>(m);
 		break;
-		
+
 		case Smoke::t_uchar:
 			marshall_it<unsigned char>(m);
 		break;
- 
+
 		case Smoke::t_short:
 			marshall_it<short>(m);
 		break;
-      
+
 		case Smoke::t_ushort:
 			marshall_it<unsigned short>(m);
 		break;
@@ -140,11 +141,11 @@ marshall_basetype(Marshall *m)
 		case Smoke::t_int:
 			marshall_it<int>(m);
 		break;
-		
+
 		case Smoke::t_uint:
 			marshall_it<unsigned int>(m);
 		break;
- 
+
 		case Smoke::t_long:
 			marshall_it<long>(m);
 		break;
@@ -152,7 +153,7 @@ marshall_basetype(Marshall *m)
 		case Smoke::t_ulong:
 			marshall_it<unsigned long>(m);
 		break;
- 
+
 		case Smoke::t_float:
 			marshall_it<float>(m);
 		break;
@@ -164,14 +165,14 @@ marshall_basetype(Marshall *m)
 		case Smoke::t_enum:
 			marshall_it<SmokeEnumWrapper>(m);
 		break;
-     
+
 		case Smoke::t_class:
 			marshall_it<SmokeClassWrapper>(m);
 		break;
 
 		default:
 			m->unsupported();
-		break;	
+		break;
 	}
 
 }
@@ -197,7 +198,7 @@ void marshall_ucharP(Marshall *m) {
 static const char * KCODE = 0;
 static QTextCodec *codec = 0;
 
-void 
+void
 init_codec() {
 
 	KCODE = INI_ORIG_STR("qt.codec");
@@ -213,7 +214,7 @@ init_codec() {
 }
 
 
-QString* 
+QString*
 qstringFromZString(zval* zstring) {
 	if (KCODE == 0) {
 		init_codec();
@@ -230,7 +231,7 @@ qstringFromZString(zval* zstring) {
 	return new QString(QString::fromLocal8Bit(zstring->value.str.val, zstring->value.str.len));
 }
 
-zval* 
+zval*
 zstringFromQString(QString * s) {
 
 	if (KCODE == 0) {
@@ -292,7 +293,7 @@ static void marshall_QString(Marshall *m) {
 			phpqt_createObject(m->var(), (void*) s, qstring_ce, -1);
 		}
 		break;
- 
+
 		default:
 			m->unsupported();
 		break;
@@ -337,7 +338,7 @@ Marshall::HandlerFn getMarshallFn(const SmokeType &type) {
 	if(h == 0 && type.isConst() && strlen(type.name()) > strlen("const ")) {
 			h = type_handlers[type.name() + strlen("const ")];
 	}
-	
+
 	if(h != 0) {
 		return h->fn;
 	}
