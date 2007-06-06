@@ -1,7 +1,7 @@
 /*!
  * PHP-Qt - The PHP language bindings for Qt
  *
- * Copyright (C) 2006 
+ * Copyright (C) 2006
  * Thomas Moenicke <thomas.moenicke at kdemail.net>
  *
  * This program is free software; you can redistribute it and/or
@@ -86,7 +86,7 @@ public:
 		    VirtualMethodCall c(smoke, method, args, o->zval_ptr, &zmem, &o->zval_ptr);
 		    c.next();
 		}
-		
+
 		return false;
     }
 
@@ -109,7 +109,7 @@ public:
  *	@return	-
  */
 
-void 
+void
 smokephp_init() {
 
     if (qt_Smoke != 0L) {
@@ -127,11 +127,11 @@ smokephp_init() {
 }
 
 /*!
- *  @param  const char*     c   class-name 
+ *  @param  const char*     c   class-name
  *  @param  const char*     m   mangled function-name
  *  @return Smoke::Index        unambiguous method ID
  */
-Smoke::Index 
+Smoke::Index
 smokephp_getMethod(const char* c, const char* m, int argc, zval*** args)
 {
 
@@ -173,7 +173,7 @@ smokephp_getMethod(const char* c, const char* m, int argc, zval*** args)
 								right = true;
 							break;
 						case Smoke::t_float:
-						case Smoke::t_double: 
+						case Smoke::t_double:
 							if(type == IS_DOUBLE)
 								right = true;
 							break;
@@ -182,7 +182,7 @@ smokephp_getMethod(const char* c, const char* m, int argc, zval*** args)
 							break;
 						case Smoke::t_class:
 							if(type == IS_OBJECT){
-							    QByteArray* name = 
+							    QByteArray* name =
 							    new QByteArray(
 								PQ::smoke()->types[
 								    PQ::smoke()->argumentList[
@@ -204,7 +204,7 @@ smokephp_getMethod(const char* c, const char* m, int argc, zval*** args)
 					return PQ::smoke()->ambiguousMethodList[i];
 				}
 			}
-			
+
 			i++;
     	}
     }
@@ -242,7 +242,7 @@ smokephp_callMethod(void *obj, Smoke::Index method, Smoke::Stack qargs) {
  * #define IS_RESOURCE	7
  * #define IS_CONSTANT	8
  * #define IS_CONSTANT_ARRAY	9
- * 
+ *
  *  @param  zval***                 args
  *	@param	int						argc
  *  @param  Smoke::StackItem*       qargs
@@ -299,13 +299,13 @@ void* transformArray(zval* args){
 	if(zend_hash_get_current_data_ex(((zval) *args).value.ht, (void**) &first_elem, 0) == FAILURE){
 		php_error(E_ERROR, "PHP-Qt: could not get first value of hashtable.");
 	}
-	
+
 	uint type = (int) (**first_elem).type;
 	if(type < 0 || type > 9){
 		// should never happen
 		php_error(E_ERROR, "Could not get type of array");
 	}
-	
+
 	void* e_arrayv;
 
 	switch(type){
@@ -358,7 +358,7 @@ void smokephp_prepareMethodName(zval*** args, int argc, QStack<QByteArray*> &met
         	    methodNameStack.top()->append("#");
         	}
 	    } else {
-	        php_error(E_ERROR,"Unknown argument or unsupported type %d at argument %d, cannot prepare method call\n", type, i);
+	        php_error(E_ERROR,"Unknown argument or unsupported type %d at argument %d, cannot prepare method call %s()\n", type, i, methodNameStack.top()->constData());
 // 	        exit(FAILURE);
 	    }
     }
@@ -412,7 +412,7 @@ QByteArray* smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack)
 }
 
 
-void 
+void
 smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method){
 
     int j;
@@ -429,11 +429,11 @@ smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const S
 
 }
 
-bool 
+bool
 smokephp_isQObject(Smoke::Index classId) {
 	if(strcmp(PQ::smoke()->classes[classId].className, "QObject") == 0)
 		return true;
-	
+
 	for(Smoke::Index *p = PQ::smoke()->inheritanceList + PQ::smoke()->classes[classId].parents;	*p;	p++) {
 		if(smokephp_isQObject(*p))
 			return true;

@@ -1,5 +1,5 @@
 <?php
-
+// todo: set bool, empty string
     /**
      *	This file contains a couple of basic tests
      *
@@ -21,8 +21,30 @@
 	const a = "a";
 	const b = 24;
 
+	public function __construct($parent)
+	{
+	    parent::__construct($parent);
+	}
+
 	public function testMethod($value = NULL) {
 	    if ($value) echo $value."\n";
+	}
+	
+	public static function staticMethod()
+	{
+	    return "staticMethod";
+	}
+
+//	    parent::tr("");
+
+	public static function staticTrMethod($arg)
+	{
+	    return parent::tr($arg);
+	}
+
+	public function blockSignals($bool)
+	{
+	    return parent::blockSignals($bool);
 	}
 	
     }
@@ -55,6 +77,38 @@
 	function testQtConstant() {
 	    echo "\ntesting Qt::Horizontal";
 	    $this->assertTrue(Qt::Horizontal == 1, "Could not fetch constant from Qt!");
+	    echo " passed";
+	}
+
+	// try to call a static method
+	function testCallStaticMethod() {
+	    echo "\ntesting foo::staticMethod()";
+	    $this->assertEquals(foo::staticMethod(), "staticMethod", "Could not call a static method!");
+	    echo " passed";
+	}
+
+	// try to call a static Qt method
+	function testCallStaticQtMethod() {
+	    echo "\ntesting foo::tr()";
+	    $this->assertEquals(foo::tr("hello") == "hello", "Could not call a static Qt method!");
+	    echo " passed";
+	}
+
+	// try to call a parent Qt method within a method
+	function testCallParentQtMethod() {
+	    echo "\ntesting parent::blockSignals() within foo::blockSignals()";
+	    $o = new QObject();
+	    $p = new foo($o);
+	    // set blockSignals to true, so we can test it
+	    $p->blockSignals(true); 
+    	    $this->assertTrue($p->blockSignals(true), "Could not call a parent Qt method!");
+	    echo " passed";
+	}
+
+	// try to call a static Qt method within a static PHP method
+	function testCallStaticQtMethodWithinStaticPHPMethod() {
+	    echo "\ntesting foo::staticTrMethod()";
+	    $this->assertEquals(foo::staticTrMethod("hello") == "hello", "Could not call a static Qt method!");
 	    echo " passed";
 	}
 
@@ -176,7 +230,7 @@
 	}
 
 	function testTr(){
-	    echo "\ntesting tr()";
+	    echo "\ntesting global tr()";
 	    $s = tr("hello world");
 	    $this->assertEquals($s->__toString(), "hello world", "tr() doesnt work!");
 	    echo " passed";

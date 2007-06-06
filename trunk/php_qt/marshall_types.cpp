@@ -208,50 +208,50 @@ MethodReturnValueBase::MethodReturnValueBase(Smoke *smoke, Smoke::Index meth, Sm
 }
 
 const Smoke::Method&
-MethodReturnValueBase::method() 
-{ 
-	return _smoke->methods[_method]; 
+MethodReturnValueBase::method()
+{
+	return _smoke->methods[_method];
 }
 
 Smoke::StackItem&
-MethodReturnValueBase::item() 
+MethodReturnValueBase::item()
 {
 	return _stack[0];
 }
 
 Smoke *
-MethodReturnValueBase::smoke() 
-{ 
-	return _smoke; 
+MethodReturnValueBase::smoke()
+{
+	return _smoke;
 }
 
-SmokeType 
-MethodReturnValueBase::type() 
-{ 
-	return _st; 
+SmokeType
+MethodReturnValueBase::type()
+{
+	return _st;
 }
 
-void 
+void
 MethodReturnValueBase::next() {}
 
-bool 
-MethodReturnValueBase::cleanup() 
-{ 
-	return false; 
+bool
+MethodReturnValueBase::cleanup()
+{
+	return false;
 }
 
-void 
-MethodReturnValueBase::unsupported() 
+void
+MethodReturnValueBase::unsupported()
 {
 	php_error(E_ERROR, "Cannot handle '%s' as return-type of %s::%s",
 	type().name(),
 	classname(),
-	_smoke->methodNames[method().name]);	
+	_smoke->methodNames[method().name]);
 }
 
-zval* 
-MethodReturnValueBase::var() 
-{ 
+zval*
+MethodReturnValueBase::var()
+{
 	return _retval;
 }
 
@@ -262,9 +262,9 @@ MethodReturnValueBase::setVar(zval* zobj)
 }
 
 const char *
-MethodReturnValueBase::classname() 
-{ 
-	return _smoke->className(method().classId); 
+MethodReturnValueBase::classname()
+{
+	return _smoke->className(method().classId);
 }
 
 zval**
@@ -278,7 +278,7 @@ MethodReturnValueBase::return_value_ptr()
  */
 
 VirtualMethodReturnValue::VirtualMethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval retval) :
-	MethodReturnValueBase(smoke,meth,stack,NULL), _retval2(retval) 
+	MethodReturnValueBase(smoke,meth,stack,NULL), _retval2(retval)
 {
 	identifier = "VirtualMethodReturnValue";
 	_retval = &_retval2;
@@ -286,10 +286,10 @@ VirtualMethodReturnValue::VirtualMethodReturnValue(Smoke *smoke, Smoke::Index me
 	(*fn)(this);
 }
 
-Marshall::Action 
-VirtualMethodReturnValue::action() 
-{ 
-	return Marshall::FromZVAL; 
+Marshall::Action
+VirtualMethodReturnValue::action()
+{
+	return Marshall::FromZVAL;
 }
 
 /**
@@ -305,16 +305,16 @@ MethodReturnValue::MethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Sta
 	(*fn)(this);
 }
 
-Marshall::Action 
-MethodReturnValue::action() 
-{ 
-	return Marshall::ToZVAL; 
+Marshall::Action
+MethodReturnValue::action()
+{
+	return Marshall::ToZVAL;
 }
 
 const char *
-MethodReturnValue::classname() 
-{ 
-	return qstrcmp(MethodReturnValueBase::classname(), "QGlobalSpace") == 0 ? "" : MethodReturnValueBase::classname(); 
+MethodReturnValue::classname()
+{
+	return qstrcmp(MethodReturnValueBase::classname(), "QGlobalSpace") == 0 ? "" : MethodReturnValueBase::classname();
 }
 
 /**
@@ -323,40 +323,40 @@ MethodReturnValue::classname()
 
 MethodCallBase::MethodCallBase(Smoke *smoke, Smoke::Index meth,zval** return_value_ptr) :
 	_smoke(smoke), _method(meth), _cur(-1), _called(false), _sp(0), _return_value_ptr(return_value_ptr)
-{  
+{
 }
 
 MethodCallBase::MethodCallBase(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack,zval** return_value_ptr) :
 	_smoke(smoke), _method(meth), _stack(stack), _cur(-1), _called(false), _sp(0), _return_value_ptr(return_value_ptr)
-{  
+{
 }
 
 Smoke *
-MethodCallBase::smoke() 
-{ 
-	return _smoke; 
+MethodCallBase::smoke()
+{
+	return _smoke;
 }
 
-SmokeType 
-MethodCallBase::type() 
-{ 
-	return SmokeType(_smoke, _args[_cur]); 
+SmokeType
+MethodCallBase::type()
+{
+	return SmokeType(_smoke, _args[_cur]);
 }
 
 Smoke::StackItem &
-MethodCallBase::item() 
-{ 
-	return _stack[_cur + 1]; 
+MethodCallBase::item()
+{
+	return _stack[_cur + 1];
 }
 
 const Smoke::Method &
-MethodCallBase::method() 
-{ 
-	return _smoke->methods[_method]; 
+MethodCallBase::method()
+{
+	return _smoke->methods[_method];
 }
-	
-void 
-MethodCallBase::next() 
+
+void
+MethodCallBase::next()
 {
 	int oldcur = _cur;
 	_cur++;
@@ -370,8 +370,8 @@ MethodCallBase::next()
 	_cur = oldcur;
 }
 
-void 
-MethodCallBase::unsupported() 
+void
+MethodCallBase::unsupported()
 {
 	php_error(E_ERROR, "Cannot handle '%s' as argument of %s::%s",
 		type().name(),
@@ -379,10 +379,10 @@ MethodCallBase::unsupported()
 		_smoke->methodNames[method().name]);
 }
 
-const char* 
-MethodCallBase::classname() 
-{ 
-	return _smoke->className(method().classId); 
+const char*
+MethodCallBase::classname()
+{
+	return _smoke->className(method().classId);
 }
 
 zval**
@@ -403,33 +403,33 @@ VirtualMethodCall::VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Sta
   	_args = _smoke->argumentList + method().args;
 }
 
-VirtualMethodCall::~VirtualMethodCall() 
+VirtualMethodCall::~VirtualMethodCall()
 {
     delete[] _stack;
 }
 
-Marshall::Action 
-VirtualMethodCall::action() 
-{ 
-	return Marshall::ToZVAL; 
+Marshall::Action
+VirtualMethodCall::action()
+{
+	return Marshall::ToZVAL;
 }
 
 zval*
-VirtualMethodCall::var() 
+VirtualMethodCall::var()
 {
 // 	*_sp[_cur] = (zval*) emalloc(sizeof(zval));
 	ZVAL_NULL(__sp[_cur]);
     return __sp[_cur];
 }
 
-int 
-VirtualMethodCall::items() 
-{ 
-	return method().numArgs; 
+int
+VirtualMethodCall::items()
+{
+	return method().numArgs;
 }
 
-void 
-VirtualMethodCall::callMethod() 
+void
+VirtualMethodCall::callMethod()
 {
 	if (_called) return;
 	_called = true;
@@ -440,10 +440,10 @@ VirtualMethodCall::callMethod()
  	VirtualMethodReturnValue r(_smoke, _method, _stack, _retval);
 }
 
-bool 
-VirtualMethodCall::cleanup() 
-{ 
-	return false; 
+bool
+VirtualMethodCall::cleanup()
+{
+	return false;
 }
 
 /**
@@ -475,40 +475,68 @@ MethodCall::MethodCall(Smoke *smoke, Smoke::Index method, zval* target, zval ***
 // 	_retval = retval;
 }
 
-MethodCall::~MethodCall() 
+MethodCall::~MethodCall()
 {
 	delete[] _stack;
 }
 
-Marshall::Action 
-MethodCall::action() 
-{ 
-	return Marshall::FromZVAL; 
+Marshall::Action
+MethodCall::action()
+{
+	return Marshall::FromZVAL;
 }
 
-zval* 
-MethodCall::var() 
+zval*
+MethodCall::var()
 {
 	if (_cur < 0) return _retval;
 	return (zval*) *_sp[_cur];
 }
 
-int 
-MethodCall::items() 
-{ 
-	return _items; 
+void
+MethodCall::callMethod() {
+	if(_called) return;
+	_called = true;
+
+	QString className(_smoke->className(method().classId));
+
+	if (! className.endsWith(_smoke->methodNames[method().name])
+		&& Z_TYPE_P(_target) == IS_NULL
+		&& !(method().flags & Smoke::mf_static) )
+	{
+		php_error(E_ERROR, "Instance is not initialized, cannot call %s",
+					_smoke->methodNames[method().name]);
+	}
+
+	if (Z_TYPE_P(_target) == IS_NULL && !(method().flags & Smoke::mf_static)) {
+		php_error(E_ERROR, "%s is not a class method\n", _smoke->methodNames[method().name]);
+	}
+
+	Smoke::ClassFn fn = _smoke->classes[method().classId].classFn;
+	void *ptr = _smoke->cast(_current_object, _current_object_class, method().classId);
+	_items = -1;
+
+	(*fn)(method().method, ptr, _stack);
+	MethodReturnValue r(_smoke, _method, _stack, _retval, _return_value_ptr);
 }
 
-bool 
-MethodCall::cleanup() 
-{ 
-	return true; 
+
+int
+MethodCall::items()
+{
+	return _items;
+}
+
+bool
+MethodCall::cleanup()
+{
+	return true;
 }
 
 const char *
-MethodCall::classname() 
-{ 
-	return qstrcmp(MethodCallBase::classname(), "QGlobalSpace") == 0 ? "" : MethodCallBase::classname(); 
+MethodCall::classname()
+{
+	return qstrcmp(MethodCallBase::classname(), "QGlobalSpace") == 0 ? "" : MethodCallBase::classname();
 }
 
 /**
@@ -516,54 +544,54 @@ MethodCall::classname()
  */
 
 SigSlotBase::SigSlotBase(zval*** sp) : _cur(-1), _called(false), _sp(sp)
-{ 
+{
 	identifier = "SigSlotBase";
 	_stack = new Smoke::StackItem[_items -1];
 }
 
-SigSlotBase::~SigSlotBase() 
-{ 
-	delete[] _stack; 
+SigSlotBase::~SigSlotBase()
+{
+	delete[] _stack;
 }
 
 const MocArgument &
-SigSlotBase::arg() 
-{ 
-	return _args[_cur + 1]; 
+SigSlotBase::arg()
+{
+	return _args[_cur + 1];
 }
 
-SmokeType 
-SigSlotBase::type() 
-{ 
-	return arg().st; 
+SmokeType
+SigSlotBase::type()
+{
+	return arg().st;
 }
 
 Smoke::StackItem &
-SigSlotBase::item() 
-{ 
-	return _stack[_cur]; 
+SigSlotBase::item()
+{
+	return _stack[_cur];
 }
 
-zval* 
-SigSlotBase::var() 
-{ 
-	return (zval*) *_sp[_cur]; 
+zval*
+SigSlotBase::var()
+{
+	return (zval*) *_sp[_cur];
 }
 
 Smoke *
-SigSlotBase::smoke() 
-{ 
-	return type().smoke(); 
+SigSlotBase::smoke()
+{
+	return type().smoke();
 }
 
-void 
-SigSlotBase::unsupported() 
+void
+SigSlotBase::unsupported()
 {
 	php_error(E_ERROR, "Cannot handle '%s' as %s argument\n", type().name(), mytype() );
 }
 
 void
-SigSlotBase::next() 
+SigSlotBase::next()
 {
 	int oldcur = _cur;
 	_cur++;
@@ -580,7 +608,7 @@ SigSlotBase::next()
 /**
  *	SlotReturnValue
  *
- *	Converts a zval* returned by a slot invocation to a Qt slot 
+ *	Converts a zval* returned by a slot invocation to a Qt slot
  *	reply type
  */
 
@@ -589,14 +617,14 @@ class SlotReturnValue : public Marshall {
     Smoke::Stack _stack;
 	zval* _result;
 public:
-	SlotReturnValue(void ** o, zval* result, MocArgument * replyType) 
+	SlotReturnValue(void ** o, zval* result, MocArgument * replyType)
 	{
 		_result = result;
 		_replyType = replyType;
 		_stack = new Smoke::StackItem[1];
 		Marshall::HandlerFn fn = getMarshallFn(type());
 		(*fn)(this);
-		// Save any address in zeroth element of the arrary of 'void*'s passed to 
+		// Save any address in zeroth element of the arrary of 'void*'s passed to
 		// qt_metacall()
 		void * ptr = o[0];
 		smokeStackToQtStack(_stack, o, 1, _replyType);
@@ -607,25 +635,25 @@ public:
 		}
     }
 
-    SmokeType type() { 
-		return _replyType[0].st; 
+    SmokeType type() {
+		return _replyType[0].st;
 	}
     Marshall::Action action() { return Marshall::FromZVAL; }
     Smoke::StackItem &item() { return _stack[0]; }
     zval* var() {
     	return _result;
     }
-	
-	void unsupported() 
+
+	void unsupported()
 	{
 		php_error(E_ERROR, "Cannot handle '%s' as slot reply-type", type().name());
     }
 	Smoke *smoke() { return type().smoke(); }
-    
+
 	void next() {}
-    
+
 	bool cleanup() { return false; }
-	
+
 	~SlotReturnValue() {
 		delete[] _stack;
 	}
@@ -648,37 +676,37 @@ InvokeSlot::InvokeSlot(zval* obj, int slotname, zval*** args, void ** o) : SigSl
 	copyArguments();
 }
 
-InvokeSlot::~InvokeSlot() 
-{ 
-	free(_sp);	
+InvokeSlot::~InvokeSlot()
+{
+	free(_sp);
 }
 
-Marshall::Action 
-InvokeSlot::action() 
-{ 
-	return Marshall::ToZVAL; 
+Marshall::Action
+InvokeSlot::action()
+{
+	return Marshall::ToZVAL;
 }
 
 const char *
-InvokeSlot::mytype() 
-{ 
-	return "slot"; 
+InvokeSlot::mytype()
+{
+	return "slot";
 }
 
-bool 
-InvokeSlot::cleanup() 
-{ 
-	return false; 
+bool
+InvokeSlot::cleanup()
+{
+	return false;
 }
 
-void 
-InvokeSlot::copyArguments() 
+void
+InvokeSlot::copyArguments()
 {
 	smokeStackFromQtStack(_stack, _o + 1, _items - 1, _args + 1);
 }
 
-void 
-InvokeSlot::invokeSlot() 
+void
+InvokeSlot::invokeSlot()
 {
 	if (_called) return;
 	_called = true;
@@ -688,10 +716,10 @@ InvokeSlot::invokeSlot()
 	}
 }
 
-void 
-InvokeSlot::mainfunction() 
-{ 
-	invokeSlot(); 
+void
+InvokeSlot::mainfunction()
+{
+	invokeSlot();
 }
 
 /**
@@ -709,26 +737,26 @@ EmitSignal::EmitSignal(QObject *obj, int id, int items, MocArgument *mocStack, z
 	_result = result;
 }
 
-Marshall::Action 
-EmitSignal::action() 
-{ 
-	return Marshall::FromZVAL; 
+Marshall::Action
+EmitSignal::action()
+{
+	return Marshall::FromZVAL;
 }
 
 Smoke::StackItem &
-EmitSignal::item() 
+EmitSignal::item()
 {
-	return _stack[_cur]; 
+	return _stack[_cur];
 }
 
 const char *
-EmitSignal::mytype() 
-{ 
-	return "signal"; 
+EmitSignal::mytype()
+{
+	return "signal";
 }
 
-void 
-EmitSignal::emitSignal() 
+void
+EmitSignal::emitSignal()
 {
 
 	if (_called) return;
@@ -745,50 +773,50 @@ EmitSignal::emitSignal()
 	delete[] o;
 }
 
-void 
-EmitSignal::mainfunction() 
-{ 
-	emitSignal(); 
+void
+EmitSignal::mainfunction()
+{
+	emitSignal();
 }
 
-bool 
-EmitSignal::cleanup() 
-{ 
-	return true; 
+bool
+EmitSignal::cleanup()
+{
+	return true;
 }
 
-SmokeType 
-EmitSignal::type() 
-{ 
-	return arg().st; 
+SmokeType
+EmitSignal::type()
+{
+	return arg().st;
 }
 
-zval* 
-EmitSignal::var() 
-{ 
-	return (zval*) *_sp[_cur]; 
+zval*
+EmitSignal::var()
+{
+	return (zval*) *_sp[_cur];
 }
 
 Smoke *
-EmitSignal::smoke() 
-{ 
-	return type().smoke(); 
+EmitSignal::smoke()
+{
+	return type().smoke();
 }
 
-void 
-EmitSignal::unsupported() 
+void
+EmitSignal::unsupported()
 {
 	php_error(E_ERROR, "Cannot handle '%s' as %s argument\n", type().name(), mytype() );
 }
 
 const MocArgument &
-EmitSignal::arg() 
-{ 
-	return _args[_cur + 1]; 
+EmitSignal::arg()
+{
+	return _args[_cur + 1];
 }
 
 void
-EmitSignal::next() 
+EmitSignal::next()
 {
 	int oldcur = _cur;
 	_cur++;

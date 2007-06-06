@@ -1,7 +1,7 @@
 /*!
  * PHP-Qt - The PHP language bindings for Qt
  *
- * Copyright (C) 2006 
+ * Copyright (C) 2006
  * Thomas Moenicke <thomas.moenicke at kdemail.net>
  * Katrina Niolet <katrina at niolet.name>
  *
@@ -70,7 +70,7 @@ static opcode_handler_t phpqt_opcode_handlers[PHPQT_OPHANDLER_COUNT];
 function_entry php_qt_functions[] = {
 	PHP_FE(confirm_php_qt_compiled,	NULL)		/* For testing, remove later. */
 	PHP_FE(SIGNAL,	NULL)
-	PHP_FE(SLOT,	NULL)	
+	PHP_FE(SLOT,	NULL)
 	PHP_FE(emit,	NULL)
 	PHP_FE(qDebug,	NULL)
 	PHP_FE(qWarning,	NULL)
@@ -132,6 +132,10 @@ QHash<void*, smokephp_object*> SmokeQtObjects;
 QHash<zend_object_handle, smokephp_object*> obj_x_smokephp;
 QStack<QByteArray*> methodNameStack;
 
+zend_class_entry* activeCe;
+zval* activeScope;
+bool parentCall;
+
 // cached
 Smoke::Index qbool;
 Smoke::Index qstring;
@@ -140,7 +144,70 @@ zend_class_entry* qobject_ce;
 extern zend_class_entry* qstring_ce;
 extern void 	_register_QString();
 
-/*
+/*!
+ *	constant method handler
+ *
+ *	here we'll try to find a defined static method in Qt and assign the
+ *  staticProxyMethod handler
+ *  see ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_HANDLER in zend_vm_execute.h
+ */
+#undef EX
+#define EX(element) execute_data->element
+
+static int (*originalConstantMethodHandler)(ZEND_OPCODE_HANDLER_ARGS);
+
+static int constantMethodHandler(ZEND_OPCODE_HANDLER_ARGS)
+{
+	zend_op *opline = EX(opline);
+	zend_class_entry *ce = EX_T(opline->op1.u.var).class_entry;
+	union _zend_function *fbc;
+	zval* function_name;
+	char* function_name_strval;
+	int function_name_strlen;
+
+	function_name = &opline->op2.u.constant;
+	// store the active ce
+	activeCe = EX_T(opline->op1.u.var).class_entry;
+
+	if (Z_TYPE_P(function_name) != IS_STRING) {
+		zend_error_noreturn(E_ERROR, "Function name must be a string");
+	}
+
+	// get method name
+  	function_name_strval = zend_str_tolower_dup(function_name->value.str.val, function_name->value.str.len);
+ 	function_name_strlen = function_name->value.str.len;
+
+	// call proxyMethod if method is not defined in userspace
+	if(zend_hash_find(&ce->function_table, function_name_strval, function_name_strlen+1, (void**) &fbc) == FAILURE)
+	{
+		zend_ptr_stack_3_push(&EG(arg_types_stack), EX(fbc), EX(object), NULL);
+		zend_bool is_const = (IS_CONST == IS_CONST);
+
+		if(zend_hash_find(&ce->function_table, "staticproxymethod", 18, (void**) &fbc) != FAILURE)
+		{
+
+			//! TODO	darn! we have a lowersized string here!
+			const char* methodName = PQ::findRealMethodName( function_name->value.str.val );
+			methodNameStack.push( new QByteArray( methodName ) );
+
+			EX(fbc) = fbc;
+
+			if(!is_const){ efree(function_name_strval); }
+			EX(opline)++;
+			ZEND_VM_CONTINUE();
+
+		}
+
+		if(!is_const){ efree(function_name_strval); }
+
+	}  // end try call proxyMethod
+
+  	return originalConstantMethodHandler(execute_data);
+
+}
+
+
+/*!
  *	constants handler
  */
 
@@ -237,23 +304,15 @@ union _zend_function* proxyHandler(zval **obj_ptr, char* methodName, int methodN
  *	generic object
  */
 
-ZEND_METHOD(php_qt_generic_class, __construct);
-ZEND_METHOD(php_qt_generic_class, __destruct);
-ZEND_METHOD(php_qt_generic_class, __toString);
-ZEND_METHOD(php_qt_generic_class, emit);
-ZEND_METHOD(php_qt_generic_class, proxyMethod);
-ZEND_METHOD(php_qt_generic_class, staticProxyMethod);
-
 static zend_function_entry php_qt_generic_methods[] = {
     ZEND_ME(php_qt_generic_class,__construct,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(php_qt_generic_class,__destruct,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(php_qt_generic_class,__toString,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(php_qt_generic_class,emit,NULL,ZEND_ACC_PUBLIC)
     ZEND_ME(php_qt_generic_class,proxyMethod,NULL,ZEND_ACC_PUBLIC)
+    ZEND_ME(php_qt_generic_class,staticProxyMethod,NULL,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
     {NULL,NULL,NULL}
 };
-
-static zend_function_entry*** php_qt_static_methods;
 
 ZEND_METHOD(php_qt_generic_class, emit){
 }
@@ -265,7 +324,7 @@ ZEND_METHOD(php_qt_generic_class, __toString)
 
 ZEND_METHOD(php_qt_generic_class, __destruct)
 {
-qDebug() << "__destruct" << getThis() << PZVAL_IS_REF(getThis());
+// qDebug() << "__destruct" << getThis() << PZVAL_IS_REF(getThis());
 	if(phpqt_SmokePHPObjectExists(getThis())) {
 
  		smokephp_object *o = phpqt_getSmokePHPObjectFromZval(getThis());
@@ -289,6 +348,8 @@ qDebug() << "__destruct" << getThis() << PZVAL_IS_REF(getThis());
 
 ZEND_METHOD(php_qt_generic_class, __construct)
 {
+	activeScope = getThis();
+
     // find parents
     zend_class_entry *ce = Z_OBJCE_P(getThis());
     zend_class_entry *ce_parent = Z_OBJCE_P(getThis());
@@ -343,7 +404,7 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 		)){
 		  	const char* phpqt_meta_stringdata_ = estrndup(phpqt_meta_stringdata->toAscii(), phpqt_meta_stringdata->size());
   			QMetaObject ob = {
-				{superdata, phpqt_meta_stringdata_, 
+				{superdata, phpqt_meta_stringdata_,
 					phpqt_meta_data, 0}
  			};
  			o->meta = (QMetaObject*) emalloc(sizeof(ob));
@@ -369,14 +430,21 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
     zend_class_entry *ce;
     // nonstaticphp_qt_generic_class_proxyMethod
     if(getThis()){
-        ce = Z_OBJCE_P(getThis());
+    	activeScope = getThis();
+
+		// if a parent:: call occurs this_ptr has the wrong ce, so we need to
+		// correct it here
+		if(parentCall)
+		{
+			ce = activeCe;
+			parentCall = false;
+        } else {
+        	ce = Z_OBJCE_P(getThis());
+        }
+
     // static
     } else {
-        char* space = "::";
-        char* class_name = get_active_class_name(&space);
-        char* method_name = get_active_function_name();
-        ce = zend_fetch_class(class_name,strlen(class_name), ZEND_FETCH_CLASS_AUTO TSRMLS_DC);
-        methodNameStack.push(new QByteArray(method_name));
+		ce = activeCe;
     }
 
     // find parents
@@ -426,10 +494,10 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
 		}
 	    }
 
-	    php_error(E_ERROR,"Call to undefined method %s::%s()", ce->name, methodNameStack.top()->constData());
-		
+	    php_error(E_ERROR,"Call to undefined method %s::%s() or wrong arguments", ce->name, methodNameStack.top()->constData());
+
 	}
-	else 
+	else
 	    php_error(E_ERROR,"Call to undefined method!");
     }
 
@@ -443,7 +511,27 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
     return;
 } // proxyMethod
 
-/*! 
+ZEND_METHOD(php_qt_generic_class, staticProxyMethod)
+{
+	this_ptr = NULL;
+
+	// do we have a parent::blablub() call?
+	if(EG(active_op_array)->scope){
+		if(EG(scope) == EG(active_op_array)->scope->parent)
+		{
+			if(activeScope)
+			{
+				parentCall = true;
+				this_ptr = activeScope;
+			}
+		}
+	}
+
+	// forward to proxyMethod
+	zim_php_qt_generic_class_proxyMethod(ht, return_value, return_value_ptr, this_ptr, return_value_used);
+}
+
+/*!
  *	PHP_MINIT_FUNCTION
  */
 
@@ -463,42 +551,30 @@ PHP_MINIT_FUNCTION(php_qt)
 	zend_orig_handler = php_qt_handler;
 	php_qt_handler.get_method = proxyHandler;
 
-	// overwrite :: operator
+	// overwrite :: operator, see zend_vm_execute.h
 	memcpy(phpqt_opcode_handlers, zend_opcode_handlers, sizeof(phpqt_opcode_handlers));
 	phpqt_original_opcode_handlers = zend_opcode_handlers;
 	zend_opcode_handlers = phpqt_opcode_handlers;
+	// ZEND_FETCH_CONSTANT = 99 => 2475
 	phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + 0] = constantHandler;
+	// replace and store ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_HANDLER
+	originalConstantMethodHandler = phpqt_opcode_handlers[2825];
+	phpqt_opcode_handlers[2825] = constantMethodHandler;
+	phpqt_opcode_handlers[2830] = constantMethodHandler;
+	phpqt_opcode_handlers[2835] = constantMethodHandler;
+	phpqt_opcode_handlers[2840] = constantMethodHandler;
+	phpqt_opcode_handlers[2845] = constantMethodHandler;
 
 	smokephp_init();
 
-	Smoke::Index qobject = PQ::smoke()->idClass("QObject");
-
-	php_qt_static_methods = (zend_function_entry***) safe_emalloc((PQ::smoke()->numClasses), sizeof(zend_function_entry **), 0);
-
-	int method_count;
 	// cache class entries
 	Smoke::Index i = 1;
 	QHash<const char*, zend_class_entry*> tmpCeTable;
-	// loop for all classes, register them
+
+	// loop for all classes, register class entries
 	for(i = 1; i <= PQ::smoke()->numClasses; i++){
 
-        // statical methods, there is no method handler which can be overwritten
-        // hope this will be better in future / see zend_std_get_static_method()
-        method_count = 0;
-        for(int j=0;j<PQ::smoke()->numMethods;j++){
-            if(PQ::smoke()->methods[j].classId == i){
-                if(!(PQ::smoke()->methods[j].flags & Smoke::mf_enum)){
-                    if((PQ::smoke()->methods[j].flags & Smoke::mf_static)){
-                        // avoids overloaded methods
-                        if(strcmp(PQ::smoke()->methodNames[PQ::smoke()->methods[j-1].name],PQ::smoke()->methodNames[PQ::smoke()->methods[j].name])){
-                            method_count++;
-                        }
-                    }
-                }
-            }
-        } // for
-
-        zend_function_entry* t = (zend_function_entry*) safe_emalloc((method_count+7), sizeof(zend_function_entry), 0);
+        zend_function_entry* t = (zend_function_entry*) safe_emalloc(7, sizeof(zend_function_entry), 0);
         zend_function_entry* p = t;
 
         PHP_QT_ME(php_qt_generic_class,__construct,phpqt_cast_arginfo,ZEND_ACC_PUBLIC);
@@ -506,57 +582,24 @@ PHP_MINIT_FUNCTION(php_qt)
         PHP_QT_ME(php_qt_generic_class,__toString,NULL,ZEND_ACC_PUBLIC);
 		PHP_QT_ME(php_qt_generic_class,emit,NULL,ZEND_ACC_PUBLIC);
         PHP_QT_ME(php_qt_generic_class,proxyMethod,phpqt_cast_arginfo,ZEND_ACC_PUBLIC);
+        PHP_QT_ME(php_qt_generic_class,staticProxyMethod,phpqt_cast_arginfo,ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
 
-		QHash<const char*, bool> tmpMethodList;	// avoids doubled method names
+		// register zend class
+		zend_class_entry ce;
+		INIT_CLASS_ENTRY(ce, PQ::smoke()->classes[i].className, p);
+		ce.name_length = strlen(PQ::smoke()->classes[i].className);
+		zend_class_entry* ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
+		tmpCeTable[PQ::smoke()->classes[i].className] = ce_ptr;
+		// cache QObject
+		if(qobject == i){
+			qobject_ce = ce_ptr;
+		}
 
-        for(int j=0;j<PQ::smoke()->numMethods;j++)
-	{
-            if(PQ::smoke()->methods[j].classId == i)
-	    {
-                if(!(PQ::smoke()->methods[j].flags & Smoke::mf_enum))
-		{
-                    if(PQ::smoke()->methods[j].flags & Smoke::mf_static)
-		    {
-                        // avoids overloaded methods, fast
-                        if(strcmp(PQ::smoke()->methodNames[PQ::smoke()->methods[j-1].name],PQ::smoke()->methodNames[PQ::smoke()->methods[j].name]))
-			{
-                        	if(!tmpMethodList.contains(PQ::smoke()->methodNames[PQ::smoke()->methods[j].name])) // method already defined in this class?
-				{ 
-								tmpMethodList[PQ::smoke()->methodNames[PQ::smoke()->methods[j].name]] = true;
-								t->fname = (char*) emalloc(strlen(PQ::smoke()->methodNames[PQ::smoke()->methods[j].name])+1);
-								t->fname = (char*) PQ::smoke()->methodNames[PQ::smoke()->methods[j].name];
-								t->handler = ZEND_MN(php_qt_generic_class_proxyMethod);
-								t->arg_info = phpqt_cast_arginfo;
-								t->flags = ZEND_ACC_PUBLIC|ZEND_ACC_STATIC;
-								t++;
-                        	}
-                        }
-                    }
-                }
-	   }
-        }
+	} // end loop classes
 
-        // stops the zend-loop 'while(ptr->fname) {...}' in zend_register_functions
-        t->fname = NULL;
-        t->handler = NULL;
-        t->arg_info = NULL;
-        t->flags = (zend_uint) NULL;
-        t++;
-
-	// register zend class
-	zend_class_entry ce;
-	INIT_CLASS_ENTRY(ce, PQ::smoke()->classes[i].className, p);
-	ce.name_length = strlen(PQ::smoke()->classes[i].className);
-	zend_class_entry* ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
-	tmpCeTable[PQ::smoke()->classes[i].className] = ce_ptr;
-	// cache QObject
-	if(qobject == i){
-	    qobject_ce = ce_ptr;
-	}		
-	} // end for
-
+	// cache some stuff
+	Smoke::Index qobject = PQ::smoke()->idClass("QObject");
 	_register_QString();
-	tmpCeTable[PQ::smoke()->classes[i].className] = qstring_ce;
 
 	// do inheritance, all classes must be defined before
 	for(Smoke::Index i = 1; i <= PQ::smoke()->numClasses; i++){
@@ -610,7 +653,7 @@ PHP_MINFO_FUNCTION(php_qt)
  *	PHP-Qt internal functions
  */
 
-int	
+int
 phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a)
 {
 	QMetaObject* d = so->meta;
@@ -644,11 +687,11 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
 #endif
 
 			if((int)i[0].s_int < 0)
-				return i[0].s_int;	
+				return i[0].s_int;
 
 		} else {
 			// should never happen
-			php_error(E_ERROR, "Cannot find %s::qt_metacall() method\n", d->className());		
+			php_error(E_ERROR, "Cannot find %s::qt_metacall() method\n", d->className());
 		}
 
 	}
@@ -714,10 +757,10 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
 
 	efree(method_name);
     return _id;
-	
+
 }
 
-static void 
+static void
 phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {
 #ifdef DEBUG
@@ -728,7 +771,7 @@ phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 bool
 phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname)
 {
-	
+
 	if(ce_ptr == NULL){
 	  php_error(E_ERROR,"methodExists fatal error: no class entry");
 	}
@@ -745,7 +788,7 @@ phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname)
 }
 
 
-zval* 
+zval*
 phpqt_callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zval** args)
 {
 
@@ -768,7 +811,7 @@ phpqt_callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zva
     return retval;
 }
 
-/*! 
+/*!
  *	creates metaObject data
  *  example: "QWidget\0\0value\0test(int)\0"
  *	@param	zval*				this_ptr	pointer of the zval
@@ -777,7 +820,7 @@ phpqt_callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zva
  *	@return	QMetaObject*
  */
 
-bool 
+bool
 phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, QMetaObject* meta, QString* meta_stringdata, uint* signature){
 
     /// readout the slots table
@@ -818,19 +861,19 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
 		signature[7] = 0;
 		signature[8] = 0;
 		signature[9] = 0;
-	
+
 		/// write classname
 		meta_stringdata->append(classname);
  		meta_stringdata->append(QChar::Null);
  		meta_stringdata->append(QChar::Null);
- 	
+
 		int i;
 		i = 10;
 
 		zend_hash_internal_pointer_reset(signals_hash);
 
 		while(zend_hash_has_more_elements(signals_hash) == SUCCESS){
-	
+
 			/// read slot from hashtable
 			zend_hash_get_current_key(signals_hash,&assocKey,&numKey,0);
 			zend_hash_get_current_data(signals_hash,(void**)&slotdata);
@@ -840,27 +883,27 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
 			qr->append(" ");
 			cout << "\t" << signaturecount << "8 8 8 0x05 ::s" << endl;
 #endif
-			
+
 			meta_stringdata->append(Z_STRVAL_PP(slotdata));
 			meta_stringdata->append(QChar::Null);
-	
+
 			zend_hash_move_forward(signals_hash);
-	
+
 			/// write slot signature
 			signature[i++] = signaturecount;
-			signature[i++] = 8;        
+			signature[i++] = 8;
 			signature[i++] = 8;
 			signature[i++] = 8;
 			signature[i++] = 0x05;
-	
+
 			signaturecount += strlen(Z_STRVAL_PP(slotdata)) + 1;
-	
+
 		}
 
     	zend_hash_internal_pointer_reset(slots_hash);
 
 		while(zend_hash_has_more_elements(slots_hash) == SUCCESS){
-	
+
 			/// read slot from hashtable
 			zend_hash_get_current_key(slots_hash,&assocKey,&numKey,0);
 			zend_hash_get_current_data(slots_hash,(void**)&slotdata);
@@ -870,21 +913,21 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
 			qr->append(" ");
 			cout << "\t" << signaturecount << "8 8 8 0x0a ::s" << endl;
 #endif
-	
+
 			meta_stringdata->append(Z_STRVAL_PP(slotdata));
 			meta_stringdata->append(QChar::Null);
 
 			zend_hash_move_forward(slots_hash);
-	
+
 			/// write slot signature
 			signature[i++] = signaturecount;
 			signature[i++] = 8;
 			signature[i++] = 8;
 			signature[i++] = 8;
 			signature[i++] = 0x0a;
-	
+
 			signaturecount += strlen(Z_STRVAL_PP(slotdata)) + 1;
-	
+
 		}
 #if MOC_DEBUG
 		cout << qr->toAscii().constData() << endl;
@@ -907,7 +950,7 @@ phpqt_SmokePHPObjectExists(zval* this_ptr)
 	return obj_x_smokephp.contains(this_ptr->value.obj.handle);
 }
 
-smokephp_object* 
+smokephp_object*
 phpqt_getSmokePHPObjectFromZval(zval* this_ptr)
 {
 

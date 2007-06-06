@@ -29,8 +29,8 @@ template<> void* smoke_ptr<void>(Marshall *m) { return m->item().s_voidp; }
 template <class T> T php_to_primitive(zval*);
 template <class T> zval* primitive_to_php(T, zval* return_value);
 
-template <class T> 
-static void marshall_from_php(Marshall *m) 
+template <class T>
+static void marshall_from_php(Marshall *m)
 {
 	zval* zobj = m->var();
 	(*smoke_ptr<T>(m)) = php_to_primitive<T>(zobj);
@@ -47,8 +47,8 @@ static void marshall_to_php(Marshall *m)
 
 // Special case marshallers
 
-template <> 
-static void marshall_from_php<char *>(Marshall *m) 
+template <>
+static void marshall_from_php<char *>(Marshall *m)
 {
 	zval* zobj = m->var();
 	m->item().s_voidp = php_to_primitive<char*>(zobj);
@@ -130,7 +130,7 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 {
 	if(m->item().s_voidp == 0) {
 		qWarning("Qt Object doesnt exist!");
-		*(m->var()) = *(Qnil);
+		ZVAL_NULL(m->var());
 		return;
 	}
 	void *p = m->item().s_voidp;
@@ -138,7 +138,7 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 	// return the original
 	if(phpqt_SmokePHPObjectExists(p)) {
 		if(m->return_value_ptr()){
-			// destroys the return_value initialized by ZE, we creare our own:
+			// destroys the return_value initialized by ZE, we create our own:
 			zval_ptr_dtor(m->return_value_ptr());
 			// prepare the return value
 			smokephp_object* o = phpqt_createOriginal(m->var(), p);
@@ -175,7 +175,7 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 		smokephp_object *o = phpqt_createObject(m->var(), __p, _ce, m->type().classId());
 
 //	    if(m->type().isConst() && m->type().isRef()) {
-	    if(m->type().isRef()) 
+	    if(m->type().isRef())
 	    {
 			p = construct_copy( o );
 #ifdef DEBUG

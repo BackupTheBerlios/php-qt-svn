@@ -38,7 +38,7 @@ extern void smokeStackFromQtStack(Smoke::Stack stack, void ** _o, int items, Moc
  *	MethodReturnValueBase
  */
 
-class MethodReturnValueBase : public Marshall 
+class MethodReturnValueBase : public Marshall
 {
 public:
 	MethodReturnValueBase(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval** return_value_ptr);
@@ -104,7 +104,7 @@ public:
 	Smoke::StackItem &item();
 	const Smoke::Method &method();
 	virtual int items() = 0;
-	virtual void callMethod() = 0;	
+	virtual void callMethod() = 0;
 	void next();
 	void unsupported();
 	zval** return_value_ptr();
@@ -135,7 +135,7 @@ public:
 	int items();
 	void callMethod();
 	bool cleanup();
- 
+
 private:
 	zval* _obj;
  	zval **__sp;
@@ -152,32 +152,7 @@ public:
 	~MethodCall();
 	Marshall::Action action();
 	zval* var();
-	inline void callMethod() {
-		if(_called) return;
-		_called = true;
-
-		QString className(_smoke->className(method().classId));
-
-		if (! className.endsWith(_smoke->methodNames[method().name])
-			&& Z_TYPE_P(_target) == IS_NULL
-			&& !(method().flags & Smoke::mf_static) ) 
-		{
-			php_error(E_ERROR, "Instance is not initialized, cannot call %s", 
-						_smoke->methodNames[method().name]);
-		}
-
-		if (Z_TYPE_P(_target) == IS_NULL && !(method().flags & Smoke::mf_static)) {
-			php_error(E_ERROR, "%s is not a class method\n", _smoke->methodNames[method().name]);
-		}
-
-		Smoke::ClassFn fn = _smoke->classes[method().classId].classFn;
-		void *ptr = _smoke->cast(_current_object, _current_object_class, method().classId);
-		_items = -1;
-
-		(*fn)(method().method, ptr, _stack);
-		MethodReturnValue r(_smoke, _method, _stack, _retval, _return_value_ptr);
-	}
-
+	void callMethod();
 	int items();
 	bool cleanup();
 
@@ -208,7 +183,7 @@ public:
 	virtual const char *mytype() = 0;
 	virtual void mainfunction() = 0;
 	void unsupported();
-	void next(); 
+	void next();
 
 protected:
 	MocArgument *_args;
@@ -233,7 +208,7 @@ class EmitSignal : public Marshall {
 	void emitSignal();
 	void mainfunction();
 	bool cleanup();
-	void next(); 
+	void next();
 	SmokeType type();
 	zval* var();
 	void unsupported();
@@ -275,7 +250,7 @@ public:
 	const char *mytype();
     bool cleanup();
 	void copyArguments();
-	void invokeSlot(); 
+	void invokeSlot();
 	void mainfunction();
 };
 
@@ -283,7 +258,7 @@ public:
 /**
  *	SignalReturnValue
  *
- *	Converts a C++ value returned by a signal invocation to a PHP 
+ *	Converts a C++ value returned by a signal invocation to a PHP
  *	reply type
  */
 class SignalReturnValue : public Marshall {
@@ -291,7 +266,7 @@ class SignalReturnValue : public Marshall {
     Smoke::Stack _stack;
 	zval * _result;
 public:
-	SignalReturnValue(void ** o, zval * result, MocArgument * replyType) 
+	SignalReturnValue(void ** o, zval * result, MocArgument * replyType)
 	{
 		_result = result;
 		_replyType = replyType;
@@ -301,25 +276,25 @@ public:
 		(*fn)(this);
     }
 
-    SmokeType type() { 
-		return _replyType[0].st; 
+    SmokeType type() {
+		return _replyType[0].st;
 	}
     Marshall::Action action() { return Marshall::ToZVAL; }
     Smoke::StackItem &item() { return _stack[0]; }
     zval* var() {
     	return _result;
     }
-	
-	void unsupported() 
+
+	void unsupported()
 	{
 		php_error(E_ERROR, "Cannot handle '%s' as signal reply-type", type().name());
     }
 	Smoke *smoke() { return type().smoke(); }
-    
+
 	void next() {}
-    
+
 	bool cleanup() { return false; }
-	
+
 	~SignalReturnValue() {
 		delete[] _stack;
 	}

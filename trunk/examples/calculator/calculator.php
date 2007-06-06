@@ -170,7 +170,7 @@
                     return true;
                 }
             }
-            return QDialog::eventFilter($target, $event);
+            return parent::eventFilter($target, $event);
         }
 
         function digitClicked()

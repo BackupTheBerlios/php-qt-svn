@@ -1,7 +1,7 @@
 /*!
  * PHP-Qt - The PHP language bindings for Qt
  *
- * Copyright (C) 2006 
+ * Copyright (C) 2006
  * Thomas Moenicke <thomas.moenicke at kdemail.net>
  * Katrina Niolet <katrina at niolet.name>
  *
@@ -167,6 +167,8 @@ smokephp_object*	phpqt_createOriginal(zval* zval_ptr, void* ptr);
 
 const char* 		printType(int type);
 
+union _zend_function* proxyHandler(zval **obj_ptr, char* methodName, int methodName_len TSRMLS_DC);
+
 extern Smoke* qt_Smoke;
 class PQ
 {
@@ -177,6 +179,21 @@ private:
 public:
     ~PQ();
     static inline Smoke* smoke() { return qt_Smoke; }
+
+	typedef short Index;
+
+	static inline const char* findRealMethodName(const char* methodName)
+	{
+
+		if(!methodName) return "";
+		QString _m(methodName);
+		//! TODO its slow but safe, implement a better algorithm
+		for(Index i=0; i < PQ::smoke()->numMethodNames; i++){
+			if(_m.compare(PQ::smoke()->methodNames[i], Qt::CaseInsensitive) == 0){ return PQ::smoke()->methodNames[i]; }
+		}
+ 		qFatal("PQ::findRealMethodName(): could not find %s", methodName);
+	}
+
 };
 
 extern int le_php_qt_hashtype;
@@ -272,5 +289,48 @@ ZEND_METHOD(QString, constBegin);
 ZEND_METHOD(QString, toLocal8Bit);
 ZEND_METHOD(QString, toInt);
 ZEND_METHOD(QString, isNull);
+
+ZEND_METHOD(php_qt_generic_class, __construct);
+ZEND_METHOD(php_qt_generic_class, __destruct);
+ZEND_METHOD(php_qt_generic_class, __toString);
+ZEND_METHOD(php_qt_generic_class, emit);
+ZEND_METHOD(php_qt_generic_class, proxyMethod);
+ZEND_METHOD(php_qt_generic_class, staticProxyMethod);
+
+// smoke stuff
+
+
+
+// ZEND stuff
+
+static int zend_check_symbol(zval **pz TSRMLS_DC)
+{
+	if (Z_TYPE_PP(pz) > 9) {
+		fprintf(stderr, "Warning!  %x has invalid type!\n", *pz);
+	} else if (Z_TYPE_PP(pz) == IS_ARRAY) {
+		zend_hash_apply(Z_ARRVAL_PP(pz), (apply_func_t) zend_check_symbol TSRMLS_CC);
+	} else if (Z_TYPE_PP(pz) == IS_OBJECT) {
+
+		/* OBJ-TBI - doesn't support new object model! */
+		zend_hash_apply(Z_OBJPROP_PP(pz), (apply_func_t) zend_check_symbol TSRMLS_CC);
+	}
+
+	return 0;
+}
+
+#define ZEND_VM_CONTINUE() return 0
+
+#define CHECK_SYMBOL_TABLES()														\
+	zend_hash_apply(&EG(symbol_table), (apply_func_t) zend_check_symbol TSRMLS_CC);	\
+	if (&EG(symbol_table)!=EG(active_symbol_table)) {								\
+		zend_hash_apply(EG(active_symbol_table), (apply_func_t) zend_check_symbol TSRMLS_CC);	\
+	}
+
+
+#define ZEND_VM_NEXT_OPCODE() \
+	CHECK_SYMBOL_TABLES() \
+	EX(opline)++; \
+	ZEND_VM_CONTINUE()
+
 
 #endif

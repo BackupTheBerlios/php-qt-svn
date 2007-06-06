@@ -320,7 +320,7 @@ public:
 	int icmp = -1;
 	while(imax >= imin) {
 	    icur = (imin + imax) / 2;
-	    icmp = strcmp(methodNames[icur], m);
+ 	    icmp = strcmp(methodNames[icur], m);
 	    if(!icmp) break;
 	    if(icmp > 0)
 		imax = icur - 1;
