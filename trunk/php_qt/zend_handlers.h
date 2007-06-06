@@ -31,6 +31,7 @@
 #define EX__(element) execute_data->element
 #define EX_T(offset) (*(temp_variable *)((char *) EX__(Ts) + offset))
 
+namespace ZendHandlers {
 
 /*!
  *	handler for regular method calls
@@ -53,5 +54,13 @@ int constantMethodHandler(ZEND_OPCODE_HANDLER_ARGS);
  */
 
 int constantHandler(ZEND_OPCODE_HANDLER_ARGS);
+
+/*!
+ *	install handlers
+ */
+
+void installZendHandlers();
+
+} // namespace ZendHandlers
 
 #endif

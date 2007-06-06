@@ -38,7 +38,8 @@ extern int (*originalConstantMethodHandler)(ZEND_OPCODE_HANDLER_ARGS);
  *	proxy handler
  */
 
-union _zend_function* proxyHandler(zval **obj_ptr, char* methodName, int methodName_len TSRMLS_DC)
+union _zend_function*
+ZendHandlers::proxyHandler(zval **obj_ptr, char* methodName, int methodName_len TSRMLS_DC)
 {
     union _zend_function *fbc;
 
@@ -75,7 +76,8 @@ union _zend_function* proxyHandler(zval **obj_ptr, char* methodName, int methodN
  *	constants handler
  */
 
-int constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
+int
+ZendHandlers::constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
 
 	zend_op *opline = EX__(opline);
 	zend_class_entry *ce = NULL;
@@ -133,7 +135,8 @@ int constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
  *  see ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_HANDLER in zend_vm_execute.h
  */
 
-int constantMethodHandler(ZEND_OPCODE_HANDLER_ARGS)
+int
+ZendHandlers::constantMethodHandler(ZEND_OPCODE_HANDLER_ARGS)
 {
 	zend_op *opline = EX(opline);
 	zend_class_entry *ce = EX_T(opline->op1.u.var).class_entry;
@@ -183,3 +186,27 @@ int constantMethodHandler(ZEND_OPCODE_HANDLER_ARGS)
 
 }
 
+void
+ZendHandlers::installZendHandlers()
+{
+
+	// overwrite method handler
+	php_qt_handler = *zend_get_std_object_handlers();
+	zend_orig_handler = php_qt_handler;
+	php_qt_handler.get_method = proxyHandler;
+
+	// overwrite :: operator, see zend_vm_execute.h
+	memcpy(phpqt_opcode_handlers, zend_opcode_handlers, sizeof(phpqt_opcode_handlers));
+	phpqt_original_opcode_handlers = zend_opcode_handlers;
+	zend_opcode_handlers = phpqt_opcode_handlers;
+	// ZEND_FETCH_CONSTANT = 99 => 2475
+	phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + 0] = constantHandler;
+	// replace and store ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_HANDLER
+	originalConstantMethodHandler = phpqt_opcode_handlers[2825];
+	phpqt_opcode_handlers[2825] = constantMethodHandler;
+	phpqt_opcode_handlers[2830] = constantMethodHandler;
+	phpqt_opcode_handlers[2835] = constantMethodHandler;
+	phpqt_opcode_handlers[2840] = constantMethodHandler;
+	phpqt_opcode_handlers[2845] = constantMethodHandler;
+
+}

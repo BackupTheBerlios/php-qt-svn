@@ -383,25 +383,7 @@ PHP_MINIT_FUNCTION(php_qt)
 	le_php_qt_hashtype = zend_register_list_destructors_ex(phpqt_destroyHashtable, NULL, "PHP-Qt object list", module_number);
 	zend_hash_init_ex(&php_qt_objptr_hash, PHPQT_CLASS_COUNT, NULL, NULL, 1, 0);
 
-	// overwrite method handler
-	php_qt_handler = *zend_get_std_object_handlers();
-	zend_orig_handler = php_qt_handler;
-	php_qt_handler.get_method = proxyHandler;
-
-	// overwrite :: operator, see zend_vm_execute.h
-	memcpy(phpqt_opcode_handlers, zend_opcode_handlers, sizeof(phpqt_opcode_handlers));
-	phpqt_original_opcode_handlers = zend_opcode_handlers;
-	zend_opcode_handlers = phpqt_opcode_handlers;
-	// ZEND_FETCH_CONSTANT = 99 => 2475
-	phpqt_opcode_handlers[(ZEND_FETCH_CONSTANT*25) + 0] = constantHandler;
-	// replace and store ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_HANDLER
-	originalConstantMethodHandler = phpqt_opcode_handlers[2825];
-	phpqt_opcode_handlers[2825] = constantMethodHandler;
-	phpqt_opcode_handlers[2830] = constantMethodHandler;
-	phpqt_opcode_handlers[2835] = constantMethodHandler;
-	phpqt_opcode_handlers[2840] = constantMethodHandler;
-	phpqt_opcode_handlers[2845] = constantMethodHandler;
-
+	ZendHandlers::installZendHandlers();
 	smokephp_init();
 
 	// cache class entries
