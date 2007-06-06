@@ -1,7 +1,7 @@
 /*!
  * PHP-Qt - The PHP language bindings for Qt
  *
- * Copyright (C) 2006
+ * Copyright (C) 2006 - 2007
  * Thomas Moenicke <thomas.moenicke at kdemail.net>
  * Katrina Niolet <katrina at niolet.name>
  *
@@ -21,7 +21,7 @@
  *
  */
 
-#include <zend_interfaces.h>
+
 #include "php_qt.h"
 #include "ext/standard/php_string.h"
 
@@ -29,6 +29,7 @@
 
 #include "marshall.h"
 #include "php_qt.h"
+#include "zend_handlers.h"
 #include "smokephp.h"
 #include "smoke.h"
 #include "marshall_types.h"
@@ -47,20 +48,17 @@ int le_php_qt_hashtype;
 HashTable php_qt_objptr_hash;
 
 // object handler
-static zend_object_handlers php_qt_handler;
-static zend_object_handlers zend_orig_handler;
+zend_object_handlers php_qt_handler;
+zend_object_handlers zend_orig_handler;
 
 PHP_INI_BEGIN()
     PHP_INI_ENTRY("qt.codec", "UTF8", PHP_INI_ALL, NULL)
 PHP_INI_END()
 
-// opcode handler
-#define PHPQT_OPHANDLER_COUNT				((25 * 151) + 1)
-#define EX__(element) execute_data->element
-#define EX_T(offset) (*(temp_variable *)((char *) EX__(Ts) + offset))
-static opcode_handler_t *phpqt_original_opcode_handlers;
-static opcode_handler_t phpqt_opcode_handlers[PHPQT_OPHANDLER_COUNT];
+int (*originalConstantMethodHandler)(ZEND_OPCODE_HANDLER_ARGS);
 
+opcode_handler_t *phpqt_original_opcode_handlers;
+opcode_handler_t phpqt_opcode_handlers[PHPQT_OPHANDLER_COUNT];
 
 /*! php_qt_functions[]
  *
@@ -144,162 +142,6 @@ zend_class_entry* qobject_ce;
 extern zend_class_entry* qstring_ce;
 extern void 	_register_QString();
 
-/*!
- *	constant method handler
- *
- *	here we'll try to find a defined static method in Qt and assign the
- *  staticProxyMethod handler
- *  see ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_HANDLER in zend_vm_execute.h
- */
-#undef EX
-#define EX(element) execute_data->element
-
-static int (*originalConstantMethodHandler)(ZEND_OPCODE_HANDLER_ARGS);
-
-static int constantMethodHandler(ZEND_OPCODE_HANDLER_ARGS)
-{
-	zend_op *opline = EX(opline);
-	zend_class_entry *ce = EX_T(opline->op1.u.var).class_entry;
-	union _zend_function *fbc;
-	zval* function_name;
-	char* function_name_strval;
-	int function_name_strlen;
-
-	function_name = &opline->op2.u.constant;
-	// store the active ce
-	activeCe = EX_T(opline->op1.u.var).class_entry;
-
-	if (Z_TYPE_P(function_name) != IS_STRING) {
-		zend_error_noreturn(E_ERROR, "Function name must be a string");
-	}
-
-	// get method name
-  	function_name_strval = zend_str_tolower_dup(function_name->value.str.val, function_name->value.str.len);
- 	function_name_strlen = function_name->value.str.len;
-
-	// call proxyMethod if method is not defined in userspace
-	if(zend_hash_find(&ce->function_table, function_name_strval, function_name_strlen+1, (void**) &fbc) == FAILURE)
-	{
-		zend_ptr_stack_3_push(&EG(arg_types_stack), EX(fbc), EX(object), NULL);
-		zend_bool is_const = (IS_CONST == IS_CONST);
-
-		if(zend_hash_find(&ce->function_table, "staticproxymethod", 18, (void**) &fbc) != FAILURE)
-		{
-
-			//! TODO	darn! we have a lowersized string here!
-			const char* methodName = PQ::findRealMethodName( function_name->value.str.val );
-			methodNameStack.push( new QByteArray( methodName ) );
-
-			EX(fbc) = fbc;
-
-			if(!is_const){ efree(function_name_strval); }
-			EX(opline)++;
-			ZEND_VM_CONTINUE();
-
-		}
-
-		if(!is_const){ efree(function_name_strval); }
-
-	}  // end try call proxyMethod
-
-  	return originalConstantMethodHandler(execute_data);
-
-}
-
-
-/*!
- *	constants handler
- */
-
-static int constantHandler(ZEND_OPCODE_HANDLER_ARGS) {
-
-	zend_op *opline = EX__(opline);
-	zend_class_entry *ce = NULL;
-	zval **value;
-
-	if (IS_CONST == IS_UNUSED) {
-		if (!zend_get_constant(opline->op2.u.constant.value.str.val, opline->op2.u.constant.value.str.len, &EX_T(opline->result.u.var).tmp_var TSRMLS_CC)) {
-			zend_error(E_NOTICE, "Use of undefined constant %s - assumed '%s'",
-						opline->op2.u.constant.value.str.val,
-						opline->op2.u.constant.value.str.val);
-			EX_T(opline->result.u.var).tmp_var = opline->op2.u.constant;
-			zval_copy_ctor(&EX_T(opline->result.u.var).tmp_var);
-		}
-		execute_data->opline++;
-	}
-
-	ce = EX_T(opline->op1.u.var).class_entry;
-
-	if (zend_hash_find(&ce->constants_table, opline->op2.u.constant.value.str.val, opline->op2.u.constant.value.str.len+1, (void **) &value) == SUCCESS) {
-		zval_update_constant(value, (void *) 1 TSRMLS_CC);
-		EX_T(opline->result.u.var).tmp_var = **value;
-		zval_copy_ctor(&EX_T(opline->result.u.var).tmp_var);
-	} else {
-		// enums are methods here
-		Smoke::Index method = PQ::smoke()->findMethod(ce->name, opline->op2.u.constant.value.str.val);
-		if(method <= 0) // smoke could not find one
-		    php_error(E_ERROR, "undefined class constant '%s'", opline->op2.u.constant.value.str.val);
-
-		method = PQ::smoke()->methodMaps[method].method;
-
-		// get the Qt value
-		Smoke::Stack args = (Smoke::Stack) safe_emalloc(1, sizeof(Smoke::Stack), 0);
-		void* dummy; // dummy here
-		smokephp_callMethod(dummy, method, args);
-
-		// write the zend return value
-		zval* return_value;
-		MAKE_STD_ZVAL(return_value);
-		ZVAL_LONG(return_value, args[0].s_enum);
-		EX_T(opline->result.u.var).tmp_var = *return_value;
-		zval_copy_ctor(&EX_T(opline->result.u.var).tmp_var);
-
-		efree(args);
-
-	}
-
-	execute_data->opline++;
-	return 0;
-
-}
-
-/**
- *	proxy handler
- */
-
-union _zend_function* proxyHandler(zval **obj_ptr, char* methodName, int methodName_len TSRMLS_DC)
-{
-    union _zend_function *fbc;
-
-    // overwritten protected Qt methods wont work until we cheat here
-    int method_len = strlen(methodName);
-    char* lc_method_name = (char*) do_alloca(method_len+1);
-    zend_str_tolower_copy(lc_method_name, methodName, method_len);
-    // get the zend object and the function pointer
-    zend_object *zobj = zend_objects_get_address(*obj_ptr TSRMLS_CC);
-    if (zend_hash_find(&zobj->ce->function_table, lc_method_name, method_len+1, (void **)&fbc) != FAILURE)
-    {
-		if(fbc->common.fn_flags & ZEND_ACC_PROTECTED)
-		{
-			if(PQ::smoke()->idMethodName(methodName) > 0)
-			{
-				fbc->common.fn_flags = ZEND_ACC_PUBLIC;
-			}
-		}
-    }
-
-    // a try for non-Qt objects
-    fbc = zend_orig_handler.get_method(obj_ptr, methodName, methodName_len);
-    if(!fbc) // maybe a Qt object
-    {
-        methodNameStack.push(new QByteArray(methodName));
-	    // call proxy
-	    fbc = zend_orig_handler.get_method(obj_ptr, "proxyMethod", 11);
-    }
-
-    return fbc;
-}
-
 /**
  *	generic object
  */
@@ -324,15 +166,11 @@ ZEND_METHOD(php_qt_generic_class, __toString)
 
 ZEND_METHOD(php_qt_generic_class, __destruct)
 {
-// qDebug() << "__destruct" << getThis() << PZVAL_IS_REF(getThis());
 	if(phpqt_SmokePHPObjectExists(getThis())) {
 
  		smokephp_object *o = phpqt_getSmokePHPObjectFromZval(getThis());
 
-// qDebug() << (o->zval_ptr == getThis());
-// qDebug() << "__destruct" << (o->zval_ptr == getThis()) << getThis() << o->zval_ptr;
 		// its not a reference
-// 		if(getThis() == o->zval_ptr)
 		if(!PZVAL_IS_REF(getThis()))
 		{
 			o->allocated = false;
@@ -342,7 +180,6 @@ ZEND_METHOD(php_qt_generic_class, __destruct)
 			qFatal("try to unmap unregistered zval");
 		}
 
-//check_qobject(getThis());
 	}
 }
 

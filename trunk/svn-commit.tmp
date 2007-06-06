@@ -1,15 +1,7 @@
-* major code cleaning
+* moved zend handlers into a seperate file
 
 --This line, and those below, will be ignored--
 
-D    config.m4
-D    admin
 M    php_qt/php_qt.h
-M    php_qt/smokephp.cpp
-M    php_qt/marshall_basetypes.h
-M    php_qt/marshall_types.cpp
 M    php_qt/php_qt.cpp
-M    php_qt/marshall_types.h
-D    TODO
-D    kdeize
-M    examples/calculator/calculator.php
+M    php_qt/CMakeLists.txt

@@ -167,7 +167,7 @@ smokephp_object*	phpqt_createOriginal(zval* zval_ptr, void* ptr);
 
 const char* 		printType(int type);
 
-union _zend_function* proxyHandler(zval **obj_ptr, char* methodName, int methodName_len TSRMLS_DC);
+
 
 extern Smoke* qt_Smoke;
 class PQ

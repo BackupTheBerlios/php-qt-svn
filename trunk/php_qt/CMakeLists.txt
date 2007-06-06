@@ -16,6 +16,7 @@ include_directories(
 set(phpqt_LIB_SRCS
     functions.cpp
     php_qt.cpp
+    zend_handlers.cpp
     smokephp.cpp
     qstring.cpp
     marshall_types.cpp
