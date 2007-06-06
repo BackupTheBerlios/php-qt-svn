@@ -1,7 +1,7 @@
-/*
+/*!
  * PHP-Qt - The PHP language bindings for Qt
  *
- * Copyright (C) 2005
+ * Copyright (C) 2005 - 2007
  * Thomas Moenicke <tm@ippfp.org>,
  * Jean-Luc Gyger <jean_luc.gyger@freesurf.ch>
  *

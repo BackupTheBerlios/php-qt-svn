@@ -409,10 +409,6 @@ PHP_MINIT_FUNCTION(php_qt)
 
 	} // end loop classes
 
-	// cache some stuff
-	Smoke::Index qobject = PQ::smoke()->idClass("QObject");
-	_register_QString();
-
 	// do inheritance, all classes must be defined before
 	for(Smoke::Index i = 1; i <= PQ::smoke()->numClasses; i++){
 	    zend_class_entry* ce = tmpCeTable[PQ::smoke()->classes[i].className];
@@ -421,6 +417,10 @@ PHP_MINIT_FUNCTION(php_qt)
     		zend_do_inheritance(ce, parent_ce TSRMLS_CC);
 	    }
 	}
+
+	// cache some stuff
+	Smoke::Index qobject = PQ::smoke()->idClass("QObject");
+	_register_QString();
 
     return SUCCESS;
 } // PHP_MINIT

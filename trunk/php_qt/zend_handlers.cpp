@@ -1,7 +1,7 @@
 /*!
  * PHP-Qt - The PHP language bindings for Qt
  *
- * Copyright (C) 2006
+ * Copyright (C) 2006 - 2007
  * Thomas Moenicke <thomas.moenicke at kdemail.net>
  * Katrina Niolet <katrina at niolet.name>
  *
