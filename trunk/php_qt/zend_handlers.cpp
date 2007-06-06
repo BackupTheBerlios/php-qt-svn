@@ -152,7 +152,7 @@ ZendHandlers::constantMethodHandler(ZEND_OPCODE_HANDLER_ARGS)
 	activeCe = EX_T(opline->op1.u.var).class_entry;
 
 	if (Z_TYPE_P(function_name) != IS_STRING) {
-		zend_error_noreturn(E_ERROR, "Function name must be a string");
+		php_error(E_ERROR, "Function name must be a string");
 	}
 
 	// get method name
