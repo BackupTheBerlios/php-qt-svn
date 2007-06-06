@@ -169,7 +169,7 @@
                     }
                     return true;
                 }
-            }
+            }//check_qobject($target);
             return parent::eventFilter($target, $event);
         }
 

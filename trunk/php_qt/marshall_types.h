@@ -132,9 +132,12 @@ public:
 	~VirtualMethodCall();
 	Marshall::Action action();
 	zval* var();
+	zval* object();
 	int items();
 	void callMethod();
 	bool cleanup();
+
+	bool makeObject;
 
 private:
 	zval* _obj;

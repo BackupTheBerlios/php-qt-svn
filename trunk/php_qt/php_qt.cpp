@@ -431,7 +431,6 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
     // nonstaticphp_qt_generic_class_proxyMethod
     if(getThis()){
     	activeScope = getThis();
-
 		// if a parent:: call occurs this_ptr has the wrong ce, so we need to
 		// correct it here
 		if(parentCall)
@@ -523,6 +522,7 @@ ZEND_METHOD(php_qt_generic_class, staticProxyMethod)
 			{
 				parentCall = true;
 				this_ptr = activeScope;
+//   				this_ptr->type = IS_OBJECT;
 			}
 		}
 	}
@@ -1047,5 +1047,6 @@ phpqt_createOriginal(zval* zval_ptr, void* ptr)
 	Z_OBJ_HT_P(zval_ptr) = &php_qt_handler;
 	zval_ptr = o->zval_ptr;
 	zval_add_ref(&zval_ptr);
+
 	return o;
 }

@@ -417,8 +417,15 @@ VirtualMethodCall::action()
 zval*
 VirtualMethodCall::var()
 {
-// 	*_sp[_cur] = (zval*) emalloc(sizeof(zval));
 	ZVAL_NULL(__sp[_cur]);
+    return __sp[_cur];
+}
+
+zval*
+VirtualMethodCall::object()
+{
+	ZVAL_NULL(__sp[_cur]);
+	__sp[_cur]->type = IS_OBJECT;
     return __sp[_cur];
 }
 

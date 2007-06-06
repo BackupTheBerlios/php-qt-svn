@@ -1,9 +1,0 @@
-
-
-- virtual and protected methods (already prepared)
-- storing meta objects in hashtable (already prepared)
-- returning of right php objects if returntype is reference
-- support for pecl operators
-- support for Q_SIGNAL/Q_SLOT macros
-- classes for tutorial 8-14 and QSvgWidget, QSvgRenderer
-

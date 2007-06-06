@@ -297,10 +297,6 @@ ZEND_METHOD(php_qt_generic_class, emit);
 ZEND_METHOD(php_qt_generic_class, proxyMethod);
 ZEND_METHOD(php_qt_generic_class, staticProxyMethod);
 
-// smoke stuff
-
-
-
 // ZEND stuff
 
 static int zend_check_symbol(zval **pz TSRMLS_DC)

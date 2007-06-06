@@ -144,7 +144,11 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 			smokephp_object* o = phpqt_createOriginal(m->var(), p);
 			// overwrite the old one:
 			*(m->return_value_ptr()) = o->zval_ptr;
-// 			*(m->var()) = *o->zval_ptr;
+
+			if(!strcmp(m->identifier, "VirtualMethodCall")){
+				// its a copy, not the original but well
+				ZVAL_ZVAL(((VirtualMethodCall*)m)->object(), o->zval_ptr, 0, 1);
+			}
 		}
 		return;
 

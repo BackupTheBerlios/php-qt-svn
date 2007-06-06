@@ -82,9 +82,10 @@ public:
 		}
 
 		if(phpqt_methodExists(o->ce_ptr, (char*) methodName)){
-			zval* zmem = ALLOCA_N(zval, smoke->methods[method].numArgs);
+// 			zval* zmem = ALLOCA_N(zval, smoke->methods[method].numArgs);
+			zval* zmem = (zval*) safe_emalloc(sizeof(zval), smoke->methods[method].numArgs,0);
 		    VirtualMethodCall c(smoke, method, args, o->zval_ptr, &zmem, &o->zval_ptr);
-		    c.next();
+			c.next();
 		}
 
 		return false;
