@@ -36,6 +36,7 @@
 #include <iostream>
 using namespace std;
 
+#include <zend.h>
 #include <zend_interfaces.h>
 #include "php.h"
 #include "php_ini.h"
