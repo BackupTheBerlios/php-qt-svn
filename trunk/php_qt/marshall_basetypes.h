@@ -1,15 +1,27 @@
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
+/*!
+ * PHP-Qt - The PHP language bindings for Qt
+ *
+ * Copyright (C) 2006 - 2007
+ * Thomas Moenicke <tm at php-qt.org>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ */
 
 #include "marshall_types.h"
 #include <QtCore/QHash>
-// extern QHash<zval*, smokephp_object*> zval_x_smokephp;
 
 template <class T> T* smoke_ptr(Marshall *m) { return (T*) m->item().s_voidp; }
 
@@ -60,7 +72,7 @@ static void marshall_from_php<SmokeEnumWrapper>(Marshall *m)
 	zval* v = m->var();
 
 	if (Z_TYPE_P(v) == IS_OBJECT) {
-		// A Qt::Enum is a subclass of Qt::Integer, so 'get_qinteger()' can be called ok
+	// A Qt::Enum is a subclass of Qt::Integer, so 'get_qinteger()' can be called ok
 	} else {
 		m->item().s_enum = (long) Z_LVAL_P(v);
 	}
@@ -86,7 +98,6 @@ static void marshall_from_php<SmokeClassWrapper>(Marshall *m)
 
 	if(!/*SmokePHPObjectExists*/(v)) {
 		check_qobject(v);
-// 		php_error(E_ERROR, "Invalid type, expecting %s, %s given\n", m->type().name(), zend_zval_type_name(v));
 		php_error(E_ERROR, "Invalid type, expecting %s, %s given (probably PHP-Qt lost the Qt object)\n", m->type().name(), Z_OBJCE_P(v)->name);
 		return;
 	}
@@ -175,7 +186,6 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 			_ce = zend_fetch_class(__className, __strLenClassName, ZEND_FETCH_CLASS_AUTO TSRMLS_DC);
 	    }
 
-// #warning parent_ce in createObject
 		smokephp_object *o = PHPQt::createObject(m->var(), __p, _ce, m->type().classId());
 
 //	    if(m->type().isConst() && m->type().isRef()) {

@@ -2,7 +2,7 @@
  * PHP-Qt - The PHP language bindings for Qt
  *
  * Copyright (C) 2006 - 2007
- * Thomas Moenicke <thomas.moenicke at kdemail.net>
+ * Thomas Moenicke <tm at php-qt.org>
  * Katrina Niolet <katrina at niolet.name>
  *
  * This program is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@
 
 #include "zend_handlers.h"
 #include "php_qt.h"
+#include "smokephp.h"
 #include "ext/standard/php_string.h"
 
 extern QStack<QByteArray*> methodNameStack;

@@ -2,7 +2,7 @@
  * PHP-Qt - The PHP language bindings for Qt
  *
  * Copyright (C) 2006
- * Thomas Moenicke <thomas.moenicke at kdemail.net>
+ * Thomas Moenicke <tm at php-qt.org>
  * Katrina Niolet <katrina at niolet.name>
  *
  * This program is free software; you can redistribute it and/or

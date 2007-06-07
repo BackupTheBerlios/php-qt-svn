@@ -1,23 +1,22 @@
 /*!
  * PHP-Qt - The PHP language bindings for Qt
  *
- * Copyright (C) 2005 - 2007
- * Thomas Moenicke <tm@ippfp.org>,
- * Jean-Luc Gyger <jean_luc.gyger@freesurf.ch>
+ * Copyright (C) 2006 - 2007
+ * Thomas Moenicke <tm at php-qt.org>
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  * QString.cpp - QString PHP implementation.
  * begin           : Wed Jan 18 23:31:01 2006
@@ -26,14 +25,13 @@
 
 #include <iostream>
 using namespace std;
+
 #include <QtCore/QDebug>
-
 #include <QtCore/QString>
-#include <zend_interfaces.h>
 
-#include "php_qt.h"
 #include "phpqt_internals.h"
 using namespace PHPQt;
+#include "qstring.h"
 
 zend_class_entry* qstring_ce;
 extern Smoke* qt_Smoke;

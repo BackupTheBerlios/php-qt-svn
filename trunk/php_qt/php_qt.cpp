@@ -2,7 +2,7 @@
  * PHP-Qt - The PHP language bindings for Qt
  *
  * Copyright (C) 2006 - 2007
- * Thomas Moenicke <thomas.moenicke at kdemail.net>
+ * Thomas Moenicke <tm at php-qt.org>
  * Katrina Niolet <katrina at niolet.name>
  *
  * This program is free software; you can redistribute it and/or
@@ -21,16 +21,14 @@
  *
  */
 
+#include <QtCore/qglobal.h>
+#include <QtCore/QHash>
 
 #include "php_qt.h"
+#include "ext/standard/info.h"
 #include "ext/standard/php_string.h"
 
-#include <QtCore/qglobal.h>
-
-#include "marshall.h"
-#include "php_qt.h"
 #include "zend_handlers.h"
-#include "smokephp.h"
 #include "smoke.h"
 #include "marshall_types.h"
 #include "phpqt_internals.h"

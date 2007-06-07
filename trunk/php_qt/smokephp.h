@@ -16,7 +16,8 @@
 #include "php.h"
 #define Qnil (zval *) NULL
 
-#include <QtCore/qbytearray.h>
+#include <QtCore/QStack>
+#include <QtCore/QByteArray>
 
 #include "php_qt.h"
 #include "marshall.h"
@@ -174,7 +175,7 @@ public:
     void setAllocated(bool isAllocated) { _isAllocated = isAllocated; }
 };
 
- 
+
 /**
  * SmokeObject is a thin wrapper around zval* objects. Each SmokeObject instance
  * increments the refcount of its zval* for the duration of its existance.
@@ -189,16 +190,16 @@ class SmokeObject {
 public:
     SmokeObject(zval* obj, Smoke_MAGIC *mag) : rv(obj), m(mag) {
     }
-    
+
     ~SmokeObject() {
     }
-    
+
     SmokeObject(const SmokeObject &other) {
 	rv = other.rv;
 	m = other.m;
 
     }
-    
+
     SmokeObject &operator =(const SmokeObject &other) {
 	rv = other.rv;
 	m = other.m;
@@ -319,5 +320,15 @@ struct MocArgument {
     SmokeType st;
     MocArgumentType argType;
 };
+
+bool 				smokephp_isQObject(Smoke::Index classId);
+void				smokephp_prepareMethodName(zval*** args, int argc, QStack<QByteArray*> &methodNameStack);
+QByteArray* 		smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack);
+Smoke::Index		smokephp_getMethod(const char* c, const char* m, int argc, zval*** args);
+void				smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method);
+void				smokephp_callMethod(void *obj, Smoke::Index method, Smoke::Stack qargs);
+void				smokephp_init();
+
+void* 				transformArray(zval* args);
 
 #endif // SMOKEPHP_H
