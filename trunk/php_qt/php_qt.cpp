@@ -33,6 +33,7 @@
 #include "marshall_types.h"
 #include "phpqt_internals.h"
 
+// #define CLASS_PREFIX 1 // needed for IQuiP
 #define DEBUG 1
 #define MOC_DEBUG 0
 
@@ -396,8 +397,16 @@ PHP_MINIT_FUNCTION(php_qt)
 
 		// register zend class
 		zend_class_entry ce;
-		INIT_CLASS_ENTRY(ce, PQ::smoke()->classes[i].className, p);
-		ce.name_length = strlen(PQ::smoke()->classes[i].className);
+
+#ifdef CLASS_PREFIX
+		QByteArray* _className = new QByteArray("_");
+		_className->append(PQ::smoke()->classes[i].className);
+#else
+		QByteArray* _className = new QByteArray(PQ::smoke()->classes[i].className);
+#endif
+
+		INIT_CLASS_ENTRY(ce, _className->constData(), p);
+		ce.name_length = _className->size();
 		zend_class_entry* ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
 		tmpCeTable[PQ::smoke()->classes[i].className] = ce_ptr;
 		// cache QObject
