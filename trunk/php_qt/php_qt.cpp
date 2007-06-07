@@ -343,7 +343,7 @@ ZEND_METHOD(php_qt_generic_class, staticProxyMethod)
 {
 	this_ptr = NULL;
 
-	// do we have a parent::blablub() call?
+	// do we have a parent::foo() call?
 	if(EG(active_op_array)->scope){
 		if(EG(scope) == EG(active_op_array)->scope->parent)
 		{
