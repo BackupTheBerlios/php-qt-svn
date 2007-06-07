@@ -13,7 +13,7 @@
 		dl('php_qt.' . PHP_SHLIB_SUFFIX);
 	}
 
-	$app = new QApplication(&$argc,$argv);
+	$app = new QApplication($argc,$argv);
 	
 	$hello = new QPushButton("Hello world!");
 	$hello->resize(100, 30);

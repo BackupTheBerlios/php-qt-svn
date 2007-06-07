@@ -13,7 +13,7 @@
 		dl('php_qt.' . PHP_SHLIB_SUFFIX);
 	}
 
-    $app = new QApplication(&$argc,$argv);
+    $app = new QApplication($argc,$argv);
 
     $quit = new QPushButton("Quit");
     $quit->resize(75,30);

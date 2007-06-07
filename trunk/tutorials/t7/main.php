@@ -86,7 +86,7 @@
         }
     }
 
-    $app = new QApplication(&$argc,$argv);
+    $app = new QApplication($argc,$argv);
 
     $widget = new MyWidget();
     $widget->show();
