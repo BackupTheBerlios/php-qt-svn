@@ -50,8 +50,8 @@ public:
 
     virtual void deleted(Smoke::Index classId, void* ptr) {
         qDebug("deleted");
-        if(phpqt_SmokePHPObjectExists(ptr)){
-			smokephp_object *o = (smokephp_object*) phpqt_getSmokePHPObjectFromQt(ptr);
+        if(PHPQt::SmokePHPObjectExists(ptr)){
+			smokephp_object *o = (smokephp_object*) PHPQt::getSmokePHPObjectFromQt(ptr);
 			if(!o->allocated){
 				delete (QObject*) ptr;
 				efree(o);
@@ -63,7 +63,7 @@ public:
     }
     virtual bool callMethod(Smoke::Index method, void* QtPtr, Smoke::Stack args, bool /*isAbstract*/) {
 
-		smokephp_object *o = (smokephp_object*) phpqt_getSmokePHPObjectFromQt(QtPtr);
+		smokephp_object *o = (smokephp_object*) PHPQt::getSmokePHPObjectFromQt(QtPtr);
 
 		if(!o){
 			// no related smokephp_object
@@ -79,11 +79,11 @@ public:
 		}
 
 		if(!strcmp(methodName, "qt_metacall")){
-			phpqt_metacall(o, args, (QMetaObject::Call) args[1].s_enum, args[2].s_int, (void**) args[3].s_voidp);
+			PHPQt::metacall(o, args, (QMetaObject::Call) args[1].s_enum, args[2].s_int, (void**) args[3].s_voidp);
 			return true;
 		}
 
-		if(phpqt_methodExists(o->ce_ptr, (char*) methodName)){
+		if(PHPQt::methodExists(o->ce_ptr, (char*) methodName)){
 // 			zval* zmem = ALLOCA_N(zval, smoke->methods[method].numArgs);
 			zval* zmem = (zval*) safe_emalloc(sizeof(zval), smoke->methods[method].numArgs,0);
 		    VirtualMethodCall c(smoke, method, args, o->zval_ptr, &zmem, &o->zval_ptr);
@@ -260,7 +260,7 @@ int treatArray(zval **val, int num_args, va_list args, zend_hash_key *hash_key){
 
 	smokephp_object *o;
 	if(type == IS_OBJECT)
-		o = phpqt_getSmokePHPObjectFromZval(((zval*) *val));
+		o = PHPQt::getSmokePHPObjectFromZval(((zval*) *val));
 
 	switch(type){
 		case IS_STRING:
@@ -399,7 +399,7 @@ QByteArray* smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack)
 		if(Z_OBJCE_P(((zval*) *argv[i])) == qstring_ce)
 		    mocStack[i+1].argType = xmoc_QString;
 		else {
-		    smokephp_object *o = phpqt_getSmokePHPObjectFromZval((zval*) *argv[i]);
+		    smokephp_object *o = PHPQt::getSmokePHPObjectFromZval((zval*) *argv[i]);
 		    mocStack[i+1].st = SmokeType(PQ::smoke(),o->classId);
 		    mocStack[i+1].argType = xmoc_void;
 		}
@@ -424,7 +424,7 @@ smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const S
  	uint type = ((int) ((zval) **args[j]).type);    // als Macro!
 	if (type == IS_OBJECT) {
 		if(Z_OBJCE_PP(args[j]) == qstring_ce) {
-		QString* o = (QString*) phpqt_getQtObjectFromZval(*args[j]);
+		QString* o = (QString*) PHPQt::getQtObjectFromZval(*args[j]);
 		qargs[j+1].s_voidp = (void*) o->toAscii().constData();
 	    }
 	}

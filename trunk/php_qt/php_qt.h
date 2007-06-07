@@ -58,7 +58,7 @@ using namespace std;
 #define Qnil (zval *) NULL
 
 #define PHP_QT_FETCH()  \
-	phpqt_getQtObjectFromZval(getThis()) \
+	getQtObjectFromZval(getThis()) \
 
 #define PHP_QT_FENTRY(zend_name, name_, arg_info_, flags_)	\
     t->fname = (char*) emalloc(strlen(#zend_name)+1); \
@@ -138,8 +138,6 @@ struct smokephp_object {
 
 const char* 		printType(int type);
 
-
-
 extern Smoke* qt_Smoke;
 class PQ
 {
@@ -167,13 +165,10 @@ public:
 
 };
 
-extern int le_php_qt_hashtype;
-extern HashTable php_qt_objptr_hash;
-
 bool 				smokephp_isQObject(Smoke::Index classId);
 void				smokephp_prepareMethodName(zval*** args, int argc, QStack<QByteArray*> &methodNameStack);
-QByteArray* 			smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack);
-Smoke::Index			smokephp_getMethod(const char* c, const char* m, int argc, zval*** args);
+QByteArray* 		smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack);
+Smoke::Index		smokephp_getMethod(const char* c, const char* m, int argc, zval*** args);
 void				smokephp_prepareConnect(zval*** args, int argc, Smoke::StackItem* qargs, const Smoke::Index method);
 void				smokephp_callMethod(void *obj, Smoke::Index method, Smoke::Stack qargs);
 void				smokephp_init();

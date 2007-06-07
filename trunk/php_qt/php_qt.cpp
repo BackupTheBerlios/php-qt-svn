@@ -159,16 +159,16 @@ ZEND_METHOD(php_qt_generic_class, __toString)
 
 ZEND_METHOD(php_qt_generic_class, __destruct)
 {
-	if(phpqt_SmokePHPObjectExists(getThis())) {
+	if(PHPQt::SmokePHPObjectExists(getThis())) {
 
- 		smokephp_object *o = phpqt_getSmokePHPObjectFromZval(getThis());
+ 		smokephp_object *o = PHPQt::getSmokePHPObjectFromZval(getThis());
 
 		// its not a reference
 		if(!PZVAL_IS_REF(getThis()))
 		{
 			o->allocated = false;
 		}
-		if(!phpqt_unmapSmokePHPObject(getThis()))
+		if(!PHPQt::unmapSmokePHPObject(getThis()))
 		{
 			qFatal("try to unmap unregistered zval");
 		}
@@ -205,7 +205,7 @@ ZEND_METHOD(php_qt_generic_class, __construct)
     c.next();
 
 	// smokephp_object is created above in c.next()
-    smokephp_object* o = phpqt_getSmokePHPObjectFromZval(getThis());
+    smokephp_object* o = PHPQt::getSmokePHPObjectFromZval(getThis());
     o->parent_ce_ptr = ce_parent; // = ce if no parent
 
 	// if QObject
@@ -224,7 +224,7 @@ ZEND_METHOD(php_qt_generic_class, __construct)
     		uint* phpqt_meta_data = (uint*) emalloc(sizeof(uint)*20*5+10);
 
 		//	create the metaObject
-		if(phpqt_getMocData(
+		if(PHPQt::getMocData(
 				getThis(),
 				o->parent_ce_ptr->name,
 				superdata,
@@ -297,7 +297,7 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
 
 	    // is it a signal?
 	    if(getThis()){
-		smokephp_object* o = phpqt_getSmokePHPObjectFromZval(getThis());
+		smokephp_object* o = PHPQt::getSmokePHPObjectFromZval(getThis());
 		if(o->meta != NULL){
 		    QMetaObject* mo = (QMetaObject*) o->meta;
 		    QByteArray signalname(methodNameStack.top()->constData());
@@ -373,7 +373,7 @@ PHP_MINIT_FUNCTION(php_qt)
 	install_handlers(Qt_handlers);
 
 	// object list
-	le_php_qt_hashtype = zend_register_list_destructors_ex(phpqt_destroyHashtable, NULL, "PHP-Qt object list", module_number);
+	le_php_qt_hashtype = zend_register_list_destructors_ex(PHPQt::destroyHashtable, NULL, "PHP-Qt object list", module_number);
 	zend_hash_init_ex(&php_qt_objptr_hash, PHPQT_CLASS_COUNT, NULL, NULL, 1, 0);
 
 	ZendHandlers::installZendHandlers();

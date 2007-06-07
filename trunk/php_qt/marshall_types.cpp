@@ -442,7 +442,7 @@ VirtualMethodCall::callMethod()
 	if (_called) return;
 	_called = true;
 
-	phpqt_callPHPMethod(_obj, (char*) _smoke->methodNames[method().name], items(), __sp);
+	PHPQt::callPHPMethod(_obj, (char*) _smoke->methodNames[method().name], items(), __sp);
 
 	zval _retval;
  	VirtualMethodReturnValue r(_smoke, _method, _stack, _retval);
@@ -465,9 +465,9 @@ MethodCall::MethodCall(Smoke *smoke, Smoke::Index method, zval* target, zval ***
 	identifier = "MethodCall";
     if(target != NULL)
     {
-		if (phpqt_SmokePHPObjectExists(_target))
+		if (PHPQt::SmokePHPObjectExists(_target))
 		{
-			smokephp_object *o = phpqt_getSmokePHPObjectFromZval(_target);
+			smokephp_object *o = PHPQt::getSmokePHPObjectFromZval(_target);
 			if (o && o->ptr)
 			{
 				_current_object = o->ptr;
@@ -718,7 +718,7 @@ InvokeSlot::invokeSlot()
 {
 	if (_called) return;
 	_called = true;
- 	zval* result = phpqt_callPHPMethod(_obj, (char*) PQ::smoke()->methodNames[PQ::smoke()->methods[_slotname].name], _items - 1, *_sp);
+ 	zval* result = PHPQt::callPHPMethod(_obj, (char*) PQ::smoke()->methodNames[PQ::smoke()->methods[_slotname].name], _items - 1, *_sp);
 	if (_args[0].argType != xmoc_void) {
 		SlotReturnValue r(_o, result, _args);
 	}

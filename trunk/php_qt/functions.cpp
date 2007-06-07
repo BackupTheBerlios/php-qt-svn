@@ -326,7 +326,7 @@ PHP_FUNCTION(qPrintable) {
 			break;
 		case IS_OBJECT:
 			if(strcmp(Z_OBJCE_P(string)->name,"QString")==0) {
-				ptr = (QString*) phpqt_getQtObjectFromZval(string);
+				ptr = (QString*) PHPQt::getQtObjectFromZval(string);
 				RETURN_STRING((char*)ptr->toLocal8Bit().constData(),1);
 			}
 			RETURN_STRING(Z_OBJCE_P(string)->name,1);
@@ -605,7 +605,7 @@ PHP_FUNCTION(tr)
     }
 
 	QString *ptr = new QString(QObject::tr(string));
-	phpqt_createObject(return_value, ptr, qstring_ce, QSTRING_CLASSID);
+	PHPQt::createObject(return_value, ptr, qstring_ce, QSTRING_CLASSID);
 
     return;
 }
@@ -619,7 +619,7 @@ PHP_FUNCTION(tr)
 void check_qobject(zval* zobject)
 {
 
-	if(!phpqt_SmokePHPObjectExists(zobject)) {
+	if(!PHPQt::SmokePHPObjectExists(zobject)) {
 
 		cout << "PHP Object \n(" << endl;
 
@@ -639,7 +639,7 @@ void check_qobject(zval* zobject)
 
 	} else {
 
-		smokephp_object* o = phpqt_getSmokePHPObjectFromZval(zobject);
+		smokephp_object* o = PHPQt::getSmokePHPObjectFromZval(zobject);
 
 		cout << "PHP-Qt object \n(" << endl;
 

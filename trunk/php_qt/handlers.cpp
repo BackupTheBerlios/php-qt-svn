@@ -260,7 +260,7 @@ static void marshall_QString(Marshall *m) {
 		case Marshall::FromZVAL:
 		{
 			if(Z_TYPE_P(m->var()) != IS_STRING){ // is object
-			    m->item().s_voidp = phpqt_getQtObjectFromZval(m->var());
+			    m->item().s_voidp = PHPQt::getQtObjectFromZval(m->var());
 			    m->next();
 			    break;
 			}
@@ -291,7 +291,7 @@ static void marshall_QString(Marshall *m) {
 		{
 			QString* s = static_cast<QString*>(m->item().s_voidp);
 // 			zval* obj = m->var();
-			phpqt_createObject(m->var(), (void*) s, qstring_ce, -1);
+			PHPQt::createObject(m->var(), (void*) s, qstring_ce, -1);
 		}
 		break;
 

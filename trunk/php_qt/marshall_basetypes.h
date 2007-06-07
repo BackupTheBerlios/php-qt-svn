@@ -84,14 +84,14 @@ static void marshall_from_php<SmokeClassWrapper>(Marshall *m)
 		return;
 	}
 
-	if(!/*phpqt_SmokePHPObjectExists*/(v)) {
+	if(!/*SmokePHPObjectExists*/(v)) {
 		check_qobject(v);
 // 		php_error(E_ERROR, "Invalid type, expecting %s, %s given\n", m->type().name(), zend_zval_type_name(v));
 		php_error(E_ERROR, "Invalid type, expecting %s, %s given (probably PHP-Qt lost the Qt object)\n", m->type().name(), Z_OBJCE_P(v)->name);
 		return;
 	}
 
-	smokephp_object *o = phpqt_getSmokePHPObjectFromZval(v);
+	smokephp_object *o = PHPQt::getSmokePHPObjectFromZval(v);
 	if(!o || !o->ptr) {
 		if(m->type().isRef()) {
 			php_error(E_WARNING, "References can't be nil\n");
@@ -136,12 +136,12 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 	void *p = m->item().s_voidp;
 
 	// return the original
-	if(phpqt_SmokePHPObjectExists(p)) {
+	if(PHPQt::SmokePHPObjectExists(p)) {
 		if(m->return_value_ptr()){
 			// destroys the return_value initialized by ZE, we create our own:
 			zval_ptr_dtor(m->return_value_ptr());
 			// prepare the return value
-			smokephp_object* o = phpqt_createOriginal(m->var(), p);
+			smokephp_object* o = PHPQt::createOriginal(m->var(), p);
 			// overwrite the old one:
 			*(m->return_value_ptr()) = o->zval_ptr;
 
@@ -176,7 +176,7 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 	    }
 
 // #warning parent_ce in createObject
-		smokephp_object *o = phpqt_createObject(m->var(), __p, _ce, m->type().classId());
+		smokephp_object *o = PHPQt::createObject(m->var(), __p, _ce, m->type().classId());
 
 //	    if(m->type().isConst() && m->type().isRef()) {
 	    if(m->type().isRef())

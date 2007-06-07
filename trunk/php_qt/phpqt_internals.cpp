@@ -40,7 +40,7 @@ QHash<zend_object_handle, smokephp_object*> obj_x_smokephp;
  */
 
 int
-phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a)
+PHPQt::metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a)
 {
 	QMetaObject* d = so->meta;
 //	int offset = d->methodOffset();
@@ -122,7 +122,7 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
                     // must be an object
                     void* ptr = *reinterpret_cast< QObject**>(_a[1]);
 
-                    phpqt_createObject(arg, ptr, qobject_ce);
+                    PHPQt::createObject(arg, ptr, qobject_ce);
             }
 
             args[j++] = &arg;
@@ -133,7 +133,7 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
     cout << "\tcall PHP method " << so->ce_ptr->name << "::" << method_name << endl;
 #endif
 
-         phpqt_callPHPMethod(so->zval_ptr, method_name, j, *args);
+         PHPQt::callPHPMethod(so->zval_ptr, method_name, j, *args);
 
     // is a signal
     } else {
@@ -147,7 +147,7 @@ phpqt_metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _c
 }
 
 void
-phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
+PHPQt::destroyHashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {
 #ifdef DEBUG
 	php_error(E_ERROR,"Hashtable destroyed. Shutdown PHP-Qt now.");
@@ -155,7 +155,7 @@ phpqt_destroyHashtable(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 }
 
 bool
-phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname)
+PHPQt::methodExists(zend_class_entry* ce_ptr, char* methodname)
 {
 
 	if(ce_ptr == NULL){
@@ -175,7 +175,7 @@ phpqt_methodExists(zend_class_entry* ce_ptr, char* methodname)
 
 
 zval*
-phpqt_callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zval** args)
+PHPQt::callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zval** args)
 {
 
 	if(this_ptr == NULL){
@@ -190,7 +190,7 @@ phpqt_callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zva
     MAKE_STD_ZVAL(retval);
 
     if(call_user_function(EG(function_table),&this_ptr,function_name,retval,param_count,args) == FAILURE){
-    	smokephp_object* o = phpqt_getSmokePHPObjectFromZval(this_ptr);
+    	smokephp_object* o = PHPQt::getSmokePHPObjectFromZval(this_ptr);
     	php_error(E_ERROR, "PHP-Qt could not call method %s::%s", o->ce_ptr->name, methodName);
     }
 
@@ -207,7 +207,7 @@ phpqt_callPHPMethod(zval* this_ptr, char* methodName, zend_uint param_count, zva
  */
 
 bool
-phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, QMetaObject* meta, QString* meta_stringdata, uint* signature){
+PHPQt::getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, QMetaObject* meta, QString* meta_stringdata, uint* signature){
 
     /// readout the slots table
     zval **slotdata;
@@ -326,18 +326,18 @@ phpqt_getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, 
 }
 
 char*
-phpqt_checkForOperator(const char* fname){
+PHPQt::checkForOperator(const char* fname){
 	return (char*) fname;
 }
 
 bool
-phpqt_SmokePHPObjectExists(zval* this_ptr)
+PHPQt::SmokePHPObjectExists(zval* this_ptr)
 {
 	return obj_x_smokephp.contains(this_ptr->value.obj.handle);
 }
 
 smokephp_object*
-phpqt_getSmokePHPObjectFromZval(zval* this_ptr)
+PHPQt::getSmokePHPObjectFromZval(zval* this_ptr)
 {
 
 	if(this_ptr == NULL){
@@ -350,28 +350,28 @@ phpqt_getSmokePHPObjectFromZval(zval* this_ptr)
 }
 
 void*
-phpqt_getQtObjectFromZval(zval* this_ptr){
-	smokephp_object* o = phpqt_getSmokePHPObjectFromZval(this_ptr);
+PHPQt::getQtObjectFromZval(zval* this_ptr){
+	smokephp_object* o = getSmokePHPObjectFromZval(this_ptr);
 	return o->ptr;
 }
 
 smokephp_object*
-phpqt_getSmokePHPObjectFromQt(void* QtPtr){
+PHPQt::getSmokePHPObjectFromQt(void* QtPtr){
 	return (smokephp_object*) SmokeQtObjects.value(QtPtr);
 }
 
 void
-phpqt_setSmokePHPObject(smokephp_object* o){
+PHPQt::setSmokePHPObject(smokephp_object* o){
 	SmokeQtObjects.insert(o->ptr, o);
 }
 
 bool
-phpqt_SmokePHPObjectExists(void* ptr){
+PHPQt::SmokePHPObjectExists(void* ptr){
 	return (SmokeQtObjects.find(ptr) != SmokeQtObjects.end());
 }
 
 bool
-phpqt_unmapSmokePHPObject(zval* o)
+PHPQt::unmapSmokePHPObject(zval* o)
 {
 	return (bool) obj_x_smokephp.remove(o->value.obj.handle);
 }
@@ -381,7 +381,7 @@ phpqt_unmapSmokePHPObject(zval* o)
  */
 
 smokephp_object*
-phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce, Smoke::Index classId){
+PHPQt::createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce, Smoke::Index classId){
 
 	Q_ASSERT (zval_ptr);
 	Q_ASSERT (ptr);
@@ -413,7 +413,7 @@ phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce, Smoke::Index
 	o->smoke = PQ::smoke();
 
 	Z_OBJ_HT_P(zval_ptr) = &php_qt_handler;
-	phpqt_setSmokePHPObject(o);
+	setSmokePHPObject(o);
 	zval_add_ref(&zval_ptr);
 
 	obj_x_smokephp.insert(zval_ptr->value.obj.handle, o);
@@ -423,9 +423,9 @@ phpqt_createObject(zval* zval_ptr, void* ptr, zend_class_entry* ce, Smoke::Index
 }
 
 smokephp_object*
-phpqt_createOriginal(zval* zval_ptr, void* ptr)
+PHPQt::createOriginal(zval* zval_ptr, void* ptr)
 {
-	smokephp_object* o = phpqt_getSmokePHPObjectFromQt(ptr);
+	smokephp_object* o = getSmokePHPObjectFromQt(ptr);
 /* 		ZVAL_ZVAL(zval_ptr, o->zval_ptr, 1, 0);
 // 		zval_ptr->is_ref = 1;
 		Z_OBJ_HT_P(zval_ptr) = &php_qt_handler;
