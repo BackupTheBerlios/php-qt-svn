@@ -109,7 +109,7 @@ CODE
 # Supported formats
 %formats = ( "java" => "kalyptusCxxToJava", "jni" => "kalyptusCxxToJNI", 
 	"dcopidl" => "kalyptusCxxToDcopIDL",
-	"smoke" => "kalyptusCxxToSmoke", "csharp" => "kalyptusCxxToCSharp", "kimono" => "kalyptusCxxToKimono",
+	"smoke" => "kalyptusCxxToSmoke", "websmoke" => "kalyptusCxxToWebSmoke","csharp" => "kalyptusCxxToCSharp", "kimono" => "kalyptusCxxToKimono",
         "ECMA" => "kalyptusCxxToECMA", "swig" => "kalyptusCxxToSwig",
 		"KDOMECMA" => "kalyptusKDOMEcma");
 

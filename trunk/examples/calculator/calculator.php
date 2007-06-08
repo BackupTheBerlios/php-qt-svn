@@ -149,7 +149,7 @@
 
         }
 
-        function eventFilter($target, $event){
+/*        function eventFilter($target, $event){
             if ($target == $display) {
                 if ($event->type() == QEvent::MouseButtonPress
                     || $event->type() == QEvent::MouseButtonDblClick
@@ -169,9 +169,9 @@
                     }
                     return true;
                 }
-            }//check_qobject($target);
+            }
             return parent::eventFilter($target, $event);
-        }
+        }*/
 
         function digitClicked()
         {

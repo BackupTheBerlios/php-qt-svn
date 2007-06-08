@@ -3,7 +3,9 @@
 #message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}: skipped subdir $(kde_build_libsmoke)")
 
 add_subdirectory(qt)
+add_subdirectory(web)
 #add_subdirectory(kde)
+
 
 ########### install files ###############
 
