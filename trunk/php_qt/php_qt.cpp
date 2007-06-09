@@ -33,7 +33,8 @@
 #include "marshall_types.h"
 #include "phpqt_internals.h"
 
-// #define CLASS_PREFIX 1 // needed for IQuiP
+#define IQUIP
+
 #define DEBUG 1
 #define MOC_DEBUG 0
 
@@ -197,10 +198,16 @@ ZEND_METHOD(php_qt_generic_class, __construct)
     }
 
     methodNameStack.push(new QByteArray(ce->name));
+
+#ifdef IQUIP
+	// remove the leading '_'
+	methodNameStack.top()->remove(0,1);
+#endif
+
     smokephp_prepareMethodName(args, argc, methodNameStack);	// #, $, ?
     Smoke::Index method = smokephp_getMethod(ce->name, methodNameStack.top()->constData(), ZEND_NUM_ARGS(), args);
 
- 	MethodCall c(PQ::smoke(), method, getThis(), args, argc-1, getThis(), return_value_ptr);
+    MethodCall c(PQ::smoke(), method, getThis(), args, argc-1, getThis(), return_value_ptr);
     c.next();
 
 	// smokephp_object is created above in c.next()
@@ -398,15 +405,8 @@ PHP_MINIT_FUNCTION(php_qt)
 		// register zend class
 		zend_class_entry ce;
 
-#ifdef CLASS_PREFIX
-		QByteArray* _className = new QByteArray("_");
-		_className->append(PQ::smoke()->classes[i].className);
-#else
-		QByteArray* _className = new QByteArray(PQ::smoke()->classes[i].className);
-#endif
-
-		INIT_CLASS_ENTRY(ce, _className->constData(), p);
-		ce.name_length = _className->size();
+		INIT_CLASS_ENTRY(ce, PQ::smoke()->classes[i].className, p);
+		ce.name_length = strlen(PQ::smoke()->classes[i].className);
 		zend_class_entry* ce_ptr = zend_register_internal_class(&ce TSRMLS_CC);
 		tmpCeTable[PQ::smoke()->classes[i].className] = ce_ptr;
 		// cache QObject
