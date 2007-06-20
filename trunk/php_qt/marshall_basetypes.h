@@ -89,21 +89,23 @@ static void marshall_to_php<SmokeEnumWrapper>(Marshall *m)
 template <>
 static void marshall_from_php<SmokeClassWrapper>(Marshall *m)
 {
-	zval* v = m->var();
+	zval* zval_ptr = m->var();
 
-	if(v == NULL) {
+	if(zval_ptr == NULL) {
 		m->item().s_class = 0;
 		return;
 	}
 
-	if(!/*SmokePHPObjectExists*/(v)) {
-		check_qobject(v);
-		php_error(E_ERROR, "Invalid type, expecting %s, %s given (probably PHP-Qt lost the Qt object)\n", m->type().name(), Z_OBJCE_P(v)->name);
+	if(!PHPQt::SmokePHPObjectExists(zval_ptr)) {
+		check_qobject(zval_ptr);
+// 		php_error(E_ERROR, "Invalid type, expecting %s, %s given (probably PHP-Qt lost the Qt object)\n", m->type().name(), Z_OBJCE_P(zval_ptr)->name);
+		php_error(E_ERROR, "Invalid type, expecting %s (probably PHP-Qt lost the Qt object)\n", m->type().name());
 		return;
 	}
 
-	smokephp_object *o = PHPQt::getSmokePHPObjectFromZval(v);
-	if(!o || !o->ptr) {
+	smokephp_object *o = PHPQt::getSmokePHPObjectFromZval(zval_ptr);
+
+	if(!o || !o->ptr()) {
 		if(m->type().isRef()) {
 			php_error(E_WARNING, "References can't be nil\n");
 			m->unsupported();
@@ -113,22 +115,22 @@ static void marshall_from_php<SmokeClassWrapper>(Marshall *m)
 		return;
 	}
 
-	void *ptr = o->ptr;
+	void *ptr = o->mPtr();
 
 //	if((!m->cleanup() && m->type().isStack())) {
 	if(m->type().isRef()){
 		ptr = construct_copy(o);
 #ifdef DEBUG
-			php_error(E_WARNING, "copying %s %p to %p\n", resolve_classname(o->smoke, o->classId, o->ptr), o->ptr, ptr);
+			php_error(E_WARNING, "copying %s %p to %p\n", resolve_classname(o->smoke(), o->classId(), o->ptr(), o->ptr(), ptr);
 #endif
 	}
 
 	const Smoke::Class &cl = m->smoke()->classes[m->type().classId()];
 
-	ptr = o->smoke->cast(
+	ptr = o->smoke()->cast(
 		ptr,				// pointer
-		o->classId,			// from
-		o->smoke->idClass(cl.className)	// to
+		o->classId(),			// from
+		o->smoke()->idClass(cl.className)	// to
 		);
 
 	m->item().s_class = ptr;
@@ -154,11 +156,10 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 			// prepare the return value
 			smokephp_object* o = PHPQt::createOriginal(m->var(), p);
 			// overwrite the old one:
-			*(m->return_value_ptr()) = o->zval_ptr;
+			*(m->return_value_ptr()) = const_cast<zval*>(o->zval_ptr());
 
 			if(!strcmp(m->identifier, "VirtualMethodCall")){
-				// its a copy, not the original but well
-				ZVAL_ZVAL(((VirtualMethodCall*)m)->object(), o->zval_ptr, 0, 1);
+				((VirtualMethodCall*)m)->var(*m->return_value_ptr());
 			}
 		}
 		return;
@@ -185,29 +186,36 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 	    } else {
 			_ce = zend_fetch_class(__className, __strLenClassName, ZEND_FETCH_CLASS_AUTO TSRMLS_DC);
 	    }
-
-		smokephp_object *o = PHPQt::createObject(m->var(), __p, _ce, m->type().classId());
+		smokephp_object *o;
+		if(!strcmp(m->identifier, "VirtualMethodCall")){
+			zval* z = (zval*) emalloc(sizeof(zval));
+// 			zval* z = (zval*) alloca(sizeof(zval));
+			((VirtualMethodCall*) m)->var(z);
+			o = PHPQt::createObject(m->var(), __p, _ce, m->type().classId());
+			m->var()->refcount--;
+		} else
+		/*smokephp_object **/o = PHPQt::createObject(m->var(), __p, _ce, m->type().classId());
 
 //	    if(m->type().isConst() && m->type().isRef()) {
 	    if(m->type().isRef())
 	    {
 			p = construct_copy( o );
 #ifdef DEBUG
-			const char * classname = o->ce_ptr->name;
-			php_error(E_WARNING, "copying %s %p to %p\n", classname, o->ptr, p);
+			const char * classname = o->ce_ptr()->name;
+			php_error(E_WARNING, "copying %s %p to %p\n", classname, o->ptr(), p);
 #endif
 			if(p) {
-				o->ptr = p;
-				o->allocated = true;
+				o->setPtr(p);
+				o->setAllocated(true);
 			}
 		}
 
 #ifdef DEBUG
-		php_error(E_WARNING, "allocating %s %p -> %p\n", __className, o->ptr, (void*)m->var());
+		php_error(E_WARNING, "allocating %s %p -> %p\n", __className, o->ptr(), (void*)m->var());
 #endif
 
 		if(m->type().isStack()) {
-			o->allocated = true;
+			o->setAllocated(true);
 		}
 
 	} // smokephp_object p doesn't exist

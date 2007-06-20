@@ -41,7 +41,9 @@ Smoke::Index connect3;
 Smoke::Index connect4;
 Smoke::Index connect5;
 
-extern QHash<void*, smokephp_object*> SmokeQtObjects;
+extern QHash<const void*, smokephp_object*> SmokeQtObjects;
+extern zval* activeScope;
+extern zend_class_entry* activeCe;
 
 class PHPQtSmokeBinding : public SmokeBinding {
 
@@ -49,16 +51,16 @@ public:
     PHPQtSmokeBinding(Smoke *s) : SmokeBinding(s) {}
 
     virtual void deleted(Smoke::Index classId, void* ptr) {
-        qDebug("deleted");
+qDebug("deleted");
         if(PHPQt::SmokePHPObjectExists(ptr)){
 			smokephp_object *o = (smokephp_object*) PHPQt::getSmokePHPObjectFromQt(ptr);
-			if(!o->allocated){
+			if(!o->allocated()){
 				delete (QObject*) ptr;
 				efree(o);
 			} else {
-				o->ptr = 0;
+				o->setPtr(0);
 			}
-			SmokeQtObjects.remove(o->ptr);
+			SmokeQtObjects.remove(o->ptr());
 		}
     }
     virtual bool callMethod(Smoke::Index method, void* QtPtr, Smoke::Stack args, bool /*isAbstract*/) {
@@ -74,7 +76,7 @@ public:
 
 		// metaobjects
 		if(!strcmp(methodName, "metaObject")){
-			args[0].s_class = o->meta;
+			args[0].s_class = o->meta();
 			return true;
 		}
 
@@ -83,11 +85,15 @@ public:
 			return true;
 		}
 
-		if(PHPQt::methodExists(o->ce_ptr, (char*) methodName)){
-// 			zval* zmem = ALLOCA_N(zval, smoke->methods[method].numArgs);
-			zval* zmem = (zval*) safe_emalloc(sizeof(zval), smoke->methods[method].numArgs,0);
-		    VirtualMethodCall c(smoke, method, args, o->zval_ptr, &zmem, &o->zval_ptr);
+		if(PHPQt::methodExists(o->ce_ptr(), (char*) methodName)){
+			activeScope = const_cast<zval*>(o->zval_ptr());
+			activeCe = Z_OBJCE_P(activeScope);
+
+			zval* zmem = ALLOCA_N(zval, smoke->methods[method].numArgs);
+// 			zval* zmem = (zval*) safe_emalloc(sizeof(zval), smoke->methods[method].numArgs,0);
+		    VirtualMethodCall c(smoke, method, args, activeScope, &zmem, &activeScope);
 			c.next();
+ 			return true;
 		}
 
 		return false;
@@ -280,8 +286,8 @@ int treatArray(zval **val, int num_args, va_list args, zend_hash_key *hash_key){
  			e_arrayv[e_arrayc++] = (void*) Z_BVAL_PP(val);
  			break;
  		case IS_OBJECT:
- 			e_arrayv[e_arrayc] = emalloc(sizeof(o->ptr));
- 			e_arrayv[e_arrayc++] = o->ptr;
+ 			e_arrayv[e_arrayc] = emalloc(sizeof(o->ptr()));
+ 			e_arrayv[e_arrayc++] = const_cast<void*>(o->ptr());
  			break;
 		default:
 			php_error(E_ERROR, "PHP-Qt: unsupported array type %d", type);
@@ -400,7 +406,7 @@ QByteArray* smokephp_getSignature(int argc, zval ***argv, MocArgument* mocStack)
 		    mocStack[i+1].argType = xmoc_QString;
 		else {
 		    smokephp_object *o = PHPQt::getSmokePHPObjectFromZval((zval*) *argv[i]);
-		    mocStack[i+1].st = SmokeType(PQ::smoke(),o->classId);
+		    mocStack[i+1].st = SmokeType(PQ::smoke(),o->classId());
 		    mocStack[i+1].argType = xmoc_void;
 		}
 		signature->append("object");

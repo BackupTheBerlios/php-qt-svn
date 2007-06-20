@@ -47,12 +47,12 @@ void*
 construct_copy(smokephp_object *o)
 {
 	const char *className;
-	if(o->classId > 0)
+	if(o->classId() > 0)
 	{
-		className = o->smoke->className(o->classId);
+		className = o->smoke()->className(o->classId());
 	} else {
 		// must be a qstring
-		return o->ptr;
+		return o->mPtr();
 	}
 
     int classNameLen = strlen(className);
@@ -60,23 +60,23 @@ construct_copy(smokephp_object *o)
     char *ccSig = new char[classNameLen + 2];       // copy constructor signature
     strcpy(ccSig, className);
     strcat(ccSig, "#");
-    Smoke::Index ccId = o->smoke->idMethodName(ccSig);
+    Smoke::Index ccId = o->smoke()->idMethodName(ccSig);
     delete[] ccSig;
     char *ccArg = new char[classNameLen + 8];
     sprintf(ccArg, "const %s&", className);
 
-    Smoke::Index ccMeth = o->smoke->findMethod(o->classId, ccId);
+    Smoke::Index ccMeth = o->smoke()->findMethod(o->classId(), ccId);
 
     if(!ccMeth) {
 		delete[] ccArg;
 		return 0;
     }
 
-    Smoke::Index method = o->smoke->methodMaps[ccMeth].method;
+    Smoke::Index method = o->smoke()->methodMaps[ccMeth].method;
     if(method > 0)
     {
 		// Make sure it's a copy constructor
-		if(!matches_arg(o->smoke, method, 0, ccArg)) {
+		if(!matches_arg(o->smoke(), method, 0, ccArg)) {
 				delete[] ccArg;
 			return 0;
 		}
@@ -85,13 +85,13 @@ construct_copy(smokephp_object *o)
     } else {
         // ambiguous method, pick the copy constructor
 		Smoke::Index i = -method;
-		while(o->smoke->ambiguousMethodList[i]) {
-			if(matches_arg(o->smoke, o->smoke->ambiguousMethodList[i], 0, ccArg))
+		while(o->smoke()->ambiguousMethodList[i]) {
+			if(matches_arg(o->smoke(), o->smoke()->ambiguousMethodList[i], 0, ccArg))
 			break;
 				i++;
 		}
         delete[] ccArg;
-		ccMeth = o->smoke->ambiguousMethodList[i];
+		ccMeth = o->smoke()->ambiguousMethodList[i];
 		if(!ccMeth)
 		{
 			return 0;
@@ -101,9 +101,9 @@ construct_copy(smokephp_object *o)
     // Okay, ccMeth is the copy constructor. Time to call it.
     Smoke::StackItem args[2];
     args[0].s_voidp = 0;
-    args[1].s_voidp = o->ptr;
-    Smoke::ClassFn fn = o->smoke->classes[o->classId].classFn;
-    (*fn)(o->smoke->methods[ccMeth].method, 0, args);
+    args[1].s_voidp = o->mPtr();
+    Smoke::ClassFn fn = o->smoke()->classes[o->classId()].classFn;
+    (*fn)(o->smoke()->methods[ccMeth].method, 0, args);
     return args[0].s_voidp;
 }
 

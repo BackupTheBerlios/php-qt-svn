@@ -263,12 +263,6 @@ MethodReturnValueBase::var()
 	return _retval;
 }
 
-void
-MethodReturnValueBase::setVar(zval* zobj)
-{
-	_retval = zobj;
-}
-
 const char *
 MethodReturnValueBase::classname()
 {
@@ -285,11 +279,12 @@ MethodReturnValueBase::return_value_ptr()
  *	VirtualMethodReturnValue
  */
 
-VirtualMethodReturnValue::VirtualMethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval retval) :
-	MethodReturnValueBase(smoke,meth,stack,NULL), _retval2(retval)
+VirtualMethodReturnValue::VirtualMethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* retval) :
+	MethodReturnValueBase(smoke,meth,stack,NULL)//, _retval(retval)
 {
 	identifier = "VirtualMethodReturnValue";
-	_retval = &_retval2;
+// 	_retval = &_retval2;
+	_retval = retval;
 	Marshall::HandlerFn fn = getMarshallFn(type());
 	(*fn)(this);
 }
@@ -373,7 +368,6 @@ MethodCallBase::next()
 		(*fn)(this);
 		_cur++;
 	}
-
 	callMethod();
 	_cur = oldcur;
 }
@@ -404,16 +398,16 @@ MethodCallBase::return_value_ptr()
  */
 
 VirtualMethodCall::VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* obj, zval **sp, zval** return_value_ptr) :
-	MethodCallBase( smoke, meth, stack, return_value_ptr), _obj(obj)/*, _sp(sp)*/
+ 	MethodCallBase( smoke, meth, stack, return_value_ptr), _obj(obj)/*, _sp(sp)*/
 {
 	__sp = sp;
-	identifier = "VirtualMethodCall";
   	_args = _smoke->argumentList + method().args;
+  	 identifier = "VirtualMethodCall";
 }
 
 VirtualMethodCall::~VirtualMethodCall()
 {
-    delete[] _stack;
+//      delete[] _stack;
 }
 
 Marshall::Action
@@ -425,15 +419,13 @@ VirtualMethodCall::action()
 zval*
 VirtualMethodCall::var()
 {
-	ZVAL_NULL(__sp[_cur]);
     return __sp[_cur];
 }
 
 zval*
-VirtualMethodCall::object()
+VirtualMethodCall::var(zval* zval_ptr)
 {
-	ZVAL_NULL(__sp[_cur]);
-	__sp[_cur]->type = IS_OBJECT;
+	__sp[_cur] = zval_ptr;
     return __sp[_cur];
 }
 
@@ -449,10 +441,8 @@ VirtualMethodCall::callMethod()
 	if (_called) return;
 	_called = true;
 
-	PHPQt::callPHPMethod(_obj, (char*) _smoke->methodNames[method().name], items(), __sp);
-
-	zval _retval;
- 	VirtualMethodReturnValue r(_smoke, _method, _stack, _retval);
+	zval* retval = PHPQt::callPHPMethod(_obj, (char*) _smoke->methodNames[method().name], items(), __sp);
+	VirtualMethodReturnValue r(_smoke, _method, _stack, retval);
 }
 
 bool
@@ -475,10 +465,10 @@ MethodCall::MethodCall(Smoke *smoke, Smoke::Index method, zval* target, zval ***
 		if (PHPQt::SmokePHPObjectExists(_target))
 		{
 			smokephp_object *o = PHPQt::getSmokePHPObjectFromZval(_target);
-			if (o && o->ptr)
+			if (o && o->ptr())
 			{
-				_current_object = o->ptr;
-				_current_object_class = o->classId;
+				_current_object = o->mPtr();
+				_current_object_class = o->classId();
 			}
 		}
 	} else {_target = (zval*) emalloc(sizeof(zval));}

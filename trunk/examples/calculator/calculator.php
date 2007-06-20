@@ -65,7 +65,7 @@
         function __construct()
         {
             parent::__construct();
-
+check_qobject($this);
             $this->pendingAdditiveOperator = new QString();
             $this->pendingMultiplicativeOperator = new QString();
 
@@ -149,7 +149,7 @@
 
         }
 
-/*        function eventFilter($target, $event){
+        function eventFilter($target, $event){
             if ($target == $display) {
                 if ($event->type() == QEvent::MouseButtonPress
                     || $event->type() == QEvent::MouseButtonDblClick
@@ -170,8 +170,8 @@
                     return true;
                 }
             }
-            return parent::eventFilter($target, $event);
-        }*/
+	    return parent::eventFilter($target, $event);
+        }
 
         function digitClicked()
         {

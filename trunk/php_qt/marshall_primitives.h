@@ -209,7 +209,7 @@ static char* php_to_primitive<char *>(zval* rv)
 {
 	if(rv == Qnil)
 		return 0;
-	
+
 	int len = rv->value.str.len;
 	char* mem = (char*) malloc(len+1);
 	memcpy(mem, rv->value.str.val, len);
@@ -246,7 +246,7 @@ static WId php_to_primitive<WId>(zval* v)
 {
 	if(v == Qnil)
 		return 0;
-	
+
 	return (WId) Z_LVAL_P(v);
 }
 
@@ -262,7 +262,7 @@ static Q_PID php_to_primitive<Q_PID>(zval* v)
 {
 	if(v == Qnil)
 		return 0;
-	
+
 	return (Q_PID) Z_LVAL_P(v);
 }
 

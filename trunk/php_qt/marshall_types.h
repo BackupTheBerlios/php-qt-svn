@@ -50,7 +50,6 @@ public:
 	bool cleanup();
 	void unsupported();
 	zval* var();
-	void setVar(zval* zobj);
 	zval** return_value_ptr();
 
 protected:
@@ -70,11 +69,11 @@ protected:
 
 class VirtualMethodReturnValue : public MethodReturnValueBase {
 public:
-	VirtualMethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval retval);
+	VirtualMethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* retval);
 	Marshall::Action action();
 
 private:
-	zval _retval2;
+// 	zval _retval2;
 };
 
 /**
@@ -132,7 +131,7 @@ public:
 	~VirtualMethodCall();
 	Marshall::Action action();
 	zval* var();
-	zval* object();
+	zval* var(zval* zval_ptr);
 	int items();
 	void callMethod();
 	bool cleanup();

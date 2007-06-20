@@ -645,7 +645,7 @@ void check_qobject(zval* zobject)
 
 		cout << "\t       zval => " << zobject << endl;
 // 		cout << "\tclass entry => " << Z_OBJCE_P(zobject)->name << endl;
-		cout << "\tclass entry => " << o->ce_ptr->name << endl;
+		cout << "\tclass entry => " << o->ce_ptr()->name << endl;
 		cout << "\t  ref count => " << zobject->refcount << endl;
 		cout << "\t     is_ref => " << (int) zobject->is_ref << endl;
 		cout << "\t       type => " << printType(Z_TYPE_P(zobject)) << endl;
@@ -658,12 +658,12 @@ void check_qobject(zval* zobject)
 		cout << endl;
 
 		cout << "\t      smokeobj => " << o << endl;
-		cout << "\t         Smoke => " << o->smoke << endl;
-		cout << "\t       classId => " << o->classId << endl;
-		cout << "\t        Qt ptr => " << o->ptr << endl;
-		cout << "\t        ce_ptr => " << o->ce_ptr << endl;
-		cout << "\t      zval_ptr => " << o->zval_ptr << endl;
-		cout << "\t  QMetaObject* => " << o->meta << endl;
+		cout << "\t         Smoke => " << o->smoke() << endl;
+		cout << "\t       classId => " << o->classId() << endl;
+		cout << "\t        Qt ptr => " << o->ptr() << endl;
+		cout << "\t        ce_ptr => " << o->ce_ptr() << endl;
+		cout << "\t      zval_ptr => " << o->zval_ptr() << endl;
+		cout << "\t  QMetaObject* => " << o->meta() << endl;
 
 		cout << ")" << endl;
 	}

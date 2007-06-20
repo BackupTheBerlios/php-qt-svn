@@ -33,7 +33,7 @@
 #include "marshall_types.h"
 #include "phpqt_internals.h"
 
-#define IQUIP
+// #define IQUIP
 
 #define DEBUG 1
 #define MOC_DEBUG 0
@@ -160,19 +160,19 @@ ZEND_METHOD(php_qt_generic_class, __toString)
 ZEND_METHOD(php_qt_generic_class, __destruct)
 {
 	if(PHPQt::SmokePHPObjectExists(getThis())) {
+qDebug() << "destruct" << getThis();
 
  		smokephp_object *o = PHPQt::getSmokePHPObjectFromZval(getThis());
 
-		// its not a reference
+//		its not a reference
 		if(!PZVAL_IS_REF(getThis()))
 		{
-			o->allocated = false;
+			o->setAllocated(false);
 		}
 		if(!PHPQt::unmapSmokePHPObject(getThis()))
 		{
 			qFatal("try to unmap unregistered zval");
 		}
-
 	}
 }
 
@@ -188,6 +188,7 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 // 	    ce_parent = ce->parent;
 	    ce = ce->parent; // orig
     }
+    activeCe = ce;
 
     // get arguments
     int i, argc = ZEND_NUM_ARGS();
@@ -212,18 +213,18 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 
 	// smokephp_object is created above in c.next()
     smokephp_object* o = PHPQt::getSmokePHPObjectFromZval(getThis());
-    o->parent_ce_ptr = ce_parent; // = ce if no parent
+    o->setParentCePtr(ce_parent); // = ce if no parent
 
 	// if QObject
 	if(smokephp_isQObject(PQ::smoke()->idClass(ce->name))){
 
 		// fetch superdata
-		Smoke::Index nameId = o->smoke->idMethodName("metaObject");
-		Smoke::Index meth = o->smoke->findMethod(o->classId, nameId);
-		Smoke::Method &methodId = o->smoke->methods[o->smoke->methodMaps[meth].method];
-		Smoke::ClassFn fn = o->smoke->classes[methodId.classId].classFn;
+		Smoke::Index nameId = o->smoke()->idMethodName("metaObject");
+		Smoke::Index meth = o->smoke()->findMethod(o->classId(), nameId);
+		Smoke::Method &methodId = o->smoke()->methods[o->smoke()->methodMaps[meth].method];
+		Smoke::ClassFn fn = o->smoke()->classes[methodId.classId].classFn;
 		Smoke::StackItem i[1];
-		(*fn)(methodId.method, o->ptr, i);
+		(*fn)(methodId.method, const_cast<void*>(o->ptr()), i);
 		QMetaObject *superdata = (QMetaObject *) i[0].s_voidp;
 
  		QString* phpqt_meta_stringdata = new QString("");
@@ -232,9 +233,9 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 		//	create the metaObject
 		if(PHPQt::getMocData(
 				getThis(),
-				o->parent_ce_ptr->name,
+				o->parent_ce_ptr()->name,
 				superdata,
-				o->meta,
+				o->meta(),
 				phpqt_meta_stringdata,
 				phpqt_meta_data
 		)){
@@ -243,11 +244,11 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 				{superdata, phpqt_meta_stringdata_,
 					phpqt_meta_data, 0}
  			};
- 			o->meta = (QMetaObject*) emalloc(sizeof(ob));
- 			memcpy(o->meta, &ob, sizeof(ob));
-
+ 			QMetaObject* m = (QMetaObject*) emalloc(sizeof(ob));
+ 			memcpy(m, &ob, sizeof(ob));
+			o->setMetaObject(m);
 		} else {
-			o->meta = superdata;
+			o->setMetaObject(superdata);
 		}
 
 	}
@@ -266,7 +267,6 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
     zend_class_entry *ce;
     // nonstaticphp_qt_generic_class_proxyMethod
     if(getThis()){
-    	activeScope = getThis();
 		// if a parent:: call occurs this_ptr has the wrong ce, so we need to
 		// correct it here
 		if(parentCall)
@@ -274,9 +274,9 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
 			ce = activeCe;
 			parentCall = false;
         } else {
+        	activeScope = getThis();
         	ce = Z_OBJCE_P(getThis());
         }
-
     // static
     } else {
 		ce = activeCe;
@@ -304,8 +304,8 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
 	    // is it a signal?
 	    if(getThis()){
 		smokephp_object* o = PHPQt::getSmokePHPObjectFromZval(getThis());
-		if(o->meta != NULL){
-		    QMetaObject* mo = (QMetaObject*) o->meta;
+		if(o->meta() != NULL){
+		    QMetaObject* mo = (QMetaObject*) o->meta();
 		    QByteArray signalname(methodNameStack.top()->constData());
 		    signalname.replace("$","");
 		    signalname.replace("#","");
@@ -315,10 +315,10 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
 		    // seems to be a signal
 		    int index = mo->indexOfSignal(signalname);
 		    if(index >= 0) {
-			QObject *qobj = (QObject*)o->smoke->cast(
-			    o->ptr,
-			    o->classId,
-			    o->smoke->idClass("QObject")
+			QObject *qobj = (QObject*)o->smoke()->cast(
+			    const_cast<void*>(o->ptr()),
+			    o->classId(),
+			    o->smoke()->idClass("QObject")
 			);
 			zval* result;
 			EmitSignal signal(qobj, index, argc, mocStack, args, result);
@@ -358,7 +358,6 @@ ZEND_METHOD(php_qt_generic_class, staticProxyMethod)
 			{
 				parentCall = true;
 				this_ptr = activeScope;
-//   				this_ptr->type = IS_OBJECT;
 			}
 		}
 	}

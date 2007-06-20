@@ -19,6 +19,7 @@
 
     $calc = new Calculator();
     $calc->show();
+
     $app->exec();
 
 ?>

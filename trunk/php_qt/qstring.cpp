@@ -605,10 +605,10 @@ ZEND_METHOD(QString, __construct){
 			}
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 				smokephp_object *o = getSmokePHPObjectFromZval(z_0);
-				if(o->ce_ptr == qstring_ce){
-				    QString *QString_ptr = new QString(*((QString*) o->ptr));
+				if(o->ce_ptr() == qstring_ce){
+				    QString *QString_ptr = new QString(*((QString*) o->ptr()));
 				}
-				createObject(getThis(), (void*) o->ptr, o->ce_ptr);
+				createObject(getThis(), o->ptr(), o->ce_ptr());
 				RETURN_NULL();
 			}
 		}
@@ -621,7 +621,7 @@ ZEND_METHOD(QString, __construct){
 			if(Z_TYPE_P(z_0) == IS_OBJECT && Z_TYPE_P(z_1) == IS_LONG){
 			    smokephp_object* o = getSmokePHPObjectFromZval(z_0);
 // TODO type checking
-    			    createObject(getThis(), o->ptr, o->ce_ptr);
+    			    createObject(getThis(), o->ptr(), o->ce_ptr());
 			    RETURN_NULL();
 			}
 			if(Z_TYPE_P(z_0) == IS_LONG && Z_TYPE_P(z_1) == IS_LONG){
@@ -1067,7 +1067,7 @@ ZEND_METHOD(QString, toAscii){
 	if (ZEND_NUM_ARGS() == 0){
 			QString *obj = (QString*) PHP_QT_FETCH();
 //			smokephp_object* o = PHP_QT_FETCH();
-//			QString *obj = (QString*) o->ptr;
+//			QString *obj = (QString*) o->ptr();
 			RETURN_STRING((char*) obj->toAscii().constData(), 1);
 	}
 }
@@ -2066,7 +2066,7 @@ ZEND_METHOD(QString, append){
 			if(Z_TYPE_P(z_0) == IS_OBJECT){
 			    smokephp_object* o = getSmokePHPObjectFromZval(getThis());
 			    QString* obj_z_0 = (QString*) getQtObjectFromZval(z_0);
-			    QString* s = new QString(((QString*) o->ptr)->append((QString) *obj_z_0));
+			    QString* s = new QString(((QString*) o->ptr())->append((QString) *obj_z_0));
 			    createObject(return_value, s, qstring_ce, QSTRING_CLASSID);
 			    return;
 			}

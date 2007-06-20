@@ -45,6 +45,7 @@ using namespace std;
 
 #include <QtCore/QString>
 #include <QtCore/QMetaObject>
+#include <QtCore/QDebug>
 
 // for older php versions
 #ifndef ZEND_MN
@@ -121,15 +122,43 @@ void check_qobject(zval* zobject);
 void init_codec();
 zval* zstringFromQString(QString * s);
 
-struct smokephp_object {
-    bool allocated;
-    Smoke *smoke;
-    int classId;
-    void *ptr;
-    zend_class_entry *ce_ptr;
-    zend_class_entry *parent_ce_ptr;
-    zval *zval_ptr;
-    QMetaObject* meta;
+class smokephp_object {
+public:
+	inline explicit smokephp_object(Smoke* smoke, int classId, const void* ptr, const zend_class_entry* ce, zval* zval_ptr)
+		: 	m_smoke(smoke),
+			m_classId(classId),
+			m_ptr(ptr),
+			m_ce_ptr(ce),
+			m_parent_ce_ptr(ce),
+			m_zval_ptr(zval_ptr),
+			m_allocated(true)
+	{
+	}
+
+	inline const bool allocated() { return m_allocated; }
+	inline Smoke* smoke() { return m_smoke; }
+	inline const int classId() { return m_classId; }
+	inline const void* ptr() { return m_ptr; }
+	inline void* mPtr() { return const_cast<void*>(m_ptr); } // can be modified
+	inline const zend_class_entry* ce_ptr() { return m_ce_ptr; }
+	inline const zend_class_entry* parent_ce_ptr() { return m_parent_ce_ptr; }
+	inline const zval* zval_ptr() { return m_zval_ptr; }
+	inline QMetaObject* meta() { return m_meta; }
+
+	inline void setAllocated( bool allocated ) { m_allocated = allocated; }
+	inline void setParentCePtr(zend_class_entry* parent_ce_ptr) { m_parent_ce_ptr = parent_ce_ptr; }
+	inline void setMetaObject(QMetaObject* meta) { m_meta = meta; }
+	inline void setPtr(void* ptr) { m_ptr = ptr; }
+
+private:
+    bool m_allocated;
+    Smoke *m_smoke;
+    int m_classId;
+    const void *m_ptr;
+    const zend_class_entry *m_ce_ptr;
+    const zend_class_entry *m_parent_ce_ptr;
+    zval *m_zval_ptr;
+    QMetaObject* m_meta;
 };
 
 const char* 		printType(int type);
