@@ -49,6 +49,20 @@
 	
     }
 
+    class myWidget extends QWidget
+    {
+	public function __construct()
+	{
+	    parent::__construct();
+	}
+	
+	public function sizeHint()
+	{
+	  echo ".";
+	    return parent::sizeHint();
+	}
+	
+    }
 
 
     class QtBasicTestCase extends PHPUnit_Framework_TestCase {
@@ -235,6 +249,23 @@
 	    $this->assertEquals($s->__toString(), "hello world", "tr() doesnt work!");
 	    echo " passed";
 	}
+
+      function testVirtualMethodCall()
+      {
+	echo "\ntesting virtual method call 'sizeHint()' in a loop: ";
+	$argc=1;
+	$argv=array("argv");
+	$app = new QApplication($argc, $argv);
+    
+	$m = new myWidget();
+    
+	for( $i = 0; $i < 10; $i++ )
+	  {
+	    $m->show();
+	    $m->hide();
+	  }
+	echo " passed";
+      }
 
     }    
     
