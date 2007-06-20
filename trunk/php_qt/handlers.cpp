@@ -303,7 +303,6 @@ static void marshall_QString(Marshall *m) {
 		case Marshall::ToZVAL:
 		{
 			QString* s = static_cast<QString*>(m->item().s_voidp);
-// 			zval* obj = m->var();
 			PHPQt::createObject(m->var(), (void*) s, qstring_ce, -1);
 		}
 		break;

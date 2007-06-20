@@ -280,10 +280,10 @@ MethodReturnValueBase::return_value_ptr()
  */
 
 VirtualMethodReturnValue::VirtualMethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* retval) :
-	MethodReturnValueBase(smoke,meth,stack,NULL)//, _retval(retval)
+	MethodReturnValueBase(smoke,meth,stack,NULL)
 {
 	identifier = "VirtualMethodReturnValue";
-// 	_retval = &_retval2;
+
 	_retval = retval;
 	Marshall::HandlerFn fn = getMarshallFn(type());
 	(*fn)(this);
@@ -407,7 +407,6 @@ VirtualMethodCall::VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Sta
 
 VirtualMethodCall::~VirtualMethodCall()
 {
-//      delete[] _stack;
 }
 
 Marshall::Action
@@ -477,7 +476,7 @@ MethodCall::MethodCall(Smoke *smoke, Smoke::Index method, zval* target, zval ***
     _items = _smoke->methods[_method].numArgs;
 
     _stack = new Smoke::StackItem[items + 1];
-// 	_retval = retval;
+
 }
 
 MethodCall::~MethodCall()
