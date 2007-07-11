@@ -65,7 +65,7 @@
         function __construct()
         {
             parent::__construct();
-check_qobject($this);
+
             $this->pendingAdditiveOperator = new QString();
             $this->pendingMultiplicativeOperator = new QString();
 
@@ -170,7 +170,7 @@ check_qobject($this);
                     return true;
                 }
             }
-	    return parent::eventFilter($target, $event);
+            return parent::eventFilter($target, $event);
         }
 
         function digitClicked()

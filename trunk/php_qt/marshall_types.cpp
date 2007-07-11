@@ -26,6 +26,8 @@
 #include "marshall_types.h"
 #include "phpqt_internals.h"
 
+extern zval* activeScope;
+
 void
 smokeStackToQtStack(Smoke::Stack stack, void ** o, int items, MocArgument* args)
 {
@@ -211,7 +213,6 @@ smokeStackFromQtStack(Smoke::Stack stack, void ** _o, int items, MocArgument* ar
 MethodReturnValueBase::MethodReturnValueBase(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval** return_value_ptr) :
 	_smoke(smoke), _method(meth), _stack(stack), _return_value_ptr(return_value_ptr)
 {
-	identifier = "MethodReturnValueBase";
 	_st.set(_smoke, method().ret);
 }
 
@@ -263,6 +264,14 @@ MethodReturnValueBase::var()
 	return _retval;
 }
 
+zval*
+MethodReturnValueBase::var(zval* zval_ptr)
+{
+	_retval = zval_ptr;
+	return _retval;
+}
+
+
 const char *
 MethodReturnValueBase::classname()
 {
@@ -282,8 +291,6 @@ MethodReturnValueBase::return_value_ptr()
 VirtualMethodReturnValue::VirtualMethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* retval) :
 	MethodReturnValueBase(smoke,meth,stack,NULL)
 {
-	identifier = "VirtualMethodReturnValue";
-
 	_retval = retval;
 	Marshall::HandlerFn fn = getMarshallFn(type());
 	(*fn)(this);
@@ -302,7 +309,6 @@ VirtualMethodReturnValue::action()
 MethodReturnValue::MethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, zval* retval, zval** return_value_ptr) :
 	MethodReturnValueBase(smoke,meth,stack,return_value_ptr)/*, _return_value_ptr(return_value_ptr)*/
 {
-	identifier = "MethodReturnValue";
 	_retval = retval;
 	Marshall::HandlerFn fn = getMarshallFn(type());
 	(*fn)(this);
@@ -402,7 +408,6 @@ VirtualMethodCall::VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Sta
 {
 	__sp = sp;
   	_args = _smoke->argumentList + method().args;
-  	 identifier = "VirtualMethodCall";
 }
 
 VirtualMethodCall::~VirtualMethodCall()
@@ -440,7 +445,7 @@ VirtualMethodCall::callMethod()
 	if (_called) return;
 	_called = true;
 
-	zval* retval = PHPQt::callPHPMethod(_obj, (char*) _smoke->methodNames[method().name], items(), __sp);
+	zval* retval = PHPQt::callPHPMethod(_obj, _smoke->methodNames[method().name], items(), __sp);
 	VirtualMethodReturnValue r(_smoke, _method, _stack, retval);
 }
 
@@ -457,8 +462,6 @@ VirtualMethodCall::cleanup()
 MethodCall::MethodCall(Smoke *smoke, Smoke::Index method, zval* target, zval ***sp, int items, zval *retval, zval** return_value_ptr) :
  	MethodCallBase(smoke,method,return_value_ptr), _target(target), _current_object(0), _sp(sp), _items(items), _retval(retval)
 {
-
-	identifier = "MethodCall";
     if(target != NULL)
     {
 		if (PHPQt::SmokePHPObjectExists(_target))
@@ -495,6 +498,12 @@ MethodCall::var()
 {
 	if (_cur < 0) return _retval;
 	return (zval*) *_sp[_cur];
+}
+
+zval*
+MethodCall::var(zval* zval_ptr)
+{
+	return var();
 }
 
 void
@@ -549,7 +558,6 @@ MethodCall::classname()
 
 SigSlotBase::SigSlotBase(zval*** sp) : _cur(-1), _called(false), _sp(sp)
 {
-	identifier = "SigSlotBase";
 	_stack = new Smoke::StackItem[_items -1];
 }
 
@@ -663,6 +671,7 @@ public:
 	}
 
 	zval** return_value_ptr(){};
+ 	zval* var(zval* zval_ptr) { return var(); }
 
 };
 
@@ -674,7 +683,6 @@ public:
 InvokeSlot::InvokeSlot(zval* obj, int slotname, zval*** args, void ** o) : SigSlotBase(args),
     _obj(obj), _slotname(slotname), _o(o)
 {
-	identifier = "InvokeSlot";
 	_sp = (zval ***) safe_emalloc(sizeof(zval), _items - 1, 0);
 	_sp = args;
 	copyArguments();
@@ -733,7 +741,6 @@ InvokeSlot::mainfunction()
 EmitSignal::EmitSignal(QObject *obj, int id, int items, MocArgument *mocStack, zval ***sp, zval * result) :
     _obj(obj), _id(id)
 {
-	identifier = "EmitSignal";
 	_items = items + 1;
 	_args = mocStack;
 	_id = id;

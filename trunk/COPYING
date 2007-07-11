@@ -6,7 +6,7 @@ In the case that the linked Qt library is Qt Open Source Edition, PHP-Qt is lice
 
 You may write commercial, proprietary, or otherwise non-free software only if you have purchased a commercial edition of Qt.
 Purchase of a commercial edition of Qt, however, does not entitle you to support (technical or otherwise) for PHP-Qt of any kind.
-Additionally the following coditions apply to PHP-Qt when linked against Qt Commercial Edition:
+Additionally the following conditions apply to PHP-Qt when linked against Qt Commercial Edition:
 
 1. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
 FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN

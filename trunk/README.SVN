@@ -1,0 +1,5 @@
+- make sure you have dbus support in Qt, set QTDIR and put qmake into your path
+- run ./prepare_svn.sh to fetch smoke, kalyptus and cmake modules
+- create a build dir and run cmake, make and make install
+- define qt.codec=Latin1 and extension=php_qt.so in your php.ini file
+

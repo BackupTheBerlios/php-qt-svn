@@ -50,6 +50,7 @@ public:
 	bool cleanup();
 	void unsupported();
 	zval* var();
+	zval* var(zval* zval_ptr);
 	zval** return_value_ptr();
 
 protected:
@@ -135,6 +136,7 @@ public:
 	int items();
 	void callMethod();
 	bool cleanup();
+	bool doAlloc() { return true; }
 
 	bool makeObject;
 
@@ -154,6 +156,7 @@ public:
 	~MethodCall();
 	Marshall::Action action();
 	zval* var();
+	zval* var(zval* zval_ptr);
 	void callMethod();
 	int items();
 	bool cleanup();
@@ -213,6 +216,7 @@ class EmitSignal : public Marshall {
 	void next();
 	SmokeType type();
 	zval* var();
+	zval* var(zval* zval_ptr) { return var(); }
 	void unsupported();
 	Smoke* smoke();
 	const MocArgument &arg();

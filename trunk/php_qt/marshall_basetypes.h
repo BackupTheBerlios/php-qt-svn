@@ -51,6 +51,10 @@ static void marshall_from_php(Marshall *m)
 template <class T>
 static void marshall_to_php(Marshall *m)
 {
+	if(m->doAlloc()){
+		zval* z = (zval*) emalloc(sizeof(zval*));
+		m->var(z);
+	}
 	*(m->var()) = *primitive_to_php<T>( *smoke_ptr<T>(m) , m->var());
 }
 
@@ -157,10 +161,7 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 			smokephp_object* o = PHPQt::createOriginal(m->var(), p);
 			// overwrite the old one:
 			*(m->return_value_ptr()) = const_cast<zval*>(o->zval_ptr());
-
-			if(!strcmp(m->identifier, "VirtualMethodCall")){
-				((VirtualMethodCall*)m)->var(*m->return_value_ptr());
-			}
+			m->var(*m->return_value_ptr());
 		}
 		return;
 
@@ -175,26 +176,24 @@ static void marshall_to_php<SmokeClassWrapper>(Marshall *m)
 	    if (Z_TYPE_P(m->var()) == IS_OBJECT)
 	    {
 	    	_ce = Z_OBJCE_P(m->var());
-		// object has to be casted
-	    } else if(!strcmp(__className, "QObject")) { // classname == QObject
-			// cast the Qt object: from, to
+		//! object has to be casted
+	    } else if(!strcmp(__className, "QObject")) {
+			//! cast the Qt object: from, to
 			__p = m->smoke()->cast(__p, m->smoke()->idClass("QObject"), m->type().classId());
-			// cast the php one
+			//! cast the php one
 			_ce = zend_fetch_class((char*) __qo->metaObject()->className(), strlen(__qo->metaObject()->className()), ZEND_FETCH_CLASS_AUTO TSRMLS_DC);
 
-	    // fallback, already with correct type
+	    //! fallback, already with correct type
 	    } else {
 			_ce = zend_fetch_class(__className, __strLenClassName, ZEND_FETCH_CLASS_AUTO TSRMLS_DC);
 	    }
-		smokephp_object *o;
-		if(!strcmp(m->identifier, "VirtualMethodCall")){
-			zval* z = (zval*) emalloc(sizeof(zval));
-// 			zval* z = (zval*) alloca(sizeof(zval));
-			((VirtualMethodCall*) m)->var(z);
-			o = PHPQt::createObject(m->var(), __p, _ce, m->type().classId());
-			m->var()->refcount--;
-		} else
-		/*smokephp_object **/o = PHPQt::createObject(m->var(), __p, _ce, m->type().classId());
+
+		if(m->doAlloc())
+		{
+ 			zval* z = (zval*) emalloc(sizeof(zval));
+			m->var(z);
+		}
+		smokephp_object *o = PHPQt::createObject(m->var(), __p, _ce, m->type().classId());
 
 //	    if(m->type().isConst() && m->type().isRef()) {
 	    if(m->type().isRef())

@@ -21,8 +21,10 @@ public:
     virtual Action action() = 0;
     virtual Smoke::StackItem &item() = 0;
     virtual zval* var() = 0;
+	virtual zval* var(zval* zval_ptr) = 0;
     virtual void unsupported() = 0;
     virtual Smoke *smoke() = 0;
+    virtual bool doAlloc() { return false; }
     /**
      * For return-values, next() does nothing.
      * For FromRV, next() calls the method and returns.
@@ -48,14 +50,12 @@ public:
 	 */
 	virtual zval** return_value_ptr() = 0;
 
-	const char* identifier;
-
 };
 
 class SmokeEnumWrapper {
 public:
 	Marshall *m;
-};	
+};
 
 class SmokeClassWrapper {
 public:

@@ -131,7 +131,8 @@ public:
 			m_ce_ptr(ce),
 			m_parent_ce_ptr(ce),
 			m_zval_ptr(zval_ptr),
-			m_allocated(true)
+			m_allocated(true),
+			m_meta(0)
 	{
 	}
 

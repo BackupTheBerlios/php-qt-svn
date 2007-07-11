@@ -150,6 +150,9 @@ static zend_function_entry php_qt_generic_methods[] = {
 };
 
 ZEND_METHOD(php_qt_generic_class, emit){
+  smokephp_object* o = PHPQt::getSmokePHPObjectFromZval(const_cast<const zval*>(getThis()));
+  qDebug() << o->meta();
+
 }
 
 ZEND_METHOD(php_qt_generic_class, __toString)
@@ -160,11 +163,8 @@ ZEND_METHOD(php_qt_generic_class, __toString)
 ZEND_METHOD(php_qt_generic_class, __destruct)
 {
 	if(PHPQt::SmokePHPObjectExists(getThis())) {
-qDebug() << "destruct" << getThis();
-
  		smokephp_object *o = PHPQt::getSmokePHPObjectFromZval(getThis());
-
-//		its not a reference
+		//! its not a reference
 		if(!PZVAL_IS_REF(getThis()))
 		{
 			o->setAllocated(false);
@@ -188,6 +188,7 @@ ZEND_METHOD(php_qt_generic_class, __construct)
 // 	    ce_parent = ce->parent;
 	    ce = ce->parent; // orig
     }
+
     activeCe = ce;
 
     // get arguments
@@ -276,6 +277,7 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
         } else {
         	activeScope = getThis();
         	ce = Z_OBJCE_P(getThis());
+        	activeCe = ce;
         }
     // static
     } else {
@@ -305,7 +307,7 @@ ZEND_METHOD(php_qt_generic_class, proxyMethod)
 	    if(getThis()){
 		smokephp_object* o = PHPQt::getSmokePHPObjectFromZval(getThis());
 		if(o->meta() != NULL){
-		    QMetaObject* mo = (QMetaObject*) o->meta();
+		    QMetaObject* mo = static_cast<QMetaObject*>(o->meta());
 		    QByteArray signalname(methodNameStack.top()->constData());
 		    signalname.replace("$","");
 		    signalname.replace("#","");

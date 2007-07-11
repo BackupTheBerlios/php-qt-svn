@@ -51,7 +51,6 @@ public:
     PHPQtSmokeBinding(Smoke *s) : SmokeBinding(s) {}
 
     virtual void deleted(Smoke::Index classId, void* ptr) {
-qDebug("deleted");
         if(PHPQt::SmokePHPObjectExists(ptr)){
 			smokephp_object *o = (smokephp_object*) PHPQt::getSmokePHPObjectFromQt(ptr);
 			if(!o->allocated()){
@@ -87,11 +86,10 @@ qDebug("deleted");
 
 		if(PHPQt::methodExists(o->ce_ptr(), (char*) methodName)){
 			activeScope = const_cast<zval*>(o->zval_ptr());
-			activeCe = Z_OBJCE_P(activeScope);
-
+			activeCe = const_cast<zend_class_entry*>(o->ce_ptr());
 			zval* zmem = ALLOCA_N(zval, smoke->methods[method].numArgs);
-// 			zval* zmem = (zval*) safe_emalloc(sizeof(zval), smoke->methods[method].numArgs,0);
-		    VirtualMethodCall c(smoke, method, args, activeScope, &zmem, &activeScope);
+			zval* tmp = (zval*) emalloc(sizeof(zval));
+ 		    VirtualMethodCall c(smoke, method, args, activeScope, &zmem, &tmp);
 			c.next();
  			return true;
 		}
@@ -131,7 +129,7 @@ smokephp_init() {
 	php_error(E_ERROR,"could not initialize smoke (no class definitions)");
     }
 
-    PQ::smoke()->binding = new PHPQtSmokeBinding(PQ::smoke());
+	PQ::smoke()->binding = new PHPQtSmokeBinding(PQ::smoke());
 
 }
 

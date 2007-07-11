@@ -140,6 +140,7 @@ PHP_FUNCTION(qobject_cast){
 	// see marshall_basetypes.h, marshall_to_php<SmokeClassWrapper>
  	zval_ptr_dtor(return_value_ptr);
  	*(return_value_ptr) = obj;
+    zval_add_ref(return_value_ptr);
     return;
 
 }

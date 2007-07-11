@@ -48,7 +48,7 @@ PHPQt::metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _
 	int offset = d->methodCount();
 
 #if MOC_DEBUG
-	cout << "qt_metacall " << so->ce_ptr->name << endl;
+	qDebug() << "qt_metacall " << so->ce_ptr()->name << endl;
 #endif
 
 	// call the C++ one
@@ -58,7 +58,7 @@ PHPQt::metacall(smokephp_object* so, Smoke::StackItem* args, QMetaObject::Call _
 
 		// methodId
 		Smoke::Index nameId = so->smoke()->idMethodName("qt_metacall$$?");
-		Smoke::Index method = so->smoke()->findMethod(so->classId(), nameId);
+ 		Smoke::Index method = so->smoke()->findMethod(so->classId(), nameId);
 
 		if(method > 0){
 			Smoke::Method &m = so->smoke()->methods[so->smoke()->methodMaps[method].method];
@@ -176,7 +176,7 @@ PHPQt::methodExists(const zend_class_entry* ce_ptr, const char* methodname)
 
 
 zval*
-PHPQt::callPHPMethod(const zval* this_ptr, char* methodName, zend_uint param_count, zval** args)
+PHPQt::callPHPMethod(const zval* this_ptr, const char* methodName, zend_uint param_count, zval** args)
 {
 
 	if(this_ptr == NULL){
@@ -185,7 +185,7 @@ PHPQt::callPHPMethod(const zval* this_ptr, char* methodName, zend_uint param_cou
 
     zval *function_name;
     MAKE_STD_ZVAL(function_name);
-    ZVAL_STRING(function_name,methodName,1);
+    ZVAL_STRING(function_name,const_cast<char*>(methodName),1);
 
     zval* retval;
     MAKE_STD_ZVAL(retval);
@@ -425,15 +425,8 @@ smokephp_object*
 PHPQt::createOriginal(zval* zval_ptr, void* ptr)
 {
 	smokephp_object* o = getSmokePHPObjectFromQt(ptr);
-/* 		ZVAL_ZVAL(zval_ptr, o->zval_ptr, 1, 0);
-// 		zval_ptr->is_ref = 1;
-		Z_OBJ_HT_P(zval_ptr) = &php_qt_handler;
-		zval_x_smokephp.insert(zval_ptr, o);*/
-	Z_OBJ_HT_P(zval_ptr) = &php_qt_handler;
  	zval_ptr = const_cast<zval*>(o->zval_ptr());
-
 	zval_add_ref(&zval_ptr);
-
 	return o;
 }
 

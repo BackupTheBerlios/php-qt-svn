@@ -25,12 +25,8 @@ set(phpqt_LIB_SRCS
     )
 
 add_library(php_qt SHARED ${phpqt_LIB_SRCS})
+
 target_link_libraries(php_qt ${QT_QTCORE_LIBRARY} QtSvg QtGui QtNetwork QtSql QtOpenGL QtXml QtUiTools ${QTDBUS_LIBRARY} ${QSCINTILLA_LIBRARIES} ${QWT_LIBRARIES} smokeqt)
 set_target_properties(php_qt PROPERTIES PREFIX "")
+
 install(TARGETS php_qt DESTINATION ${PHP5_EXTENSION_DIR}/ )
-
-add_library(iquip SHARED ${phpqt_LIB_SRCS})
-target_link_libraries(iquip ${QT_QTCORE_LIBRARY} QtSvg QtGui QtNetwork QtSql QtOpenGL QtXml QtUiTools ${QTDBUS_LIBRARY} ${QSCINTILLA_LIBRARIES} ${QWT_LIBRARIES} smokewebqt)
-set_target_properties(iquip PROPERTIES PREFIX "")
-install(TARGETS iquip DESTINATION ${PHP5_EXTENSION_DIR}/ )
-

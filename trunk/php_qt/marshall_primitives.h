@@ -97,8 +97,8 @@ static int php_to_primitive<int>(zval* v)
 template <>
 static zval* primitive_to_php<int>(int sv, zval* return_value)
 {
-        RETVAL_LONG(sv);
-	return return_value;
+    RETVAL_LONG(sv);
+  	return return_value;
 }
 
 template <>

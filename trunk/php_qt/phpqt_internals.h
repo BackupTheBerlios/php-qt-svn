@@ -32,7 +32,7 @@ namespace PHPQt {
 
 void 				destroyHashtable(zend_rsrc_list_entry *rsrc);
 
-zval* 				callPHPMethod(const zval* zend_ptr, char* methodname, zend_uint param_count, zval** params);
+zval* 				callPHPMethod(const zval* zend_ptr, const char* methodname, zend_uint param_count, zval** params);
 bool 				methodExists(const zend_class_entry* ce_ptr, const char* methodname);
 bool 				getMocData(zval* this_ptr, char* classname, const QMetaObject* superdata, QMetaObject* metachar, QString* meta_stringdata, uint* signature);
 int					metacall(smokephp_object* this_ptr, Smoke::StackItem* args, QMetaObject::Call _c, int _id, void **_a);
