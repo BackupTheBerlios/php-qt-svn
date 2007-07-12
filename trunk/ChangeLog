@@ -1,4 +1,15 @@
+2007-007-12  Katrina Niolet <katrina@niolet.name>
 
+	        * Updated installation instructions to include step by step proccess for building outside of the source tree
+	
+2007-007-12  Thomas Moenicke <thomas.moenicke@kdemail.net>
+
+                * virtual method calls improved (memory issues)
+		* internally re-organized
+		* references improved
+
+2007-005-20  Thomas Moenicke <thomas.moenicke@kdemail.net>
+	
 		* mapping of zend object instead of zval
 
 2007-003-22  Thomas Moenicke <thomas.moenicke@kdemail.net>
